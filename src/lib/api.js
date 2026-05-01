@@ -49,25 +49,8 @@ export const api = {
       totalOrders: data.total_orders || 0,
       activeProducts: data.active_products || 0,
       lowStock: data.low_stock_products || 0,
-      recentSales: data.recent_orders.map(o => ({
-        id: o.tracking_id,
-        date: new Date(o.created_at).toLocaleDateString(),
-        amount: o.total_amount
-      })),
-      chartData: [
-        { name: 'Mon', value: 4000 },
-        { name: 'Tue', value: 3000 },
-        { name: 'Wed', value: 2000 },
-        { name: 'Thu', value: 2780 },
-        { name: 'Fri', value: 1890 },
-        { name: 'Mon', sales: 4000 },
-        { name: 'Tue', sales: 3000 },
-        { name: 'Wed', sales: 2000 },
-        { name: 'Thu', sales: 2780 },
-        { name: 'Fri', sales: 1890 },
-        { name: 'Sat', sales: 2390 },
-        { name: 'Sun', sales: 3490 },
-      ]
+      recentOrders: data.recent_orders || [],
+      chartData: data.chart_data || []
     };
   },
 

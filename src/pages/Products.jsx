@@ -14,18 +14,29 @@ import {
   Eye
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { toast } from 'sonner';
 
 const Products = () => {
   const { selectedStore } = useStore();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
+  const siteId = selectedStore === 'acharu' ? 1 : 2;
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, [selectedStore]);
+
+  const fetchCategories = async () => {
+    const data = await api.getCategories(siteId);
+    setCategories(data);
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -34,10 +45,16 @@ const Products = () => {
     setLoading(false);
   };
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                        p.id.toString().includes(searchQuery);
+    
+    const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-8">
@@ -73,9 +90,17 @@ const Products = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          <button className="p-4 bg-white border border-slate-200 rounded-2xl text-slate-500 hover:text-maroon transition-all">
-            <Filter size={20} />
-          </button>
+          <div className="relative">
+            <select 
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="appearance-none p-4 pl-6 pr-12 bg-white border border-slate-200 rounded-2xl text-slate-700 font-bold outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all cursor-pointer"
+            >
+              <option value="All">All Categories</option>
+              {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+            </select>
+            <Filter size={18} className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          </div>
           <div className="text-sm font-bold text-slate-400 px-4">
             Total: <span className="text-slate-800">{filteredProducts.length}</span>
           </div>
@@ -151,6 +176,152 @@ const Products = () => {
             </div>
           )}
         </div>
+      </div>
+      {/* Modal */}
+      {isModalOpen && (
+        <ProductModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+          editingProduct={editingProduct}
+          onSuccess={fetchProducts}
+          siteId={selectedStore === 'acharu' ? 1 : 2}
+        />
+      )}
+    </div>
+  );
+};
+
+const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) => {
+  const [formData, setFormData] = useState(editingProduct || {
+    name: '',
+    category_id: '',
+    price: '',
+    weight: '',
+    stock: '',
+    description: ''
+  });
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCats = async () => {
+      const data = await api.getCategories(siteId);
+      setCategories(data);
+    };
+    fetchCats();
+  }, [siteId]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (editingProduct) {
+        await api.updateProduct(editingProduct.id, formData);
+        toast.success('Product updated');
+      } else {
+        await api.storeProduct({ ...formData, site_id: siteId });
+        toast.success('Product created');
+      }
+      onSuccess();
+      onClose();
+    } catch (error) {
+      toast.error('Error saving product');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
+      <div className="bg-white rounded-[40px] p-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+        <h2 className="text-3xl font-display font-black mb-8">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Product Name</label>
+              <input 
+                type="text" 
+                required
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Category</label>
+              <select 
+                required
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold appearance-none"
+                value={formData.category_id}
+                onChange={(e) => setFormData({...formData, category_id: e.target.value})}
+              >
+                <option value="">Select Category</option>
+                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Price (৳)</label>
+              <input 
+                type="number" 
+                required
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                value={formData.price}
+                onChange={(e) => setFormData({...formData, price: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Weight (kg)</label>
+              <input 
+                type="number" 
+                step="0.01"
+                required
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                value={formData.weight}
+                onChange={(e) => setFormData({...formData, weight: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Stock</label>
+              <input 
+                type="number" 
+                required
+                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                value={formData.stock}
+                onChange={(e) => setFormData({...formData, stock: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Description</label>
+            <textarea 
+              rows={4}
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-medium"
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4">
+            <button 
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              disabled={loading}
+              className="flex-1 py-4 bg-maroon text-white font-bold rounded-2xl shadow-xl shadow-maroon/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+            >
+              {loading ? 'Saving...' : editingProduct ? 'Update Product' : 'Create Product'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
