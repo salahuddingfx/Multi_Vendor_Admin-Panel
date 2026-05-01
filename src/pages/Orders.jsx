@@ -71,11 +71,13 @@ const Orders = () => {
   const [activeOrder, setActiveOrder] = useState(null);
   const printRef = useRef();
 
+  const siteId = selectedStore === 'acharu' ? 1 : 2;
+
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const data = await api.getOrders(selectedStore);
+        const data = await api.getOrders(siteId);
         setOrders(data.data || []);
       } catch (err) {
         console.error(err);
