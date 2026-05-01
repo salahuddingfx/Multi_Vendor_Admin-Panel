@@ -26,7 +26,6 @@ import {
   Cell
 } from 'recharts';
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
 import { clsx } from 'clsx';
 
 const Dashboard = () => {
@@ -115,7 +114,7 @@ const Dashboard = () => {
         <div className="hidden md:flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-soft border border-black/[0.02]">
           <Clock size={18} className="text-slate-400" />
           <span className="text-sm font-black uppercase tracking-widest text-slate-500">
-            {format(new Date(), 'EEEE, dd MMMM')}
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
           </span>
         </div>
       </div>
@@ -198,7 +197,7 @@ const Dashboard = () => {
                   stroke={selectedStore === 'acharu' ? '#800000' : '#475569'} 
                   strokeWidth={4}
                   fillOpacity={1} 
-                  fill="url(#colorSales)" 
+                  fill={`url(#colorSales)`} 
                 />
               </AreaChart>
             </ResponsiveContainer>
