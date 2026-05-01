@@ -99,7 +99,7 @@ const Orders = () => {
   });
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    contentRef: printRef,
   });
 
   const handleStatusChange = async (orderId, newStatus) => {
@@ -308,15 +308,26 @@ const Orders = () => {
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button 
-                        onClick={() => { setActiveOrder(order); setTimeout(handlePrint, 100); }}
+                        onClick={() => { 
+                          setActiveOrder(order); 
+                          setTimeout(() => {
+                            handlePrint();
+                          }, 150);
+                        }}
                         className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
-                        title="Print Invoice"
+                        title="Instant Print (Frontend)"
                       >
                         <Printer size={18} />
                       </button>
-                      <button className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm">
-                        <ChevronRight size={18} />
-                      </button>
+                      <a 
+                        href={`http://127.0.0.1:8000/orders/${order.id}/invoice`} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="p-3 text-slate-400 hover:text-maroon hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
+                        title="Backend Invoice (HTML)"
+                      >
+                        <ExternalLink size={18} />
+                      </a>
                     </div>
                   </td>
                 </tr>
