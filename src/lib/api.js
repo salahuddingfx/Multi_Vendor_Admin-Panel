@@ -18,6 +18,19 @@ adminClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Add a response interceptor to handle 401 errors
+adminClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && !window.location.pathname.includes('/login')) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin-app-state');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const api = {
   // Login
   login: async (credentials) => {
@@ -47,43 +60,40 @@ export const api = {
         { name: 'Wed', value: 2000 },
         { name: 'Thu', value: 2780 },
         { name: 'Fri', value: 1890 },
-        { name: 'Sat', value: 2390 },
-        { name: 'Sun', value: 3490 },
+        { name: 'Mon', sales: 4000 },
+        { name: 'Tue', sales: 3000 },
+        { name: 'Wed', sales: 2000 },
+        { name: 'Thu', sales: 2780 },
+        { name: 'Fri', sales: 1890 },
+        { name: 'Sat', sales: 2390 },
+        { name: 'Sun', sales: 3490 },
       ]
     };
   },
 
-  // Products CRUD
-  getProducts: async (storeId) => {
-    const siteId = storeId === 'acharu' ? 1 : 2;
+  // Products
+  getProducts: async (siteId) => {
     const response = await adminClient.get('/products', { params: { site_id: siteId } });
-    const products = response.data.data.data;
-    
-    return products.map(p => ({
-      ...p,
-      category: p.category?.name || 'Uncategorized',
-      image: p.images && p.images.length > 0 ? p.images[0].image_path : null
-    }));
+    return response.data.data;
   },
-  
+
   storeProduct: async (productData) => {
     const response = await adminClient.post('/products', productData);
     return response.data.data;
   },
 
-  updateProduct: async (productId, productData) => {
-    const response = await adminClient.put(`/products/${productId}`, productData);
+  updateProduct: async (id, productData) => {
+    const response = await adminClient.put(`/products/${id}`, productData);
     return response.data.data;
   },
 
-  deleteProduct: async (productId) => {
-    const response = await adminClient.delete(`/products/${productId}`);
+  deleteProduct: async (id) => {
+    const response = await adminClient.delete(`/products/${id}`);
     return response.data.data;
   },
 
-  // Categories CRUD
-  getCategories: async (storeId) => {
-    const siteId = storeId === 'acharu' ? 1 : 2;
+  // Categories
+  getCategories: async (siteId) => {
     const response = await adminClient.get('/categories', { params: { site_id: siteId } });
     return response.data.data;
   },
@@ -93,19 +103,18 @@ export const api = {
     return response.data.data;
   },
 
-  updateCategory: async (categoryId, categoryData) => {
-    const response = await adminClient.put(`/categories/${categoryId}`, categoryData);
+  updateCategory: async (id, categoryData) => {
+    const response = await adminClient.put(`/categories/${id}`, categoryData);
     return response.data.data;
   },
 
-  deleteCategory: async (categoryId) => {
-    const response = await adminClient.delete(`/categories/${categoryId}`);
+  deleteCategory: async (id) => {
+    const response = await adminClient.delete(`/categories/${id}`);
     return response.data.data;
   },
 
   // Orders
-  getOrders: async (storeId) => {
-    const siteId = storeId === 'acharu' ? 1 : 2;
+  getOrders: async (siteId) => {
     const response = await adminClient.get('/orders', { params: { site_id: siteId } });
     return response.data.data;
   },

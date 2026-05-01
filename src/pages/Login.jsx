@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { login as apiLogin } from '../api/api';
+import { api as apiLogin } from '../lib/api';
 import { Lock, Mail, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -17,9 +17,9 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await apiLogin({ email, password });
-      localStorage.setItem('admin_token', response.token);
-      login(response.user);
+      const response = await apiLogin.login({ email, password });
+      localStorage.setItem('admin_token', response.data.token);
+      login(response.data.user);
       toast.success('Welcome back, ' + response.user.name + '!');
       navigate('/');
     } catch (error) {
