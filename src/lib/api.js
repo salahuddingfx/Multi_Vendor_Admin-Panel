@@ -74,7 +74,13 @@ export const api = {
   // Products
   getProducts: async (siteId) => {
     const response = await adminClient.get('/products', { params: { site_id: siteId } });
-    return response.data.data;
+    const products = response.data.data.data; // Access data inside pagination
+    
+    return products.map(p => ({
+      ...p,
+      category: p.category?.name || 'Uncategorized',
+      image: p.images && p.images.length > 0 ? p.images[0].image_path : 'https://images.unsplash.com/photo-1514516348920-f319999a5e8f?q=80&w=200&auto=format&fit=crop'
+    }));
   },
 
   storeProduct: async (productData) => {
