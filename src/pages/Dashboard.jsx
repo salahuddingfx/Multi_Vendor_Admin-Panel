@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import api from '../lib/api';
+import { api } from '../lib/api';
 import { 
   TrendingUp, 
   ShoppingBag, 
