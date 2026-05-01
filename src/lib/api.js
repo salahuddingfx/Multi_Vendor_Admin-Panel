@@ -203,5 +203,16 @@ export const api = {
   deletePage: async (id) => {
     const response = await adminClient.delete(`/pages/${id}`);
     return response.data.data;
+  },
+
+  // Contact Messages
+  getMessages: async (siteId) => {
+    const response = await adminClient.get('/messages', { params: { site_id: siteId } });
+    return response.data.data; // this is the paginator object
+  },
+
+  markMessageRead: async (id) => {
+    const response = await adminClient.put(`/messages/${id}/read`);
+    return response.data.data;
   }
 };
