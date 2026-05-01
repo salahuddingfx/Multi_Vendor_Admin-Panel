@@ -23,7 +23,7 @@ const Reviews = () => {
   const [replyText, setReplyText] = useState({});
   const [submittingReply, setSubmittingReply] = useState({});
 
-  const currentStore = stores.find(s => s.id === selectedStore);
+  const currentStore = (stores || []).find(s => s.id === selectedStore);
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
   useEffect(() => {
