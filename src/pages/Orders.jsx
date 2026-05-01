@@ -253,9 +253,13 @@ const Orders = () => {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col max-w-[200px]">
                       <span className="font-bold text-slate-800 text-sm">{order.customer_name}</span>
-                      <span className="text-slate-400 text-xs mt-0.5">{order.customer_phone}</span>
+                      <span className="text-slate-400 text-[10px] mt-0.5">{order.customer_phone}</span>
+                      <span className="text-[10px] text-slate-500 mt-1 line-clamp-2" title={order.customer_address}>
+                        {order.customer_address}
+                      </span>
+                      <span className="text-[9px] font-black uppercase text-slate-300 mt-1">{order.location}</span>
                     </div>
                   </td>
                   <td className="px-8 py-6">
