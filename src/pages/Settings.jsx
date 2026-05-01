@@ -71,6 +71,13 @@ const Settings = () => {
     delivery_outside: '120',
     delivery_per_kg: '10',
     bkash_number: '',
+    free_delivery_threshold: '2500',
+    social_links: {
+      facebook: '',
+      instagram: '',
+      tiktok: '',
+      youtube: ''
+    },
     about: defaultAbout,
     home: defaultHome,
   });
@@ -97,6 +104,13 @@ const Settings = () => {
           delivery_outside: data.delivery_outside || '120',
           delivery_per_kg: data.delivery_per_kg || '10',
           bkash_number: data.bkash_number || '',
+          free_delivery_threshold: data.free_delivery_threshold || '2500',
+          social_links: data.social_links ? (typeof data.social_links === 'string' ? JSON.parse(data.social_links) : data.social_links) : {
+            facebook: '',
+            instagram: '',
+            tiktok: '',
+            youtube: ''
+          },
           about: data.about ? (typeof data.about === 'string' ? JSON.parse(data.about) : data.about) : defaultAbout,
           home: data.home ? (typeof data.home === 'string' ? JSON.parse(data.home) : data.home) : defaultHome,
         });
@@ -166,6 +180,7 @@ const Settings = () => {
     { id: 'general', label: 'General', icon: Globe },
     { id: 'home', label: 'Home Page', icon: Layout },
     { id: 'about', label: 'About Page', icon: Users },
+    { id: 'social', label: 'Social Media', icon: Plus },
     { id: 'notifications', label: 'Alerts', icon: Bell },
   ];
 
@@ -232,6 +247,7 @@ const Settings = () => {
                   ['Delivery Charge (Inside City)', 'delivery_inside', 'text'],
                   ['Delivery Charge (Outside City)', 'delivery_outside', 'text'],
                   ['Per KG Extra Charge', 'delivery_per_kg', 'text'],
+                  ['Free Delivery Threshold (৳)', 'free_delivery_threshold', 'number'],
                   ['bKash Number', 'bkash_number', 'text'],
                 ].map(([label, key, type]) => (
                   <div key={key} className="space-y-2">
@@ -611,8 +627,44 @@ const Settings = () => {
             </div>
           )}
 
+          {/* ── SOCIAL MEDIA TAB ── */}
+          {activeTab === 'social' && (
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div>
+                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
+                  📱 Social Media Links
+                </h3>
+                <p className="text-slate-500 text-sm mb-8">Leave blank to hide the icon from your store footer.</p>
+                
+                <div className="space-y-6 max-w-2xl">
+                  {[
+                    ['Facebook Page URL', 'facebook'],
+                    ['Instagram Profile URL', 'instagram'],
+                    ['TikTok Profile URL', 'tiktok'],
+                    ['YouTube Channel URL', 'youtube'],
+                  ].map(([label, key]) => (
+                    <div key={key} className="space-y-2">
+                      <label className={labelCls}>{label}</label>
+                      <input
+                        type="url"
+                        value={settings.social_links[key]}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          social_links: { ...settings.social_links, [key]: e.target.value }
+                        })}
+                        className={inputCls}
+                        placeholder={`https://${key}.com/yourprofile`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <SaveButton />
+            </div>
+          )}
+
           {/* Placeholder tabs */}
-          {!['general', 'about', 'home'].includes(activeTab) && (
+          {!['general', 'about', 'home', 'social'].includes(activeTab) && (
             <div className="py-20 text-center space-y-4">
               <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
                 <Layout className="text-slate-200" size={32} />
