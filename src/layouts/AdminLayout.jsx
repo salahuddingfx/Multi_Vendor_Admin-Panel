@@ -12,7 +12,9 @@ import {
   ChevronDown,
   Globe,
   Bell,
-  LogOut
+  LogOut,
+  Mail,
+  Users
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Toaster, toast } from 'sonner';
@@ -26,7 +28,10 @@ const AdminLayout = () => {
     { name: 'Products', href: '/products', icon: Package },
     { name: 'Orders', href: '/orders', icon: ShoppingBag },
     { name: 'Inventory', href: '/inventory', icon: Warehouse },
+    { name: 'Categories', href: '/categories', icon: Globe },
     { name: 'Pages', href: '/pages', icon: FileText },
+    { name: 'Messages', href: '/messages', icon: Mail },
+    { name: 'Users', href: '/users', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

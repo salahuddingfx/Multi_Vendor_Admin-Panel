@@ -65,6 +65,43 @@ export const api = {
       image: p.images && p.images.length > 0 ? p.images[0].image_path : null
     }));
   },
+  
+  storeProduct: async (productData) => {
+    const response = await adminClient.post('/products', productData);
+    return response.data.data;
+  },
+
+  updateProduct: async (productId, productData) => {
+    const response = await adminClient.put(`/products/${productId}`, productData);
+    return response.data.data;
+  },
+
+  deleteProduct: async (productId) => {
+    const response = await adminClient.delete(`/products/${productId}`);
+    return response.data.data;
+  },
+
+  // Categories CRUD
+  getCategories: async (storeId) => {
+    const siteId = storeId === 'acharu' ? 1 : 2;
+    const response = await adminClient.get('/categories', { params: { site_id: siteId } });
+    return response.data.data;
+  },
+
+  storeCategory: async (categoryData) => {
+    const response = await adminClient.post('/categories', categoryData);
+    return response.data.data;
+  },
+
+  updateCategory: async (categoryId, categoryData) => {
+    const response = await adminClient.put(`/categories/${categoryId}`, categoryData);
+    return response.data.data;
+  },
+
+  deleteCategory: async (categoryId) => {
+    const response = await adminClient.delete(`/categories/${categoryId}`);
+    return response.data.data;
+  },
 
   // Orders
   getOrders: async (storeId) => {
