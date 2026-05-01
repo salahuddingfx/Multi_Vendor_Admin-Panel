@@ -105,8 +105,12 @@ const Categories = () => {
             <div key={cat.id} className="bg-white p-6 rounded-[32px] shadow-premium border border-black/[0.01] group relative">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${cat.is_featured ? 'bg-maroon text-white shadow-lg shadow-maroon/20' : 'bg-slate-50 text-slate-400'}`}>
-                    <Tag size={24} />
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all overflow-hidden ${cat.is_featured ? 'bg-maroon text-white shadow-lg shadow-maroon/20' : 'bg-slate-50 text-slate-400'}`}>
+                    {cat.image_path ? (
+                      <img src={cat.image_path} className="w-full h-full object-cover" />
+                    ) : (
+                      <Tag size={24} />
+                    )}
                   </div>
                   <div>
                     <div className="font-black text-slate-800 text-lg uppercase tracking-tight">{cat.name}</div>
