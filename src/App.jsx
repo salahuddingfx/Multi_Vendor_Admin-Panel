@@ -12,7 +12,8 @@ import Categories from './pages/Categories';
 import Inventory from './pages/Inventory';
 import Messages from './pages/Messages';
 import Users from './pages/Users';
-import PagesEditor from './pages/PagesEditor';
+import Pages from './pages/Pages';
+import Reviews from './pages/Reviews';
 import Banners from './pages/Banners';
 
 const App = () => {
@@ -28,7 +29,8 @@ const App = () => {
         <Route path="orders" element={<Orders />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="banners" element={<Banners />} />
-        <Route path="pages" element={<PagesEditor />} />
+        <Route path="pages" element={<Pages />} />
+        <Route path="reviews" element={<Reviews />} />
         <Route path="messages" element={<Messages />} />
         <Route path="users" element={<Users />} />
         <Route path="categories" element={<Categories />} />
