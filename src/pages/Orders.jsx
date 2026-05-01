@@ -238,7 +238,18 @@ const Orders = () => {
                   <td className="px-8 py-6">
                     <div className="flex flex-col">
                       <span className="font-black text-slate-900 text-sm">#{order.tracking_id.toUpperCase()}</span>
-                      <span className="text-slate-400 text-xs mt-1">{new Date(order.created_at).toLocaleDateString()}</span>
+                      <span className="text-slate-400 text-[10px] mt-1">{new Date(order.created_at).toLocaleString()}</span>
+                      <div className="mt-2 flex flex-col gap-1">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded w-fit">
+                          {order.payment_method?.toUpperCase()}
+                        </span>
+                        {order.transaction_id && (
+                          <span className="text-[10px] font-medium text-slate-400">Trx: {order.transaction_id}</span>
+                        )}
+                        {order.sender_number && (
+                          <span className="text-[10px] font-medium text-slate-400">From: {order.sender_number}</span>
+                        )}
+                      </div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
