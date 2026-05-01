@@ -47,6 +47,18 @@ const Products = () => {
     setLoading(false);
   };
 
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await api.deleteProduct(id);
+        toast.success('Product deleted successfully');
+        fetchProducts();
+      } catch (error) {
+        toast.error('Failed to delete product');
+      }
+    }
+  };
+
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -159,10 +171,19 @@ const Products = () => {
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-maroon hover:text-white transition-all">
+                      <button 
+                        onClick={() => {
+                          setEditingProduct(product);
+                          setIsModalOpen(true);
+                        }}
+                        className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-maroon hover:text-white transition-all"
+                      >
                         <Edit2 size={18} />
                       </button>
-                      <button className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                      <button 
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
+                      >
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -202,7 +223,7 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
     stock: editingProduct?.stock || '',
     description: editingProduct?.description || ''
   });
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -220,7 +241,9 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
     
     const data = new FormData();
     Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    if (imageFile) data.append('image', imageFile);
+    if (imageFiles.length > 0) {
+      imageFiles.forEach(file => data.append('images[]', file));
+    }
     if (!editingProduct) data.append('site_id', siteId);
 
     try {
@@ -329,25 +352,39 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
           </div>
 
           <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Product Image</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Product Images</label>
             <div className="relative group">
               <input 
                 type="file" 
+                multiple
                 accept="image/*"
                 className="hidden"
                 id="product-image"
-                onChange={(e) => setImageFile(e.target.files[0])}
+                onChange={(e) => setImageFiles(Array.from(e.target.files))}
               />
               <label 
                 htmlFor="product-image"
-                className="flex items-center justify-between w-full px-8 py-5 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer hover:border-maroon hover:bg-maroon/5 transition-all group"
+                className="flex flex-col items-center justify-center w-full px-8 py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer hover:border-maroon hover:bg-maroon/5 transition-all group"
               >
-                <span className="text-slate-500 font-bold">
-                  {imageFile ? imageFile.name : (editingProduct ? 'Change product image' : 'Choose a product photo...')}
-                </span>
-                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-maroon group-hover:text-white group-hover:border-maroon transition-all">
-                  <Plus size={20} />
+                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-maroon group-hover:text-white group-hover:border-maroon transition-all mb-4">
+                  <Plus size={24} />
                 </div>
+                <span className="text-slate-800 font-bold mb-1">
+                  {imageFiles.length > 0 ? `${imageFiles.length} images selected` : 'Click to select multiple images'}
+                </span>
+                <span className="text-slate-400 text-sm font-medium">
+                  {editingProduct ? 'Note: Uploading new images will replace existing ones.' : 'Hold Ctrl or Cmd to select multiple files'}
+                </span>
+                
+                {imageFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4 justify-center">
+                    {imageFiles.map((file, i) => (
+                      <div key={i} className="px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-500">
+                        {file.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </label>
             </div>
           </div>
