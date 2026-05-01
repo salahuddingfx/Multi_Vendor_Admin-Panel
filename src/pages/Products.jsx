@@ -11,8 +11,10 @@ import {
   ChevronLeft, 
   ChevronRight,
   Package,
-  Eye
+  Eye,
+  Save
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { toast } from 'sonner';
 
@@ -239,110 +241,153 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
-      <div className="bg-white rounded-[40px] p-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-        <h2 className="text-3xl font-display font-black mb-8">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="bg-white rounded-[48px] p-8 md:p-12 w-full max-w-3xl my-auto shadow-2xl relative"
+      >
+        <button onClick={onClose} className="absolute top-8 right-8 w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
+          <Plus size={24} className="rotate-45" />
+        </button>
+
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-1 rounded-full bg-maroon" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Inventory Management</span>
+          </div>
+          <h2 className="text-4xl font-display font-black text-slate-800 tracking-tight">
+            {editingProduct ? 'Edit Product' : 'Add New Product'}
+          </h2>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Product Name</label>
               <input 
                 type="text" 
                 required
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                placeholder="Enter product title..."
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold text-slate-700"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Category</label>
-              <select 
-                required
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold appearance-none"
-                value={formData.category_id}
-                onChange={(e) => setFormData({...formData, category_id: e.target.value})}
-              >
-                <option value="">Select Category</option>
-                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-              </select>
+              <div className="relative">
+                <select 
+                  required
+                  className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold text-slate-700 appearance-none"
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({...formData, category_id: e.target.value})}
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                </select>
+                <ChevronRight size={20} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Price (৳)</label>
               <input 
                 type="number" 
                 required
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                placeholder="0.00"
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold text-slate-700"
                 value={formData.price}
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Weight (kg)</label>
               <input 
                 type="number" 
                 step="0.01"
                 required
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                placeholder="0.5"
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold text-slate-700"
                 value={formData.weight}
                 onChange={(e) => setFormData({...formData, weight: e.target.value})}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Stock</label>
               <input 
                 type="number" 
                 required
-                className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+                placeholder="100"
+                className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold text-slate-700"
                 value={formData.stock}
                 onChange={(e) => setFormData({...formData, stock: e.target.value})}
               />
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Product Image</label>
-            <input 
-              type="file" 
-              accept="image/*"
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
-              onChange={(e) => setImageFile(e.target.files[0])}
-            />
-            {editingProduct && !imageFile && (
-              <p className="text-[10px] text-slate-400 ml-4 italic">Leave blank to keep current image</p>
-            )}
+            <div className="relative group">
+              <input 
+                type="file" 
+                accept="image/*"
+                className="hidden"
+                id="product-image"
+                onChange={(e) => setImageFile(e.target.files[0])}
+              />
+              <label 
+                htmlFor="product-image"
+                className="flex items-center justify-between w-full px-8 py-5 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer hover:border-maroon hover:bg-maroon/5 transition-all group"
+              >
+                <span className="text-slate-500 font-bold">
+                  {imageFile ? imageFile.name : (editingProduct ? 'Change product image' : 'Choose a product photo...')}
+                </span>
+                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-maroon group-hover:text-white group-hover:border-maroon transition-all">
+                  <Plus size={20} />
+                </div>
+              </label>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Description</label>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Detailed Description</label>
             <textarea 
               rows={4}
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-medium"
+              placeholder="Tell your customers more about this product..."
+              className="w-full px-8 py-6 bg-slate-50 border border-slate-100 rounded-[32px] outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-medium text-slate-700 leading-relaxed"
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
             />
           </div>
 
-          <div className="flex gap-4 pt-4">
+          <div className="flex gap-4 pt-6">
             <button 
               type="button"
               onClick={onClose}
-              className="flex-1 py-4 bg-slate-50 text-slate-400 font-bold rounded-2xl"
+              className="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-3xl hover:bg-slate-100 transition-all"
             >
               Cancel
             </button>
             <button 
               type="submit"
               disabled={loading}
-              className="flex-1 py-4 bg-maroon text-white font-bold rounded-2xl shadow-xl shadow-maroon/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+              className="flex-1 py-5 bg-maroon text-white font-black uppercase tracking-widest text-sm rounded-3xl shadow-2xl shadow-maroon/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
             >
-              {loading ? 'Saving...' : editingProduct ? 'Update Product' : 'Create Product'}
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Save size={18} />
+                  {editingProduct ? 'Save Changes' : 'Create Product'}
+                </>
+              )}
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };
