@@ -57,10 +57,12 @@ const mockOrders = [
 ];
 
 const statusStyles = {
-  'Order Received': 'bg-blue-50 text-blue-600 border-blue-100',
-  'Processed': 'bg-purple-50 text-purple-600 border-purple-100',
-  'Shipping': 'bg-amber-50 text-amber-600 border-amber-100',
-  'Delivered': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+  'placed': 'bg-blue-50 text-blue-600 border-blue-100',
+  'confirmed': 'bg-indigo-50 text-indigo-600 border-indigo-100',
+  'packed': 'bg-purple-50 text-purple-600 border-purple-100',
+  'shipped': 'bg-amber-50 text-amber-600 border-amber-100',
+  'delivered': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+  'cancelled': 'bg-rose-50 text-rose-600 border-rose-100',
 };
 
 const Orders = () => {
@@ -69,6 +71,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeOrder, setActiveOrder] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('All');
   const printRef = useRef();
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
@@ -88,14 +91,58 @@ const Orders = () => {
     fetchOrders();
   }, [selectedStore]);
 
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch = order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         order.tracking_id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterStatus === 'All' || order.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
   });
 
-  const filteredOrders = orders.filter(order => 
-    order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    order.tracking_id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await api.updateOrderStatus(orderId, newStatus);
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    } catch (err) {
+      alert('Failed to update status');
+      console.error(err);
+    }
+  };
+
+  const handlePaymentStatusChange = async (orderId, newStatus) => {
+    try {
+      await api.updatePaymentStatus(orderId, newStatus);
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, payment_status: newStatus } : o));
+    } catch (err) {
+      alert('Failed to update payment status');
+      console.error(err);
+    }
+  };
+
+  const handleExport = () => {
+    const data = filteredOrders.map(o => ({
+      ID: o.tracking_id,
+      Customer: o.customer_name,
+      Phone: o.customer_phone,
+      Total: o.total_amount,
+      Status: o.status,
+      Date: new Date(o.created_at).toLocaleDateString()
+    }));
+    const csv = [
+      Object.keys(data[0]).join(','),
+      ...data.map(row => Object.values(row).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `orders-${selectedStore}-${new Date().toLocaleDateString()}.csv`;
+    a.click();
+  };
 
   return (
     <div className="space-y-8 pb-20">
@@ -106,11 +153,26 @@ const Orders = () => {
         </div>
         
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:border-slate-300 transition-all shadow-sm">
-            <Filter size={18} />
-            Filter
-          </button>
-          <button className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200">
+          <div className="relative">
+            <select 
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="appearance-none flex items-center gap-2 px-10 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:border-slate-300 transition-all shadow-sm outline-none cursor-pointer"
+            >
+              <option value="All">All Status</option>
+              <option value="placed">Placed</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="packed">Packed</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          </div>
+          <button 
+            onClick={handleExport}
+            className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
+          >
             Export Data
           </button>
         </div>
@@ -164,6 +226,7 @@ const Orders = () => {
               <tr className="bg-slate-50/50">
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Order Details</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Customer</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Products</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Total</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
@@ -185,15 +248,47 @@ const Orders = () => {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <span className="font-black text-slate-900">৳{order.total_amount}</span>
+                    <div className="flex flex-col gap-1">
+                      {order.items?.map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">{item.quantity}x</span>
+                          <span className="text-xs font-medium text-slate-600 truncate max-w-[150px]">{item.name}</span>
+                        </div>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-8 py-6">
-                    <span className={clsx(
-                      "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                      statusStyles[order.status]
-                    )}>
-                      {order.status}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-black text-slate-900">৳{order.total_amount}</span>
+                      <select 
+                        value={order.payment_status || 'unpaid'}
+                        onChange={(e) => handlePaymentStatusChange(order.id, e.target.value)}
+                        className={clsx(
+                          "text-[10px] font-black uppercase mt-1 bg-transparent border-none outline-none cursor-pointer",
+                          order.payment_status === 'paid' ? 'text-emerald-500' : 'text-rose-500'
+                        )}
+                      >
+                        <option value="unpaid">Unpaid</option>
+                        <option value="paid">Paid</option>
+                      </select>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <select 
+                      value={order.status}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                      className={clsx(
+                        "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border outline-none cursor-pointer",
+                        statusStyles[order.status] || "bg-slate-50 text-slate-600 border-slate-100"
+                      )}
+                    >
+                      <option value="placed">Placed</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="packed">Packed</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">

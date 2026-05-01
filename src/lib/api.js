@@ -126,6 +126,11 @@ export const api = {
     return response.data.data;
   },
 
+  updatePaymentStatus: async (orderId, paymentStatus) => {
+    const response = await adminClient.put(`/orders/${orderId}/payment-status`, { payment_status: paymentStatus });
+    return response.data.data;
+  },
+
   // Site Settings
   getSettings: async (siteId) => {
     const response = await adminClient.get(`/sites/${siteId}/settings`);
