@@ -57,7 +57,13 @@ export const api = {
   getProducts: async (storeId) => {
     const siteId = storeId === 'acharu' ? 1 : 2;
     const response = await adminClient.get('/products', { params: { site_id: siteId } });
-    return response.data.data.data; // Pagination data
+    const products = response.data.data.data;
+    
+    return products.map(p => ({
+      ...p,
+      category: p.category?.name || 'Uncategorized',
+      image: p.images && p.images.length > 0 ? p.images[0].image_path : null
+    }));
   },
 
   // Orders
