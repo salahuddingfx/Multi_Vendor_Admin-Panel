@@ -1,23 +1,32 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { api } from '../lib/api';
+import api from '../lib/api';
 import { 
   TrendingUp, 
   ShoppingBag, 
-  Package,
+  Package, 
+  AlertCircle,
   ArrowUpRight,
-  Clock
+  ArrowDownRight,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import { 
+  AreaChart, 
+  Area, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  AreaChart,
-  Area 
+  BarChart,
+  Bar,
+  Cell
 } from 'recharts';
 import { motion } from 'framer-motion';
+import { format } from 'date-fns';
 import { clsx } from 'clsx';
 
 const Dashboard = () => {
@@ -25,118 +34,141 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const siteId = selectedStore === 'acharu' ? 1 : 2;
+
   useEffect(() => {
-    const fetchStats = async () => {
-      setLoading(true);
-      const data = await api.getDashboardStats(selectedStore);
-      setStats(data);
-      setLoading(false);
-    };
     fetchStats();
   }, [selectedStore]);
 
-  if (loading) return (
-    <div className="animate-pulse space-y-12">
-      <div className="h-20 bg-white/50 rounded-3xl w-1/3" />
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {[1,2,3,4].map(i => <div key={i} className="h-48 bg-white rounded-[40px]" />)}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 h-[500px] bg-white rounded-[48px]" />
-        <div className="h-[500px] bg-white rounded-[48px]" />
-      </div>
-    </div>
-  );
+  const fetchStats = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/admin/stats?site_id=${siteId}`);
+      if (response.data.success) {
+        setStats(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch stats', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const themeColor = selectedStore === 'acharu' ? '#800000' : '#475569';
-  const data = stats.chartData;
-  const statItems = [
-    { name: 'Total Sales', value: `৳${stats.totalSales.toLocaleString()}`, icon: TrendingUp, change: '12.5', isUp: true },
-    { name: 'Orders', value: stats.totalOrders, icon: ShoppingBag, change: '5.2', isUp: true },
-    { name: 'Products', value: stats.activeProducts, icon: Package, change: '0.0', isUp: true },
-    { name: 'Low Stock', value: stats.lowStock, icon: Clock, change: '2.0', isUp: false },
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="w-12 h-12 text-slate-400 animate-spin" />
+        <p className="text-slate-500 font-medium">Crunching numbers...</p>
+      </div>
+    );
+  }
+
+  const statCards = [
+    { 
+      label: 'Total Revenue', 
+      value: `৳${stats.total_sales.toLocaleString()}`, 
+      icon: TrendingUp, 
+      color: 'text-emerald-600', 
+      bg: 'bg-emerald-50',
+      trend: '+12.5%',
+      trendUp: true
+    },
+    { 
+      label: 'Total Orders', 
+      value: stats.total_orders, 
+      icon: ShoppingBag, 
+      color: 'text-blue-600', 
+      bg: 'bg-blue-50',
+      trend: '+5.2%',
+      trendUp: true
+    },
+    { 
+      label: 'Active Products', 
+      value: stats.active_products, 
+      icon: Package, 
+      color: 'text-amber-600', 
+      bg: 'bg-amber-50',
+      trend: '0%',
+      trendUp: true
+    },
+    { 
+      label: 'Low Stock', 
+      value: stats.low_stock_products, 
+      icon: AlertCircle, 
+      color: 'text-rose-600', 
+      bg: 'bg-rose-50',
+      trend: '-2',
+      trendUp: false
+    },
   ];
 
   return (
-    <div className="space-y-12 pb-20">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <span className="w-12 h-1 rounded-full" style={{ backgroundColor: themeColor }} />
-            <span className="text-xs font-black uppercase tracking-[0.4em] text-slate-400">Overview Analytics</span>
-          </div>
-          <h1 className="text-5xl font-display font-black text-slate-800 tracking-tight">
-            Welcome back, <span style={{ color: themeColor }}>Admin</span>
+    <div className="space-y-10 animate-in fade-in duration-1000">
+      {/* Welcome Section */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-4xl font-display font-black text-slate-800 mb-2">
+            Store <span className="text-slate-400">Overview</span>
           </h1>
-          <p className="text-slate-400 font-medium text-lg">Here's the latest performance for {selectedStore === 'acharu' ? 'Acharu' : 'Taja Shutki'}.</p>
+          <p className="text-slate-500 font-medium italic">Welcome back! Here's what's happening today.</p>
         </div>
-        
-        <div className="flex items-center gap-4">
-           <div className="bg-white/50 backdrop-blur-md p-2 rounded-2xl border border-white/60 shadow-sm flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
-              <span className="text-xs font-bold text-slate-600 uppercase tracking-widest px-2">Live Status</span>
-           </div>
+        <div className="hidden md:flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-soft border border-black/[0.02]">
+          <Clock size={18} className="text-slate-400" />
+          <span className="text-sm font-black uppercase tracking-widest text-slate-500">
+            {format(new Date(), 'EEEE, dd MMMM')}
+          </span>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {statItems.map((item, index) => (
-          <motion.div
-            key={item.name}
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statCards.map((stat, i) => (
+          <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="group relative bg-white rounded-[40px] p-8 shadow-premium border border-black/[0.01] hover:scale-[1.03] transition-all duration-500 overflow-hidden"
+            transition={{ delay: i * 0.1 }}
+            key={stat.label}
+            className="bg-white p-8 rounded-[32px] border border-black/[0.02] shadow-premium group hover:-translate-y-2 transition-all duration-500"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 bg-slate-50 rounded-full group-hover:scale-150 transition-transform duration-700 opacity-50" />
-            
-            <div className="relative flex flex-col gap-6">
-              <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 shadow-sm">
-                  <item.icon size={26} />
-                </div>
-                <div className={clsx(
-                  "px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase flex items-center gap-1.5",
-                  item.isUp ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
-                )}>
-                  {item.isUp ? '↑' : '↓'} {item.change}%
-                </div>
+            <div className="flex justify-between items-start mb-6">
+              <div className={clsx("p-4 rounded-2xl transition-all duration-500 group-hover:scale-110", stat.bg, stat.color)}>
+                <stat.icon size={24} />
               </div>
-              
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{item.name}</p>
-                <h3 className="text-4xl font-display font-black text-slate-800 tracking-tight">
-                  {item.value}
-                </h3>
+              <div className={clsx(
+                "flex items-center gap-1 text-[10px] font-black px-3 py-1 rounded-full",
+                stat.trendUp ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
+              )}>
+                {stat.trendUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                {stat.trend}
               </div>
             </div>
+            <h3 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-1">{stat.label}</h3>
+            <p className="text-3xl font-display font-black text-slate-800 tracking-tight">{stat.value}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white rounded-[48px] p-10 shadow-premium border border-black/[0.01] relative overflow-hidden">
-          <div className="flex items-center justify-between mb-10 relative z-10">
-            <div>
-              <h3 className="text-2xl font-display font-black text-slate-800 tracking-tight">Sales Performance</h3>
-              <p className="text-slate-400 text-sm font-medium mt-1">Daily revenue trends</p>
-            </div>
-            <select className="bg-slate-50 border-none rounded-2xl px-6 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-slate-100 transition-all cursor-pointer">
+        {/* Sales Chart */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="lg:col-span-2 bg-white p-8 md:p-10 rounded-[40px] border border-black/[0.02] shadow-premium"
+        >
+          <div className="flex items-center justify-between mb-10">
+            <h3 className="text-xl font-display font-black text-slate-800">Revenue Analytics</h3>
+            <select className="bg-slate-50 border-none rounded-xl px-4 py-2 text-xs font-bold text-slate-500 outline-none">
               <option>Last 7 Days</option>
               <option>Last 30 Days</option>
             </select>
           </div>
-          
-          <div className="h-[400px] w-full relative z-10">
+          <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
+              <AreaChart data={stats.chart_data}>
                 <defs>
-                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={themeColor} stopOpacity={0.15}/>
-                    <stop offset="95%" stopColor={themeColor} stopOpacity={0}/>
+                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={selectedStore === 'acharu' ? '#800000' : '#475569'} stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor={selectedStore === 'acharu' ? '#800000' : '#475569'} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -144,68 +176,87 @@ const Dashboard = () => {
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 700 }}
-                  dy={15}
+                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+                  dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 700 }}
+                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    borderRadius: '24px', 
+                    borderRadius: '20px', 
                     border: 'none', 
-                    boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)',
-                    padding: '20px'
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                    padding: '16px'
                   }}
-                  itemStyle={{ fontWeight: 800, color: themeColor }}
-                  labelStyle={{ fontWeight: 800, color: '#1e293b', marginBottom: '4px' }}
                 />
                 <Area 
                   type="monotone" 
-                  dataKey="value" 
-                  stroke={themeColor} 
-                  strokeWidth={5}
+                  dataKey="sales" 
+                  stroke={selectedStore === 'acharu' ? '#800000' : '#475569'} 
+                  strokeWidth={4}
                   fillOpacity={1} 
-                  fill="url(#colorValue)" 
+                  fill="url(#colorSales)" 
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-white rounded-[48px] p-10 shadow-premium border border-black/[0.01]">
-          <div className="flex items-center justify-between mb-10">
-            <h3 className="text-2xl font-display font-black text-slate-800 tracking-tight">Recent Orders</h3>
-            <button className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white transition-all">
-              <ArrowUpRight size={20} />
-            </button>
+        {/* Recent Orders */}
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-white p-8 md:p-10 rounded-[40px] border border-black/[0.02] shadow-premium flex flex-col"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-display font-black text-slate-800">Recent Orders</h3>
+            <button className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-800 transition-colors">View All</button>
           </div>
           
-          <div className="space-y-6">
-            {stats.recentSales.map((sale) => (
-              <div key={sale.id} className="flex items-center gap-5 p-5 rounded-[32px] hover:bg-slate-50 transition-all group cursor-pointer border border-transparent hover:border-slate-100">
-                <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:shadow-md transition-all">
-                  <ShoppingBag size={22} />
-                </div>
-                <div className="flex-grow">
-                  <p className="font-black text-slate-800 text-sm tracking-tight">Order #{sale.id}</p>
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">{sale.date}</p>
+          <div className="space-y-6 flex-grow">
+            {stats.recent_orders.map((order) => (
+              <div key={order.id} className="flex items-center justify-between group">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform">
+                    <ShoppingBag size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm leading-none mb-1">#{order.tracking_id}</h4>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{order.customer_name}</p>
+                  </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-display font-black text-slate-800 text-lg">৳{sale.amount}</p>
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 ml-auto mt-2" />
+                  <p className="font-black text-slate-800 text-sm mb-1">৳{order.total_amount}</p>
+                  <span className={clsx(
+                    "text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
+                    order.status === 'delivered' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                  )}>
+                    {order.status}
+                  </span>
                 </div>
               </div>
             ))}
+
+            {stats.recent_orders.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                  <ShoppingBag size={24} className="text-slate-200" />
+                </div>
+                <p className="text-sm font-bold text-slate-400">No recent orders yet.</p>
+              </div>
+            )}
           </div>
 
-          <button className="w-full mt-10 py-5 rounded-[28px] bg-slate-50 text-slate-800 font-black text-sm uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all shadow-sm">
-            View All Transactions
-          </button>
-        </div>
+          <div className="mt-10 p-6 bg-slate-50 rounded-3xl border border-slate-100">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={18} className="text-emerald-500" />
+              <p className="text-xs font-bold text-slate-600">Your store is performing <span className="text-emerald-600 font-black">20% better</span> than last month!</p>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
