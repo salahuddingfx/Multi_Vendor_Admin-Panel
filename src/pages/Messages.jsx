@@ -92,6 +92,13 @@ const Messages = () => {
                 </div>
               </div>
               <div className="bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+                {msg.subject && (
+                  <div className="mb-4 pb-4 border-b border-slate-200">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-maroon block mb-1">Subject</span>
+                    <h4 className="text-sm font-bold text-slate-800">{msg.subject}</h4>
+                  </div>
+                )}
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Message</span>
                 <p className="text-slate-600 font-medium leading-relaxed italic">"{msg.message}"</p>
               </div>
             </div>
