@@ -42,7 +42,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const data = await api.getProducts(selectedStore);
+    const data = await api.getProducts(siteId);
     setProducts(data);
     setLoading(false);
   };
