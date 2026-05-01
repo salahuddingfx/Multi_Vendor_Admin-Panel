@@ -49,8 +49,15 @@ export const api = {
       totalOrders: data.total_orders || 0,
       activeProducts: data.active_products || 0,
       lowStock: data.low_stock_products || 0,
-      recentOrders: data.recent_orders || [],
-      chartData: data.chart_data || []
+      recentSales: (data.recent_orders || []).map(o => ({
+        id: o.tracking_id,
+        date: new Date(o.created_at).toLocaleDateString(),
+        amount: o.total_amount
+      })),
+      chartData: (data.chart_data || []).map(d => ({
+        name: d.name,
+        value: d.sales
+      }))
     };
   },
 
