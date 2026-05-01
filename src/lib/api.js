@@ -101,12 +101,17 @@ export const api = {
   },
 
   storeCategory: async (categoryData) => {
-    const response = await adminClient.post('/categories', categoryData);
+    const response = await adminClient.post('/categories', categoryData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data.data;
   },
 
-  updateCategory: async (id, categoryData) => {
-    const response = await adminClient.put(`/categories/${id}`, categoryData);
+  updateCategory: async (id, formData) => {
+    // Note: We use the direct POST route we added in api.php for multipart updates
+    const response = await adminClient.post(`/categories/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data.data;
   },
 
