@@ -42,10 +42,8 @@ const Dashboard = () => {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const response = await api.get(`/admin/stats?site_id=${siteId}`);
-      if (response.data.success) {
-        setStats(response.data.data);
-      }
+      const data = await api.getDashboardStats(selectedStore);
+      setStats(data);
     } catch (error) {
       console.error('Failed to fetch stats', error);
     } finally {
@@ -53,7 +51,7 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) {
+  if (loading || !stats) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="w-12 h-12 text-slate-400 animate-spin" />
@@ -65,7 +63,7 @@ const Dashboard = () => {
   const statCards = [
     { 
       label: 'Total Revenue', 
-      value: `৳${stats.total_sales.toLocaleString()}`, 
+      value: `৳${(stats.totalSales || 0).toLocaleString()}`, 
       icon: TrendingUp, 
       color: 'text-emerald-600', 
       bg: 'bg-emerald-50',
@@ -74,7 +72,7 @@ const Dashboard = () => {
     },
     { 
       label: 'Total Orders', 
-      value: stats.total_orders, 
+      value: stats.totalOrders || 0, 
       icon: ShoppingBag, 
       color: 'text-blue-600', 
       bg: 'bg-blue-50',
@@ -83,7 +81,7 @@ const Dashboard = () => {
     },
     { 
       label: 'Active Products', 
-      value: stats.active_products, 
+      value: stats.activeProducts || 0, 
       icon: Package, 
       color: 'text-amber-600', 
       bg: 'bg-amber-50',
@@ -92,7 +90,7 @@ const Dashboard = () => {
     },
     { 
       label: 'Low Stock', 
-      value: stats.low_stock_products, 
+      value: stats.lowStock || 0, 
       icon: AlertCircle, 
       color: 'text-rose-600', 
       bg: 'bg-rose-50',
@@ -163,7 +161,7 @@ const Dashboard = () => {
           </div>
           <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats.chart_data}>
+              <AreaChart data={stats.chartData || []}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor={selectedStore === 'acharu' ? '#800000' : '#475569'} stopOpacity={0.1}/>
@@ -193,7 +191,7 @@ const Dashboard = () => {
                 />
                 <Area 
                   type="monotone" 
-                  dataKey="sales" 
+                  dataKey="value" 
                   stroke={selectedStore === 'acharu' ? '#800000' : '#475569'} 
                   strokeWidth={4}
                   fillOpacity={1} 
@@ -216,30 +214,24 @@ const Dashboard = () => {
           </div>
           
           <div className="space-y-6 flex-grow">
-            {stats.recent_orders.map((order) => (
+            {(stats.recentSales || []).map((order) => (
               <div key={order.id} className="flex items-center justify-between group">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform">
                     <ShoppingBag size={20} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-800 text-sm leading-none mb-1">#{order.tracking_id}</h4>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{order.customer_name}</p>
+                    <h4 className="font-bold text-slate-800 text-sm leading-none mb-1">#{order.id}</h4>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{order.date}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-black text-slate-800 text-sm mb-1">৳{order.total_amount}</p>
-                  <span className={clsx(
-                    "text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
-                    order.status === 'delivered' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
-                  )}>
-                    {order.status}
-                  </span>
+                  <p className="font-black text-slate-800 text-sm mb-1">৳{order.amount}</p>
                 </div>
               </div>
             ))}
 
-            {stats.recent_orders.length === 0 && (
+            {(stats.recentSales || []).length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                   <ShoppingBag size={24} className="text-slate-200" />
