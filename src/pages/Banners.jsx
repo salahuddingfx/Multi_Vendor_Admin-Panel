@@ -4,16 +4,22 @@ import { Image as ImageIcon, Plus, Trash2, Edit2, Save, X, ExternalLink } from '
 import { api } from '../lib/api';
 import { toast } from 'sonner';
 
+const labelCls = "block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1";
+const inputCls = "w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-maroon/5 focus:border-maroon outline-none transition-all font-bold text-slate-900";
+
 const Banners = () => {
   const { selectedStore } = useStore();
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState(null);
+  const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     subtitle: '',
     badge: '',
+    button_text: 'Shop Now',
+    product_id: '',
     image: null,
     order: 0
   });
@@ -23,11 +29,15 @@ const Banners = () => {
   const fetchBanners = async () => {
     setLoading(true);
     try {
-      const res = await api.getHeroSlides(siteId);
-      setBanners(res.data || []);
+      const [bannerData, productData] = await Promise.all([
+        api.getHeroSlides(siteId),
+        api.getProducts(siteId)
+      ]);
+      setBanners(bannerData || []);
+      setProducts(productData || []);
     } catch (err) {
       console.error(err);
-      toast.error('Failed to load banners');
+      toast.error('Failed to load data');
     } finally {
       setLoading(false);
     }
@@ -44,6 +54,8 @@ const Banners = () => {
     data.append('title', formData.title);
     data.append('subtitle', formData.subtitle || '');
     data.append('badge', formData.badge || '');
+    data.append('button_text', formData.button_text || 'Shop Now');
+    data.append('product_id', formData.product_id || '');
     data.append('order', formData.order);
     if (formData.image) {
       data.append('image', formData.image);
@@ -59,7 +71,7 @@ const Banners = () => {
       }
       setIsModalOpen(false);
       setEditingBanner(null);
-      setFormData({ title: '', subtitle: '', badge: '', image: null, order: 0 });
+      setFormData({ title: '', subtitle: '', badge: '', button_text: 'Shop Now', product_id: '', image: null, order: 0 });
       fetchBanners();
     } catch (err) {
       console.error(err);
@@ -133,6 +145,8 @@ const Banners = () => {
                         title: banner.title,
                         subtitle: banner.subtitle,
                         badge: banner.badge,
+                        button_text: banner.button_text || 'Shop Now',
+                        product_id: banner.product_id || '',
                         order: banner.order,
                         image: null
                       });
@@ -189,6 +203,32 @@ const Banners = () => {
                     onChange={(e) => setFormData({...formData, badge: e.target.value})}
                     className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-maroon/5 focus:border-maroon outline-none transition-all font-bold text-slate-900"
                     placeholder="E.g. NEW"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Link to Product</label>
+                  <select 
+                    value={formData.product_id}
+                    onChange={(e) => setFormData({...formData, product_id: e.target.value})}
+                    className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-maroon/5 focus:border-maroon outline-none transition-all font-bold text-slate-900"
+                  >
+                    <option value="">No Link</option>
+                    {products.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className={labelCls}>Button Text</label>
+                  <input 
+                    type="text" 
+                    value={formData.button_text}
+                    onChange={(e) => setFormData({...formData, button_text: e.target.value})}
+                    className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-maroon/5 focus:border-maroon outline-none transition-all font-bold text-slate-900"
+                    placeholder="E.g. Shop Now"
                   />
                 </div>
               </div>

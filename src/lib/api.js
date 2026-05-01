@@ -214,5 +214,21 @@ export const api = {
   markMessageRead: async (id) => {
     const response = await adminClient.put(`/messages/${id}/read`);
     return response.data.data;
+  },
+
+  // Reviews
+  getReviews: async (siteId) => {
+    const response = await adminClient.get('/reviews', { params: { site_id: siteId } });
+    return response.data.data;
+  },
+
+  updateReview: async (id, reviewData) => {
+    const response = await adminClient.put(`/reviews/${id}`, reviewData);
+    return response.data.data;
+  },
+
+  deleteReview: async (id) => {
+    const response = await adminClient.delete(`/reviews/${id}`);
+    return response.data.data;
   }
 };
