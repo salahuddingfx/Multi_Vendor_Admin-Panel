@@ -71,6 +71,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeOrder, setActiveOrder] = useState(null);
+  const [printType, setPrintType] = useState('standard');
   const [filterStatus, setFilterStatus] = useState('All');
   const printRef = useRef();
 
@@ -307,18 +308,52 @@ const Orders = () => {
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
-                        onClick={() => { 
-                          setActiveOrder(order); 
-                          setTimeout(() => {
-                            handlePrint();
-                          }, 150);
-                        }}
-                        className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
-                        title="Instant Print (Frontend)"
-                      >
-                        <Printer size={18} />
-                      </button>
+                      <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
+                        <button 
+                          onClick={() => { 
+                            setActiveOrder(order); 
+                            setPrintType('standard');
+                            setTimeout(() => handlePrint(), 150);
+                          }}
+                          className="p-2 text-slate-400 hover:text-slate-900 hover:bg-white rounded-lg transition-all"
+                          title="Print A4 Invoice"
+                        >
+                          <Printer size={16} />
+                        </button>
+                        <button 
+                          onClick={() => { 
+                            setActiveOrder(order); 
+                            setPrintType('1.75');
+                            setTimeout(() => handlePrint(), 150);
+                          }}
+                          className="px-2 py-1 text-[10px] font-bold text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
+                          title="Print 1.75in Label"
+                        >
+                          1.75"
+                        </button>
+                        <button 
+                          onClick={() => { 
+                            setActiveOrder(order); 
+                            setPrintType('2.0');
+                            setTimeout(() => handlePrint(), 150);
+                          }}
+                          className="px-2 py-1 text-[10px] font-bold text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
+                          title="Print 2.0in Label"
+                        >
+                          2.0"
+                        </button>
+                        <button 
+                          onClick={() => { 
+                            setActiveOrder(order); 
+                            setPrintType('1.5');
+                            setTimeout(() => handlePrint(), 150);
+                          }}
+                          className="px-2 py-1 text-[10px] font-bold text-slate-400 hover:text-orange-600 hover:bg-white rounded-lg transition-all"
+                          title="Print 1.5in Receipt"
+                        >
+                          1.5"
+                        </button>
+                      </div>
                       <a 
                         href={`http://127.0.0.1:8000/orders/${order.id}/invoice`} 
                         target="_blank" 
@@ -338,7 +373,7 @@ const Orders = () => {
       </div>
 
       {/* Hidden Invoice Component for Printing */}
-      <InvoiceTemplate ref={printRef} order={activeOrder} />
+      <InvoiceTemplate ref={printRef} order={activeOrder} type={printType} />
     </div>
   );
 };
