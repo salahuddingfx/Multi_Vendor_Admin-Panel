@@ -33,10 +33,8 @@ const Reviews = () => {
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const response = await api.get(`/admin/reviews?site_id=${siteId}`);
-      if (response.data.success) {
-        setReviews(response.data.data);
-      }
+      const data = await api.getReviews(siteId);
+      setReviews(data);
     } catch (error) {
       toast.error('Failed to fetch reviews');
     } finally {
@@ -46,8 +44,8 @@ const Reviews = () => {
 
   const toggleApproval = async (id, currentStatus) => {
     try {
-      const response = await api.put(`/admin/reviews/${id}`, { is_approved: !currentStatus });
-      if (response.data.success) {
+      const data = await api.updateReview(id, { is_approved: !currentStatus });
+      if (data) {
         setReviews(reviews.map(r => r.id === id ? { ...r, is_approved: !currentStatus } : r));
         toast.success(currentStatus ? 'Review unapproved' : 'Review approved');
       }
@@ -59,11 +57,9 @@ const Reviews = () => {
   const deleteReview = async (id) => {
     if (!window.confirm('Delete this review permanently?')) return;
     try {
-      const response = await api.delete(`/admin/reviews/${id}`);
-      if (response.data.success) {
-        setReviews(reviews.filter(r => r.id !== id));
-        toast.success('Review deleted');
-      }
+      const data = await api.deleteReview(id);
+      setReviews(reviews.filter(r => r.id !== id));
+      toast.success('Review deleted');
     } catch (error) {
       toast.error('Failed to delete review');
     }
@@ -73,8 +69,8 @@ const Reviews = () => {
     if (!replyText[id]?.trim()) return;
     setSubmittingReply(prev => ({ ...prev, [id]: true }));
     try {
-      const response = await api.put(`/admin/reviews/${id}`, { admin_reply: replyText[id] });
-      if (response.data.success) {
+      const data = await api.updateReview(id, { admin_reply: replyText[id] });
+      if (data) {
         setReviews(reviews.map(r => r.id === id ? { ...r, admin_reply: replyText[id] } : r));
         toast.success('Reply saved');
       }
