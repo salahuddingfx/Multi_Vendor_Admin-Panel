@@ -192,14 +192,15 @@ const Products = () => {
 };
 
 const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) => {
-  const [formData, setFormData] = useState(editingProduct || {
-    name: '',
-    category_id: '',
-    price: '',
-    weight: '',
-    stock: '',
-    description: ''
+  const [formData, setFormData] = useState({
+    name: editingProduct?.name || '',
+    category_id: editingProduct?.category_id || '',
+    price: editingProduct?.price || '',
+    weight: editingProduct?.weight || '',
+    stock: editingProduct?.stock || '',
+    description: editingProduct?.description || ''
   });
+  const [imageFile, setImageFile] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -214,12 +215,18 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    
+    const data = new FormData();
+    Object.keys(formData).forEach(key => data.append(key, formData[key]));
+    if (imageFile) data.append('image', imageFile);
+    if (!editingProduct) data.append('site_id', siteId);
+
     try {
       if (editingProduct) {
-        await api.updateProduct(editingProduct.id, formData);
+        await api.updateProduct(editingProduct.id, data);
         toast.success('Product updated');
       } else {
-        await api.storeProduct({ ...formData, site_id: siteId });
+        await api.storeProduct(data);
         toast.success('Product created');
       }
       onSuccess();
@@ -293,6 +300,19 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                 onChange={(e) => setFormData({...formData, stock: e.target.value})}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Product Image</label>
+            <input 
+              type="file" 
+              accept="image/*"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold"
+              onChange={(e) => setImageFile(e.target.files[0])}
+            />
+            {editingProduct && !imageFile && (
+              <p className="text-[10px] text-slate-400 ml-4 italic">Leave blank to keep current image</p>
+            )}
           </div>
 
           <div className="space-y-2">

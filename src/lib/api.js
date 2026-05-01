@@ -73,13 +73,19 @@ export const api = {
     }));
   },
 
-  storeProduct: async (productData) => {
-    const response = await adminClient.post('/products', productData);
+  storeProduct: async (formData) => {
+    const response = await adminClient.post('/products', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data.data;
   },
 
-  updateProduct: async (id, productData) => {
-    const response = await adminClient.put(`/products/${id}`, productData);
+  updateProduct: async (id, formData) => {
+    // Laravel has an issue with PUT + Multipart, so we spoof it with POST + _method=PUT
+    formData.append('_method', 'PUT');
+    const response = await adminClient.post(`/products/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data.data;
   },
 
