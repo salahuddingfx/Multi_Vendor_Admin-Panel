@@ -120,6 +120,17 @@ export const api = {
     return response.data.data;
   },
 
+  // Site Settings
+  getSettings: async (siteId) => {
+    const response = await adminClient.get(`/sites/${siteId}/settings`);
+    return response.data.data;
+  },
+
+  updateSettings: async (siteId, settings) => {
+    const response = await adminClient.put(`/sites/${siteId}/settings`, { settings });
+    return response.data.data;
+  },
+
   // User Management
   getUsers: async () => {
     const response = await adminClient.get('/users');
