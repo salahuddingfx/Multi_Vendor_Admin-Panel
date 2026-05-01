@@ -30,8 +30,8 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
           </div>
           <div style={{ textAlign: 'right' }}>
             <h2 style={{ fontSize: '14px', fontWeight: 'bold', margin: 0 }}>INVOICE</h2>
-            <p style={{ fontSize: '11px', margin: '2px 0' }}>#{order.id.split('-')[0].toUpperCase()}</p>
-            <p style={{ fontSize: '10px', margin: 0 }}>{new Date().toLocaleDateString()}</p>
+            <p style={{ fontSize: '11px', margin: '2px 0' }}>#{String(order.tracking_id || order.id).split('-')[0].toUpperCase()}</p>
+            <p style={{ fontSize: '10px', margin: 0 }}>{new Date(order.created_at || new Date()).toLocaleDateString()}</p>
           </div>
         </div>
 
@@ -39,9 +39,9 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
           <div>
             <p style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', color: '#666', marginBottom: '5px' }}>Bill To:</p>
-            <p style={{ fontSize: '12px', fontWeight: 'bold', margin: '2px 0' }}>{order.customerName}</p>
-            <p style={{ fontSize: '11px', margin: '2px 0', opacity: 0.8 }}>{order.phone}</p>
-            <p style={{ fontSize: '11px', margin: '2px 0', opacity: 0.8, lineHeight: '1.4' }}>{order.address}</p>
+            <p style={{ fontSize: '12px', fontWeight: 'bold', margin: '2px 0' }}>{order.customer_name || order.customerName}</p>
+            <p style={{ fontSize: '11px', margin: '2px 0', opacity: 0.8 }}>{order.customer_phone || order.phone}</p>
+            <p style={{ fontSize: '11px', margin: '2px 0', opacity: 0.8, lineHeight: '1.4' }}>{order.customer_address || order.address}</p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <p style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', color: '#666', marginBottom: '5px' }}>Order Details:</p>
@@ -85,11 +85,11 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px' }}>
             <span style={{ fontSize: '11px', marginRight: '40px' }}>Shipping:</span>
-            <span style={{ fontSize: '11px', fontWeight: 'bold', width: '80px', textAlign: 'right' }}>৳{order.shipping}</span>
+            <span style={{ fontSize: '11px', fontWeight: 'bold', width: '80px', textAlign: 'right' }}>৳{order.delivery_charge || order.shipping}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', backgroundColor: '#f9f9f9', padding: '10px' }}>
             <span style={{ fontSize: '14px', fontWeight: '900', marginRight: '40px', textTransform: 'uppercase' }}>Total Amount:</span>
-            <span style={{ fontSize: '14px', fontWeight: '900', width: '80px', textAlign: 'right' }}>৳{order.total}</span>
+            <span style={{ fontSize: '14px', fontWeight: '900', width: '80px', textAlign: 'right' }}>৳{order.total_amount || order.total}</span>
           </div>
         </div>
 
