@@ -230,5 +230,26 @@ export const api = {
   deleteReview: async (id) => {
     const response = await adminClient.delete(`/reviews/${id}`);
     return response.data.data;
+  },
+
+  // Coupons
+  getCoupons: async () => {
+    const response = await adminClient.get('/coupons');
+    return response.data;
+  },
+
+  storeCoupon: async (couponData) => {
+    const response = await adminClient.post('/coupons', couponData);
+    return response.data;
+  },
+
+  updateCoupon: async (id, couponData) => {
+    const response = await adminClient.put(`/coupons/${id}`, couponData);
+    return response.data;
+  },
+
+  deleteCoupon: async (id) => {
+    const response = await adminClient.delete(`/coupons/${id}`);
+    return response.data;
   }
 };
