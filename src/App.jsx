@@ -13,6 +13,7 @@ import Inventory from './pages/Inventory';
 import Messages from './pages/Messages';
 import Users from './pages/Users';
 import PagesEditor from './pages/PagesEditor';
+import Banners from './pages/Banners';
 
 const App = () => {
   const { isAuthenticated } = useStore();
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
         <Route path="inventory" element={<Inventory />} />
+        <Route path="banners" element={<Banners />} />
         <Route path="pages" element={<PagesEditor />} />
         <Route path="messages" element={<Messages />} />
         <Route path="users" element={<Users />} />

@@ -14,7 +14,8 @@ import {
   Bell,
   LogOut,
   Mail,
-  Users
+  Users,
+  Image as ImageIcon
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Toaster, toast } from 'sonner';
@@ -29,6 +30,7 @@ const AdminLayout = () => {
     { name: 'Orders', href: '/orders', icon: ShoppingBag },
     { name: 'Inventory', href: '/inventory', icon: Warehouse },
     { name: 'Categories', href: '/categories', icon: Globe },
+    { name: 'Banners', href: '/banners', icon: ImageIcon },
     { name: 'Pages', href: '/pages', icon: FileText },
     { name: 'Messages', href: '/messages', icon: Mail },
     { name: 'Users', href: '/users', icon: Users },

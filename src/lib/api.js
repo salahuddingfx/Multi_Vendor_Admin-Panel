@@ -151,5 +151,52 @@ export const api = {
   updateUser: async (userId, userData) => {
     const response = await adminClient.put(`/users/${userId}`, userData);
     return response.data.data;
+  },
+
+  // Hero Slides (Banners)
+  getHeroSlides: async (siteId) => {
+    const response = await adminClient.get('/hero-slides', { params: { site_id: siteId } });
+    return response.data.data;
+  },
+
+  storeHeroSlide: async (formData) => {
+    const response = await adminClient.post('/hero-slides', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data.data;
+  },
+
+  updateHeroSlide: async (id, formData) => {
+    // Note: We use the direct POST route we added in api.php for multipart updates
+    const response = await adminClient.post(`/hero-slides/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data.data;
+  },
+
+  deleteHeroSlide: async (id) => {
+    const response = await adminClient.delete(`/hero-slides/${id}`);
+    return response.data.data;
+  },
+
+  // Dynamic Pages
+  getPages: async (siteId) => {
+    const response = await adminClient.get('/pages', { params: { site_id: siteId } });
+    return response.data.data;
+  },
+
+  storePage: async (pageData) => {
+    const response = await adminClient.post('/pages', pageData);
+    return response.data.data;
+  },
+
+  updatePage: async (id, pageData) => {
+    const response = await adminClient.put(`/pages/${id}`, pageData);
+    return response.data.data;
+  },
+
+  deletePage: async (id) => {
+    const response = await adminClient.delete(`/pages/${id}`);
+    return response.data.data;
   }
 };
