@@ -88,6 +88,8 @@ const Categories = () => {
             setEditingCategory(null); 
             setName(''); 
             setIsFeatured(false);
+            setImage(null);
+            setImagePreview(null);
             setIsModalOpen(true); 
           }}
           className="bg-maroon text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 shadow-xl shadow-maroon/20 hover:scale-105 active:scale-95 transition-all uppercase text-sm tracking-wider"
@@ -130,6 +132,8 @@ const Categories = () => {
                       setEditingCategory(cat); 
                       setName(cat.name); 
                       setIsFeatured(cat.is_featured);
+                      setImage(null);
+                      setImagePreview(null);
                       setIsModalOpen(true); 
                     }}
                     className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-slate-800 transition-all"
