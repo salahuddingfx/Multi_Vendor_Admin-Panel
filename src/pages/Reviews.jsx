@@ -1,12 +1,29 @@
 import { useState, useEffect } from 'react';
-import { api } from '../lib/api';
-import { Trash2, CheckCircle, XCircle, Star, MessageSquare, Loader2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import api from '../lib/api';
+import { 
+  Star, 
+  CheckCircle2, 
+  XCircle, 
+  Trash2, 
+  MessageSquare, 
+  Search,
+  Loader2,
+  AlertTriangle
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import { clsx } from 'clsx';
 
 const Reviews = () => {
+  const { selectedStore, stores } = useStore();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { selectedStore } = useStore();
+  const [search, setSearch] = useState('');
+  const [replyText, setReplyText] = useState({});
+  const [submittingReply, setSubmittingReply] = useState({});
+
+  const currentStore = stores.find(s => s.id === selectedStore);
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
   useEffect(() => {
@@ -14,105 +31,187 @@ const Reviews = () => {
   }, [selectedStore]);
 
   const fetchReviews = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await api.getReviews(siteId);
-      // Handle both paginated (res.data) and plain array responses
-      setReviews(Array.isArray(res) ? res : (res?.data || []));
-    } catch (err) {
-      console.error(err);
+      const response = await api.get(`/admin/reviews?site_id=${siteId}`);
+      if (response.data.success) {
+        setReviews(response.data.data);
+      }
+    } catch (error) {
+      toast.error('Failed to fetch reviews');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleToggleApproval = async (id, currentStatus) => {
+  const toggleApproval = async (id, currentStatus) => {
     try {
-      await api.updateReview(id, { is_approved: !currentStatus });
-      fetchReviews();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this review?")) {
-      try {
-        await api.deleteReview(id);
-        fetchReviews();
-      } catch (err) {
-        console.error(err);
+      const response = await api.put(`/admin/reviews/${id}`, { is_approved: !currentStatus });
+      if (response.data.success) {
+        setReviews(reviews.map(r => r.id === id ? { ...r, is_approved: !currentStatus } : r));
+        toast.success(currentStatus ? 'Review unapproved' : 'Review approved');
       }
+    } catch (error) {
+      toast.error('Operation failed');
     }
   };
 
-  const renderStars = (rating) => {
+  const deleteReview = async (id) => {
+    if (!window.confirm('Delete this review permanently?')) return;
+    try {
+      const response = await api.delete(`/admin/reviews/${id}`);
+      if (response.data.success) {
+        setReviews(reviews.filter(r => r.id !== id));
+        toast.success('Review deleted');
+      }
+    } catch (error) {
+      toast.error('Failed to delete review');
+    }
+  };
+
+  const submitReply = async (id) => {
+    if (!replyText[id]?.trim()) return;
+    setSubmittingReply(prev => ({ ...prev, [id]: true }));
+    try {
+      const response = await api.put(`/admin/reviews/${id}`, { admin_reply: replyText[id] });
+      if (response.data.success) {
+        setReviews(reviews.map(r => r.id === id ? { ...r, admin_reply: replyText[id] } : r));
+        toast.success('Reply saved');
+      }
+    } catch (error) {
+      toast.error('Failed to save reply');
+    } finally {
+      setSubmittingReply(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const filteredReviews = reviews.filter(r => 
+    r.customer_name.toLowerCase().includes(search.toLowerCase()) ||
+    r.product?.name.toLowerCase().includes(search.toLowerCase()) ||
+    r.comment?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading) {
     return (
-      <div className="flex text-yellow-400">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} size={14} fill={i < Math.floor(rating) ? "currentColor" : "none"} className={i < Math.floor(rating) ? "" : "text-slate-300"} />
-        ))}
-        <span className="ml-1 text-xs font-bold text-slate-500">{rating}</span>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="w-12 h-12 text-slate-400 animate-spin" />
+        <p className="text-slate-500 font-medium">Curating reviews...</p>
       </div>
     );
-  };
+  }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-8">
+    <div className="space-y-10 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Customer Reviews</h1>
-          <p className="text-slate-500">Approve or moderate reviews submitted by customers.</p>
+          <h1 className="text-4xl font-display font-black text-slate-800 mb-2">Review Management</h1>
+          <p className="text-slate-500 font-medium">Moderate customer feedback and build trust.</p>
+        </div>
+
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-slate-800" size={20} />
+          <input 
+            type="text" 
+            placeholder="Search reviews..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full md:w-80 pl-12 pr-6 py-4 bg-white rounded-2xl shadow-soft border border-black/[0.02] outline-none focus:ring-4 focus:ring-slate-100 transition-all font-medium"
+          />
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center p-20"><Loader2 className="animate-spin text-maroon" size={32} /></div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.length === 0 ? (
-            <div className="col-span-full p-12 text-center bg-slate-50 rounded-2xl border border-slate-100">
-              <MessageSquare size={48} className="mx-auto text-slate-300 mb-4" />
-              <p className="text-lg font-bold text-slate-600">No reviews found.</p>
-            </div>
-          ) : reviews.map(review => (
-            <div key={review.id} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-bold text-slate-800">{review.customer_name}</h3>
-                    <p className="text-xs text-slate-400">{new Date(review.created_at).toLocaleDateString()}</p>
+      <div className="grid grid-cols-1 gap-6">
+        {filteredReviews.map((review) => (
+          <motion.div 
+            layout
+            key={review.id}
+            className={clsx(
+              "bg-white rounded-[32px] p-8 border border-black/[0.02] shadow-premium transition-all",
+              !review.is_approved && "border-amber-100 bg-amber-50/10"
+            )}
+          >
+            <div className="flex flex-col lg:flex-row gap-8">
+              <div className="flex-grow space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600 font-black text-xl">
+                      {review.customer_name[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-black text-slate-800 text-lg leading-none mb-1">{review.customer_name}</h3>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        {review.product?.name || 'General Review'}
+                      </p>
+                    </div>
                   </div>
-                  {renderStars(review.rating)}
+                  <div className="flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-xl">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={14} className={i < review.rating ? "fill-amber-400 text-amber-400" : "text-slate-200"} />
+                    ))}
+                  </div>
                 </div>
-                {review.product && (
-                  <div className="mb-3 text-xs font-bold text-maroon bg-maroon/5 inline-block px-2 py-1 rounded-md">
-                    Product: {review.product.name}
+
+                <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100 italic text-slate-600">
+                  "{review.comment}"
+                </div>
+
+                {/* Reply Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-slate-400 mb-1">
+                    <MessageSquare size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Admin Response</span>
                   </div>
-                )}
-                <p className="text-slate-600 text-sm leading-relaxed mb-6 italic">
-                  "{review.comment || 'No comment provided.'}"
-                </p>
+                  <div className="flex gap-3">
+                    <textarea 
+                      value={replyText[review.id] ?? review.admin_reply ?? ''}
+                      onChange={(e) => setReplyText(prev => ({ ...prev, [review.id]: e.target.value }))}
+                      placeholder="Type your reply here..."
+                      className="flex-grow p-4 bg-white border border-slate-100 rounded-2xl text-sm outline-none focus:border-slate-300 transition-all resize-none h-20"
+                    />
+                    <button 
+                      onClick={() => submitReply(review.id)}
+                      disabled={submittingReply[review.id]}
+                      className="px-6 rounded-2xl bg-slate-900 text-white font-black uppercase tracking-widest text-[10px] hover:bg-slate-800 transition-all disabled:opacity-50"
+                    >
+                      {submittingReply[review.id] ? <Loader2 className="animate-spin" size={16} /> : 'Save'}
+                    </button>
+                  </div>
+                </div>
               </div>
-              
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+
+              <div className="lg:w-48 flex lg:flex-col gap-3">
                 <button 
-                  onClick={() => handleToggleApproval(review.id, review.is_approved)}
-                  className={`flex items-center gap-2 text-sm font-bold px-3 py-1.5 rounded-lg transition-colors ${review.is_approved ? 'text-green-600 bg-green-50 hover:bg-green-100' : 'text-amber-600 bg-amber-50 hover:bg-amber-100'}`}
+                  onClick={() => toggleApproval(review.id, review.is_approved)}
+                  className={clsx(
+                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all",
+                    review.is_approved ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                  )}
                 >
-                  {review.is_approved ? <><CheckCircle size={16} /> Approved</> : <><XCircle size={16} /> Pending</>}
+                  {review.is_approved ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                  {review.is_approved ? 'Unapprove' : 'Approve'}
                 </button>
                 <button 
-                  onClick={() => handleDelete(review.id)}
-                  className="text-slate-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                  onClick={() => deleteReview(review.id)}
+                  className="flex-1 flex items-center justify-center gap-2 p-4 bg-rose-50 text-rose-600 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-rose-100 transition-all"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={16} />
+                  Delete
                 </button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </motion.div>
+        ))}
+
+        {filteredReviews.length === 0 && (
+          <div className="text-center py-32 bg-white rounded-[40px] border border-black/[0.02] shadow-soft">
+            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Star className="text-slate-200" size={32} />
+            </div>
+            <h3 className="text-xl font-display font-black text-slate-800 mb-2">No reviews found</h3>
+            <p className="text-slate-400 font-medium">Try searching with a different keyword.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
