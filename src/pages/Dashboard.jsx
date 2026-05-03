@@ -67,8 +67,8 @@ const Dashboard = () => {
       icon: TrendingUp, 
       color: 'text-emerald-600', 
       bg: 'bg-emerald-50',
-      trend: '+12.5%',
-      trendUp: true
+      trend: `${stats.growth >= 0 ? '+' : ''}${stats.growth}%`,
+      trendUp: stats.growth >= 0
     },
     { 
       label: 'Total Orders', 
@@ -249,6 +249,75 @@ const Dashboard = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Low Stock Alerts Section */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white p-8 md:p-10 rounded-[40px] border border-black/[0.02] shadow-premium"
+      >
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-rose-50 text-rose-600 rounded-xl">
+              <AlertCircle size={24} />
+            </div>
+            <div>
+              <h3 className="text-xl font-display font-black text-slate-800">Inventory Health</h3>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Low stock alerts</p>
+            </div>
+          </div>
+          <button className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-800 transition-colors">Manage Inventory</button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-50">
+                <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Product Name</th>
+                <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Category</th>
+                <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Stock</th>
+                <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {(stats.lowStockProducts || []).map((product) => (
+                <tr key={product.id} className="group hover:bg-slate-50/50 transition-colors">
+                  <td className="py-5">
+                    <p className="font-bold text-slate-800 text-sm">{product.name}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">SKU: {product.sku || 'N/A'}</p>
+                  </td>
+                  <td className="py-5">
+                    <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                      {product.category?.name || 'General'}
+                    </span>
+                  </td>
+                  <td className="py-5">
+                    <p className="font-black text-slate-800">{product.stock}</p>
+                  </td>
+                  <td className="py-5 text-right">
+                    <span className={clsx(
+                      "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest",
+                      product.stock === 0 ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"
+                    )}>
+                      {product.stock === 0 ? 'Out of Stock' : 'Low Stock'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {(stats.lowStockProducts || []).length === 0 && (
+                <tr>
+                  <td colSpan="4" className="py-20 text-center">
+                    <div className="flex flex-col items-center">
+                      <CheckCircle2 size={40} className="text-emerald-100 mb-4" />
+                      <p className="text-sm font-bold text-slate-400">Inventory is healthy! All products are well-stocked.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </motion.div>
     </div>
   );
 };

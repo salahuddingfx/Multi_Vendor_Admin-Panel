@@ -9,7 +9,10 @@ import {
   MessageSquare, 
   Search,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Image as ImageIcon,
+  Video,
+  PlayCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -140,16 +143,52 @@ const Reviews = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-xl">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className={i < review.rating ? "fill-amber-400 text-amber-400" : "text-slate-200"} />
-                    ))}
+                  <div className="flex items-center gap-0.5 bg-amber-50 px-3 py-1.5 rounded-xl">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const isFull = review.rating >= star;
+                      const isHalf = review.rating >= star - 0.5 && !isFull;
+                      return (
+                        <div key={star} className="relative">
+                          <Star size={14} className={isFull ? "fill-amber-400 text-amber-400" : "text-slate-200"} />
+                          {isHalf && (
+                            <div className="absolute top-0 left-0 overflow-hidden w-[50%]">
+                              <Star size={14} className="fill-amber-400 text-amber-400" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
                 <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100 italic text-slate-600">
                   "{review.comment}"
                 </div>
+
+                {/* Review Media Gallery */}
+                {review.media && review.media.length > 0 && (
+                  <div className="flex flex-wrap gap-3 py-2">
+                    {review.media.map((m, idx) => (
+                      <div key={idx} className="relative group w-24 h-24 rounded-2xl overflow-hidden border border-slate-100 shadow-sm cursor-pointer hover:border-slate-300 transition-all">
+                        {m.type === 'image' ? (
+                          <img 
+                            src={m.file_path} 
+                            alt="Review Proof" 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
+                            onClick={() => window.open(m.file_path, '_blank')}
+                          />
+                        ) : (
+                          <div 
+                            className="w-full h-full bg-slate-900 flex items-center justify-center text-white"
+                            onClick={() => window.open(m.file_path, '_blank')}
+                          >
+                            <PlayCircle size={28} />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Reply Section */}
                 <div className="space-y-3">
@@ -175,22 +214,22 @@ const Reviews = () => {
                 </div>
               </div>
 
-              <div className="lg:w-48 flex lg:flex-col gap-3">
+              <div className="lg:w-40 flex lg:flex-col gap-3 justify-center">
                 <button 
                   onClick={() => toggleApproval(review.id, review.is_approved)}
                   className={clsx(
-                    "flex-1 flex items-center justify-center gap-2 p-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all",
-                    review.is_approved ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                    "w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all",
+                    review.is_approved ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
                   )}
                 >
-                  {review.is_approved ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                  {review.is_approved ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
                   {review.is_approved ? 'Unapprove' : 'Approve'}
                 </button>
                 <button 
                   onClick={() => deleteReview(review.id)}
-                  className="flex-1 flex items-center justify-center gap-2 p-4 bg-rose-50 text-rose-600 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-rose-100 transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-rose-50 text-rose-500 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-rose-100 transition-all"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                   Delete
                 </button>
               </div>

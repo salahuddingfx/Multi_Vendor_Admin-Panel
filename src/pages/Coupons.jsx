@@ -10,9 +10,11 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { api } from '../lib/api';
+import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Coupons = () => {
+  const { selectedStore } = useStore();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,13 +27,16 @@ const Coupons = () => {
     is_active: true
   });
 
+  const siteId = selectedStore === 'acharu' ? 1 : 2;
+
   useEffect(() => {
     fetchCoupons();
-  }, []);
+  }, [selectedStore]);
 
   const fetchCoupons = async () => {
     try {
-      const data = await api.getCoupons();
+      setLoading(true);
+      const data = await api.getCoupons(siteId);
       setCoupons(data);
     } catch (error) {
       console.error('Error fetching coupons:', error);
@@ -43,10 +48,11 @@ const Coupons = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = { ...formData, site_id: siteId };
       if (currentCoupon) {
-        await api.updateCoupon(currentCoupon.id, formData);
+        await api.updateCoupon(currentCoupon.id, payload);
       } else {
-        await api.storeCoupon(formData);
+        await api.storeCoupon(payload);
       }
       fetchCoupons();
       closeModal();

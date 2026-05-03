@@ -38,60 +38,47 @@ export const api = {
     return response.data;
   },
 
+  getProfile: async () => {
+    const response = await adminClient.get('/me');
+    return response.data.data;
+  },
+
   // Dashboard Stats
   getDashboardStats: async (storeId) => {
     const siteId = storeId === 'acharu' ? 1 : 2;
     const response = await adminClient.get('/stats', { params: { site_id: siteId } });
-    const data = response.data.data;
-    
-    return {
-      totalSales: data.total_sales || 0,
-      totalOrders: data.total_orders || 0,
-      activeProducts: data.active_products || 0,
-      lowStock: data.low_stock_products || 0,
-      recentSales: (data.recent_orders || []).map(o => ({
-        id: o.tracking_id,
-        date: new Date(o.created_at).toLocaleDateString(),
-        amount: o.total_amount
-      })),
-      chartData: (data.chart_data || []).map(d => ({
-        name: d.name,
-        value: d.sales
-      }))
-    };
+    return response.data.data;
+  },
+
+  getSalesStats: async (siteId, range = 'monthly') => {
+    const response = await adminClient.get('/sales/stats', { params: { site_id: siteId, range } });
+    return response.data;
   },
 
   // Products
   getProducts: async (siteId) => {
     const response = await adminClient.get('/products', { params: { site_id: siteId } });
-    const products = response.data.data.data; // Access data inside pagination
-    
-    return products.map(p => ({
-      ...p,
-      category: p.category?.name || 'Uncategorized',
-      image: p.images && p.images.length > 0 ? p.images[0].image_path : 'https://images.unsplash.com/photo-1514516348920-f319999a5e8f?q=80&w=200&auto=format&fit=crop'
-    }));
+    return response.data;
   },
 
   storeProduct: async (formData) => {
     const response = await adminClient.post('/products', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    return response.data.data;
+    return response.data;
   },
 
   updateProduct: async (id, formData) => {
-    // Laravel has an issue with PUT + Multipart, so we spoof it with POST + _method=PUT
     formData.append('_method', 'PUT');
     const response = await adminClient.post(`/products/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    return response.data.data;
+    return response.data;
   },
 
   deleteProduct: async (id) => {
     const response = await adminClient.delete(`/products/${id}`);
-    return response.data.data;
+    return response.data;
   },
 
   // Categories
@@ -100,40 +87,30 @@ export const api = {
     return response.data.data;
   },
 
-  storeCategory: async (categoryData) => {
-    const response = await adminClient.post('/categories', categoryData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    return response.data.data;
-  },
-
-  updateCategory: async (id, formData) => {
-    // Note: We use the direct POST route we added in api.php for multipart updates
-    const response = await adminClient.post(`/categories/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    return response.data.data;
-  },
-
-  deleteCategory: async (id) => {
-    const response = await adminClient.delete(`/categories/${id}`);
-    return response.data.data;
-  },
-
-  // Orders
+  // Orders & Inventory
   getOrders: async (siteId) => {
     const response = await adminClient.get('/orders', { params: { site_id: siteId } });
-    return response.data.data;
+    return response.data;
   },
 
   updateOrderStatus: async (orderId, status) => {
-    const response = await adminClient.put(`/orders/${orderId}/status`, { status });
-    return response.data.data;
+    const response = await adminClient.patch(`/orders/${orderId}/status`, { status });
+    return response.data;
   },
 
   updatePaymentStatus: async (orderId, paymentStatus) => {
     const response = await adminClient.put(`/orders/${orderId}/payment-status`, { payment_status: paymentStatus });
-    return response.data.data;
+    return response.data;
+  },
+
+  recordReturn: async (data) => {
+    const response = await adminClient.post('/inventory/return', data);
+    return response.data;
+  },
+  
+  getReturns: async () => {
+    const response = await adminClient.get('/inventory/returns');
+    return response.data;
   },
 
   // Site Settings
@@ -144,18 +121,7 @@ export const api = {
 
   updateSettings: async (siteId, settings) => {
     const response = await adminClient.put(`/sites/${siteId}/settings`, { settings });
-    return response.data.data;
-  },
-
-  // User Management
-  getUsers: async () => {
-    const response = await adminClient.get('/users');
-    return response.data.data;
-  },
-
-  updateUser: async (userId, userData) => {
-    const response = await adminClient.put(`/users/${userId}`, userData);
-    return response.data.data;
+    return response.data;
   },
 
   // Hero Slides (Banners)
@@ -168,20 +134,19 @@ export const api = {
     const response = await adminClient.post('/hero-slides', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    return response.data.data;
+    return response.data;
   },
 
   updateHeroSlide: async (id, formData) => {
-    // Note: We use the direct POST route we added in api.php for multipart updates
     const response = await adminClient.post(`/hero-slides/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
-    return response.data.data;
+    return response.data;
   },
 
   deleteHeroSlide: async (id) => {
     const response = await adminClient.delete(`/hero-slides/${id}`);
-    return response.data.data;
+    return response.data;
   },
 
   // Dynamic Pages
@@ -192,28 +157,17 @@ export const api = {
 
   storePage: async (pageData) => {
     const response = await adminClient.post('/pages', pageData);
-    return response.data.data;
+    return response.data;
   },
 
   updatePage: async (id, pageData) => {
     const response = await adminClient.put(`/pages/${id}`, pageData);
-    return response.data.data;
+    return response.data;
   },
 
   deletePage: async (id) => {
     const response = await adminClient.delete(`/pages/${id}`);
-    return response.data.data;
-  },
-
-  // Contact Messages
-  getMessages: async (siteId) => {
-    const response = await adminClient.get('/messages', { params: { site_id: siteId } });
-    return response.data.data; // this is the paginator object
-  },
-
-  markMessageRead: async (id) => {
-    const response = await adminClient.put(`/messages/${id}/read`);
-    return response.data.data;
+    return response.data;
   },
 
   // Reviews
@@ -224,17 +178,17 @@ export const api = {
 
   updateReview: async (id, reviewData) => {
     const response = await adminClient.put(`/reviews/${id}`, reviewData);
-    return response.data.data;
+    return response.data;
   },
 
   deleteReview: async (id) => {
     const response = await adminClient.delete(`/reviews/${id}`);
-    return response.data.data;
+    return response.data;
   },
 
   // Coupons
-  getCoupons: async () => {
-    const response = await adminClient.get('/coupons');
+  getCoupons: async (siteId) => {
+    const response = await adminClient.get('/coupons', { params: { site_id: siteId } });
     return response.data;
   },
 
@@ -250,6 +204,62 @@ export const api = {
 
   deleteCoupon: async (id) => {
     const response = await adminClient.delete(`/coupons/${id}`);
+    return response.data;
+  },
+
+  // Notifications
+  getNotifications: async () => {
+    const response = await adminClient.get('/notifications');
+    return response.data;
+  },
+
+  markNotificationRead: async (id) => {
+    const response = await adminClient.put(`/notifications/${id}/read`);
+    return response.data;
+  },
+
+  markAllNotificationsRead: async () => {
+    const response = await adminClient.put('/notifications/mark-all-read');
+    return response.data;
+  },
+
+  // Contact Messages
+  getMessages: async (siteId) => {
+    const response = await adminClient.get('/messages', { params: { site_id: siteId } });
+    return response.data.data;
+  },
+
+  markMessageRead: async (id) => {
+    const response = await adminClient.put(`/messages/${id}/read`);
+    return response.data;
+  },
+
+  // Admin User Management
+  getUsers: async () => {
+    const response = await adminClient.get('/users');
+    return response.data.data;
+  },
+
+  storeUser: async (formData) => {
+    const response = await adminClient.post('/users', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  updateUser: async (id, formData) => {
+    // For file uploads in Laravel via PUT, we use POST with _method=PUT
+    if (formData instanceof FormData) {
+      formData.append('_method', 'PUT');
+    }
+    const response = await adminClient.post(`/users/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  deleteUser: async (id) => {
+    const response = await adminClient.delete(`/users/${id}`);
     return response.data;
   }
 };

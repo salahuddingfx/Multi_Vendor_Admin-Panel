@@ -56,13 +56,25 @@ const mockOrders = [
   }
 ];
 
-const statusStyles = {
-  'placed': 'bg-blue-50 text-blue-600 border-blue-100',
-  'confirmed': 'bg-indigo-50 text-indigo-600 border-indigo-100',
-  'packed': 'bg-purple-50 text-purple-600 border-purple-100',
-  'shipped': 'bg-amber-50 text-amber-600 border-amber-100',
-  'delivered': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-  'cancelled': 'bg-rose-50 text-rose-600 border-rose-100',
+const statuses = [
+  { value: 'all', label: 'All Orders' },
+  { value: 'received', label: 'Received' },
+  { value: 'processed', label: 'Processed' },
+  { value: 'shipped', label: 'Shipped' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+
+const getStatusStyle = (status) => {
+  switch (status) {
+    case 'placed': return 'bg-blue-50 text-blue-600 border-blue-100';
+    case 'confirmed': return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+    case 'packed': return 'bg-purple-50 text-purple-600 border-purple-100';
+    case 'shipped': return 'bg-amber-50 text-amber-600 border-amber-100';
+    case 'delivered': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+    case 'cancelled': return 'bg-rose-50 text-rose-600 border-rose-100';
+    default: return 'bg-slate-50 text-slate-600 border-slate-100';
+  }
 };
 
 const Orders = () => {
@@ -81,10 +93,18 @@ const Orders = () => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const data = await api.getOrders(siteId);
-        setOrders(data.data || []);
+        const res = await api.getOrders(siteId);
+        // Extra safe check for Laravel Paginated response structure
+        if (res && res.data && Array.isArray(res.data.data)) {
+          setOrders(res.data.data);
+        } else if (res && Array.isArray(res.data)) {
+          setOrders(res.data);
+        } else {
+          setOrders([]);
+        }
       } catch (err) {
-        console.error(err);
+        console.error('Failed to fetch orders:', err);
+        setOrders([]);
       } finally {
         setLoading(false);
       }
@@ -92,9 +112,12 @@ const Orders = () => {
     fetchOrders();
   }, [selectedStore]);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         order.tracking_id.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredOrders = (Array.isArray(orders) ? orders : []).filter(order => {
+    const customerName = order.customer_name || '';
+    const trackingId = order.tracking_id || '';
+    
+    const matchesSearch = customerName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         trackingId.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filterStatus === 'All' || order.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -182,18 +205,20 @@ const Orders = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: 'Pending', count: '12', icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Processing', count: '08', icon: Package, color: 'text-purple-600', bg: 'bg-purple-50' },
-          { label: 'On Route', count: '05', icon: Truck, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Completed', count: '142', icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Pending', count: (Array.isArray(orders) ? orders : []).filter(o => o.status === 'placed').length, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Processing', count: (Array.isArray(orders) ? orders : []).filter(o => ['confirmed', 'packed'].includes(o.status)).length, icon: Package, color: 'text-purple-600', bg: 'bg-purple-50' },
+          { label: 'On Route', count: (Array.isArray(orders) ? orders : []).filter(o => o.status === 'shipped').length, icon: Truck, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Completed', count: (Array.isArray(orders) ? orders : []).filter(o => o.status === 'delivered').length, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-5">
-            <div className={clsx("w-14 h-14 rounded-2xl flex items-center justify-center", stat.bg)}>
+          <div key={i} className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-5 group hover:shadow-xl transition-all duration-500">
+            <div className={clsx("w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.bg)}>
               <stat.icon className={stat.color} size={24} />
             </div>
             <div>
               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{stat.label}</p>
-              <h3 className="text-2xl font-black text-slate-900 leading-tight">{stat.count}</h3>
+              <h3 className="text-2xl font-black text-slate-900 leading-tight">
+                {stat.count < 10 ? `0${stat.count}` : stat.count}
+              </h3>
             </div>
           </div>
         ))}
@@ -295,7 +320,7 @@ const Orders = () => {
                       onChange={(e) => handleStatusChange(order.id, e.target.value)}
                       className={clsx(
                         "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border outline-none cursor-pointer",
-                        statusStyles[order.status] || "bg-slate-50 text-slate-600 border-slate-100"
+                        getStatusStyle(order.status)
                       )}
                     >
                       <option value="placed">Placed</option>

@@ -6,6 +6,7 @@ import Products from './pages/Products';
 import Orders from './pages/Orders';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
+import SalesDashboard from "./pages/SalesDashboard";
 
 // Placeholders for other pages
 import Categories from './pages/Categories';
@@ -28,6 +29,7 @@ const App = () => {
         <Route index element={<Dashboard />} />
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
+        <Route path="sales" element={<SalesDashboard />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="banners" element={<Banners />} />
         <Route path="pages" element={<Pages />} />

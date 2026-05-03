@@ -16,6 +16,7 @@ export const useStore = create(
       
       login: (userData) => set({ user: userData, isAuthenticated: true }),
       logout: () => set({ user: null, isAuthenticated: false }),
+      updateUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
       
       // Theme Helper
       getThemeColor: (state) => state.selectedStore === 'acharu' ? '#800000' : '#1A365D',
