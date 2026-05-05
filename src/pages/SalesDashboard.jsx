@@ -250,15 +250,19 @@ const SalesDashboard = () => {
   );
 
   const stats = [
-    { label: 'Net Product Revenue', value: data?.total_product_price || 0, icon: ShoppingBag, color: 'emerald', isCurrency: true, subtext: 'Excluding delivery & returns' },
+    { label: 'Realized Revenue', value: data?.realized_revenue || 0, icon: ShoppingBag, color: 'emerald', isCurrency: true, subtext: 'Successfully Delivered orders' },
+    { label: 'Potential Revenue', value: data?.total_product_price || 0, icon: DollarSign, color: 'blue', isCurrency: true, subtext: 'All orders in pipeline' },
     { label: 'Total Returns', value: data?.total_returns || 0, icon: RefreshCcw, color: 'rose', isCurrency: true, subtext: 'Product value returned' },
     { label: 'Logistics Loss', value: data?.logistics_loss || 0, icon: AlertTriangle, color: 'rose', isCurrency: true, subtext: 'Lost on returns/cancelled' },
     { label: 'Real Margin', value: data?.total_revenue || 0, icon: DollarSign, color: 'maroon', isCurrency: true, subtext: 'Final profit estimation' },
     { label: 'Avg Order Value', value: data?.avg_order_value || 0, icon: Star, color: 'amber', isCurrency: true, subtext: 'Net average per order' },
     { label: 'Cancelled Value', value: data?.total_cancelled_value || 0, icon: X, color: 'slate', isCurrency: true, subtext: `${data?.total_cancelled_orders || 0} orders cancelled` },
-    { label: 'Order Velocity', value: data?.total_orders || 0, icon: TrendingUp, color: 'violet', isCurrency: false, subtext: 'Successful order count' },
-    { label: 'Growth Index', value: data?.total_customers || 0, icon: Users, color: 'indigo', isCurrency: false, subtext: 'Unique customers reached' },
+    { label: 'Order Velocity', value: data?.total_orders || 0, icon: TrendingUp, color: 'violet', isCurrency: false, subtext: 'Total order attempts' },
   ];
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
     <div className="space-y-12 pb-20">
@@ -284,6 +288,13 @@ const SalesDashboard = () => {
                 )}
               >{s === 'all' ? 'Group View' : (s === 'acharu' ? 'Acharu' : 'TajaShutki')}</button>
             ))}
+            
+            <button 
+              onClick={handlePrint}
+              className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-maroon transition-all flex items-center gap-2 shadow-lg"
+            >
+              <Download size={14} /> Master Export
+            </button>
           </div>
         </div>
         
