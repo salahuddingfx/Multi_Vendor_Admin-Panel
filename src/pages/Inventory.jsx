@@ -282,7 +282,7 @@ const Inventory = () => {
                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Per Unit</span>
                       </div>
                     </td>
-                    <td className="px-10 py-8 text-right relative z-[1]">
+                    <td className={clsx("px-10 py-8 text-right relative", activeMenu === p.id ? "z-[50]" : "z-[1]")}>
                       <div className="flex justify-end gap-3">
                         <button 
                           onClick={() => {
