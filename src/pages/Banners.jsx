@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { Image as ImageIcon, Plus, Trash2, Edit2, Save, X, ExternalLink } from 'lucide-react';
 import { api } from '../lib/api';
 import { toast } from 'sonner';
+import ConfirmModal from '../components/ConfirmModal';
 
 const labelCls = "block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1";
 const inputCls = "w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-maroon/5 focus:border-maroon outline-none transition-all font-bold text-slate-900";
@@ -23,6 +24,8 @@ const Banners = () => {
     image: null,
     order: 0
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [bannerToDelete, setBannerToDelete] = useState(null);
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -79,14 +82,15 @@ const Banners = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this banner?')) return;
+  const handleDelete = async () => {
+    if (!bannerToDelete) return;
     try {
-      await api.deleteHeroSlide(id);
+      await api.deleteHeroSlide(bannerToDelete);
       toast.success('Banner deleted');
       fetchBanners();
+      setShowDeleteConfirm(false);
+      setBannerToDelete(null);
     } catch (err) {
-      console.error(err);
       toast.error('Delete failed');
     }
   };
@@ -156,12 +160,15 @@ const Banners = () => {
                   >
                     <Edit2 size={18} />
                   </button>
-                  <button 
-                    onClick={() => handleDelete(banner.id)}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                   <button 
+                     onClick={() => {
+                       setBannerToDelete(banner.id);
+                       setShowDeleteConfirm(true);
+                     }}
+                     className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                   >
+                     <Trash2 size={18} />
+                   </button>
                 </div>
               </div>
             </div>
@@ -291,6 +298,16 @@ const Banners = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Banner?"
+        message="Are you sure you want to remove this hero slide from your homepage?"
+        type="danger"
+        confirmText="Yes, Delete Banner"
+      />
     </div>
   );
 };
