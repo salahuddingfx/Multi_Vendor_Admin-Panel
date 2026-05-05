@@ -56,6 +56,8 @@ const StatCard = ({ label, value, icon: Icon, color, isCurrency, formatCurrency,
 const SalesDashboard = () => {
   const { selectedStore, setSelectedStore } = useStore();
   const [range, setRange] = useState('monthly');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,17 +68,21 @@ const SalesDashboard = () => {
     { id: 'daily', name: '24H' },
     { id: 'weekly', name: 'Weekly' },
     { id: 'monthly', name: 'Monthly' },
+    { id: '90days', name: '90D' },
     { id: 'yearly', name: 'Yearly' },
   ];
 
   useEffect(() => {
-    fetchStats();
+    // If dates are picked, we ignore the predefined range
+    if (!startDate && !endDate) {
+      fetchStats();
+    }
   }, [range, selectedStore]);
 
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const res = await api.getSalesStats(siteId || '', range); 
+      const res = await api.getSalesStats(siteId || '', range, startDate, endDate); 
       setData(res);
     } catch (error) {
       console.error(error);
@@ -86,12 +92,21 @@ const SalesDashboard = () => {
     }
   };
 
+  const handleCustomFilter = (e) => {
+    e.preventDefault();
+    if (!startDate || !endDate) {
+      toast.error('Please select both start and end dates');
+      return;
+    }
+    fetchStats();
+  };
+
   const formatCurrency = (val) => {
     return new Intl.NumberFormat('en-BD', {
       style: 'currency',
       currency: 'BDT',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(val);
   };
 
@@ -106,66 +121,93 @@ const SalesDashboard = () => {
 
   const stats = [
     { label: 'Net Product Revenue', value: data?.total_product_price || 0, icon: ShoppingBag, color: 'emerald', isCurrency: true, subtext: 'Excluding delivery & returns' },
-    { label: 'Delivery Revenue', value: (data?.total_delivery_charge - data?.logistics_loss) || 0, icon: Store, color: 'blue', isCurrency: true, subtext: 'From successful orders' },
+    { label: 'Total Returns', value: data?.total_returns || 0, icon: RefreshCcw, color: 'rose', isCurrency: true, subtext: 'Product value returned' },
     { label: 'Logistics Loss', value: data?.logistics_loss || 0, icon: AlertTriangle, color: 'rose', isCurrency: true, subtext: 'Lost on returns/cancelled' },
-    { label: 'Real Margin', value: data?.total_revenue || 0, icon: DollarSign, color: 'maroon', isCurrency: true, subtext: 'After returns & logistics loss' },
-    { label: 'Avg Order Value', value: data?.avg_order_value || 0, icon: Star, color: 'amber', isCurrency: true, subtext: 'Per transaction average' },
-    { label: 'Avg Delivery Fee', value: data?.avg_delivery_fee || 0, icon: Calendar, color: 'blue', isCurrency: true, subtext: 'Per order average' },
+    { label: 'Real Margin', value: data?.total_revenue || 0, icon: DollarSign, color: 'maroon', isCurrency: true, subtext: 'Final profit estimation' },
+    { label: 'Avg Order Value', value: data?.avg_order_value || 0, icon: Star, color: 'amber', isCurrency: true, subtext: 'Net average per order' },
+    { label: 'Cancelled Value', value: data?.total_cancelled_value || 0, icon: X, color: 'slate', isCurrency: true, subtext: `${data?.total_cancelled_orders || 0} orders cancelled` },
     { label: 'Order Velocity', value: data?.total_orders || 0, icon: TrendingUp, color: 'violet', isCurrency: false, subtext: 'Successful order count' },
+    { label: 'Growth Index', value: data?.total_customers || 0, icon: Users, color: 'indigo', isCurrency: false, subtext: 'Unique customers reached' },
   ];
 
   return (
     <div className="space-y-12 pb-20">
       {/* Dynamic Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8">
         <div className="space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-maroon/5 rounded-full border border-maroon/10">
             <LayoutDashboard size={14} className="text-maroon" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-maroon">Business Intelligence</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-maroon">Master Intelligence</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-display font-black text-slate-900 tracking-tight leading-none">
-            {selectedStore === 'all' ? 'Group' : (selectedStore === 'acharu' ? 'Acharu' : 'TajaShutki')} <span className="text-maroon italic">Insights.</span>
+            Sales <span className="text-maroon italic">Master.</span>
           </h1>
           
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setSelectedStore('all')}
-              className={clsx(
-                "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
-                selectedStore === 'all' ? "bg-maroon text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-50"
-              )}
-            >Group View</button>
-            <button 
-              onClick={() => setSelectedStore('acharu')}
-              className={clsx(
-                "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
-                selectedStore === 'acharu' ? "bg-maroon text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-50"
-              )}
-            >Acharu</button>
-            <button 
-              onClick={() => setSelectedStore('tajashutki')}
-              className={clsx(
-                "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
-                selectedStore === 'tajashutki' ? "bg-maroon text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-50"
-              )}
-            >TajaShutki</button>
+            {['all', 'acharu', 'tajashutki'].map((s) => (
+              <button 
+                key={s}
+                onClick={() => setSelectedStore(s)}
+                className={clsx(
+                  "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+                  selectedStore === s ? "bg-maroon text-white" : "bg-white text-slate-400 border border-slate-100 hover:bg-slate-50"
+                )}
+              >{s === 'all' ? 'Group View' : (s === 'acharu' ? 'Acharu' : 'TajaShutki')}</button>
+            ))}
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-1.5 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] md:rounded-[32px] border border-black/[0.03] shadow-sm">
-          {ranges.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => setRange(r.id)}
-              className={`px-4 md:px-8 py-2 md:py-4 rounded-[18px] md:rounded-[24px] text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${
-                range === r.id 
-                  ? 'bg-slate-900 text-white shadow-2xl scale-105' 
-                  : 'text-slate-400 hover:text-slate-600 hover:bg-white'
-              }`}
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto">
+          {/* Quick Range Selector */}
+          <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] border border-black/[0.03] shadow-sm w-full md:w-auto overflow-x-auto scrollbar-hide">
+            {ranges.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => {
+                  setRange(r.id);
+                  setStartDate('');
+                  setEndDate('');
+                }}
+                className={`px-6 py-3 rounded-[18px] text-[9px] font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${
+                  range === r.id && !startDate
+                    ? 'bg-slate-900 text-white shadow-xl scale-105' 
+                    : 'text-slate-400 hover:text-slate-600 hover:bg-white'
+                }`}
+              >
+                {r.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="h-px md:h-10 w-full md:w-px bg-slate-200" />
+
+          {/* Custom Date Filter */}
+          <form onSubmit={handleCustomFilter} className="flex flex-wrap items-center gap-3 bg-white p-2 rounded-[24px] border border-slate-100 shadow-sm w-full md:w-auto">
+            <div className="flex items-center gap-2 px-3">
+              <Calendar size={14} className="text-slate-400" />
+              <input 
+                type="date" 
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="bg-transparent text-[10px] font-bold text-slate-600 focus:outline-none"
+              />
+            </div>
+            <div className="w-4 h-px bg-slate-200" />
+            <div className="flex items-center gap-2 px-3">
+              <input 
+                type="date" 
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="bg-transparent text-[10px] font-bold text-slate-600 focus:outline-none"
+              />
+            </div>
+            <button 
+              type="submit"
+              className="bg-maroon text-white px-6 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-widest hover:bg-maroon/90 transition-all flex items-center gap-2"
             >
-              {r.name}
+              Filter <ArrowRight size={14} />
             </button>
-          ))}
+          </form>
         </div>
       </div>
 
