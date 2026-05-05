@@ -4,6 +4,7 @@ import { Search, Filter, Printer, ExternalLink, ChevronRight, Package, Truck, Ch
 import { useReactToPrint } from 'react-to-print';
 import InvoiceTemplate from '../components/InvoiceTemplate';
 import { api } from '../lib/api';
+import { toast } from 'react-hot-toast';
 import { clsx } from 'clsx';
 
 const mockOrders = [
@@ -86,6 +87,8 @@ const Orders = () => {
   const [printType, setPrintType] = useState('standard');
   const [filterStatus, setFilterStatus] = useState('All');
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
   const [editingOrder, setEditingOrder] = useState(null);
   const [editForm, setEditForm] = useState({
     customer_name: '',
@@ -138,9 +141,9 @@ const Orders = () => {
     try {
       await api.updateOrderStatus(orderId, newStatus);
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+      toast.success(`Order marked as ${newStatus}`);
     } catch (err) {
-      alert('Failed to update status');
-      console.error(err);
+      toast.error('Failed to update status');
     }
   };
 
@@ -148,9 +151,9 @@ const Orders = () => {
     try {
       await api.updatePaymentStatus(orderId, newStatus);
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, payment_status: newStatus } : o));
+      toast.success(`Payment status: ${newStatus}`);
     } catch (err) {
-      alert('Failed to update payment status');
-      console.error(err);
+      toast.error('Failed to update payment status');
     }
   };
 
@@ -159,20 +162,22 @@ const Orders = () => {
       await api.updateOrder(editingOrder.id, editForm);
       setOrders(prev => prev.map(o => o.id === editingOrder.id ? { ...o, ...editForm } : o));
       setShowEditModal(false);
+      toast.success('Order details updated');
     } catch (err) {
-      alert('Failed to update order details');
-      console.error(err);
+      toast.error('Failed to update order details');
     }
   };
 
-  const handleDeleteOrder = async (orderId) => {
-    if (!window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) return;
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return;
     try {
-      await api.deleteOrder(orderId);
-      setOrders(prev => prev.filter(o => o.id !== orderId));
+      await api.deleteOrder(orderToDelete.id);
+      setOrders(prev => prev.filter(o => o.id !== orderToDelete.id));
+      setShowDeleteConfirm(false);
+      setOrderToDelete(null);
+      toast.success('Order deleted permanently');
     } catch (err) {
-      alert('Failed to delete order');
-      console.error(err);
+      toast.error('Failed to delete order');
     }
   };
 
@@ -437,7 +442,10 @@ const Orders = () => {
                       </button>
 
                       <button 
-                        onClick={() => handleDeleteOrder(order.id)}
+                        onClick={() => {
+                          setOrderToDelete(order);
+                          setShowDeleteConfirm(true);
+                        }}
                         className="p-3 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
                         title="Delete Order"
                       >
@@ -517,6 +525,36 @@ const Orders = () => {
                 Save Changes
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+          <div className="bg-white w-full max-w-sm rounded-[40px] p-10 shadow-2xl relative text-center">
+             <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Trash2 size={40} />
+             </div>
+             <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Delete Order?</h2>
+             <p className="text-slate-500 text-sm font-medium mb-8">
+                Are you sure you want to delete order <span className="font-bold">#{orderToDelete?.tracking_id.toUpperCase()}</span>? This action cannot be undone.
+             </p>
+             
+             <div className="flex flex-col gap-3">
+                <button 
+                  onClick={handleDeleteOrder}
+                  className="w-full py-4 bg-rose-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-rose-700 transition-all shadow-lg shadow-rose-200"
+                >
+                  Yes, Delete Order
+                </button>
+                <button 
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="w-full py-4 bg-slate-100 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-200 transition-all"
+                >
+                  Cancel
+                </button>
+             </div>
           </div>
         </div>
       )}
