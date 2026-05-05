@@ -391,44 +391,60 @@ const SalesDashboard = () => {
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 sm:mb-0 sm:mr-4">Date Selection</div>
-            <form onSubmit={handleCustomFilter} className="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-[28px] border border-slate-100 w-full sm:w-auto">
-              <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-maroon/20 focus-within:border-maroon/50">
-                <Calendar size={16} className="text-maroon" />
-                <div className="flex flex-col">
-                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Start Date</span>
-                  <input 
-                    type="date" 
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="bg-transparent text-[11px] font-black text-slate-900 focus:outline-none cursor-pointer"
-                  />
-                </div>
-              </div>
-              
-              <div className="w-4 h-px bg-slate-200 hidden sm:block" />
-              
-              <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-maroon/20 focus-within:border-maroon/50">
-                <Calendar size={16} className="text-maroon" />
-                <div className="flex flex-col">
-                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">End Date</span>
-                  <input 
-                    type="date" 
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="bg-transparent text-[11px] font-black text-slate-900 focus:outline-none cursor-pointer"
-                  />
-                </div>
-              </div>
+          <div className="flex flex-col lg:flex-row items-stretch gap-6 w-full lg:w-auto mt-8 lg:mt-0">
+            <div className="flex flex-col gap-3">
+               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Audit Range Selection</span>
+               <div className="flex flex-col sm:flex-row items-center gap-4">
+                  {/* Start Date Card */}
+                  <div className="relative group flex-1 sm:flex-none">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-maroon/20 to-maroon/5 rounded-[32px] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <div className="relative flex items-center bg-white border border-slate-100 rounded-[28px] p-2 pr-6 shadow-sm hover:shadow-xl transition-all duration-500 min-w-[240px]">
+                      <div className="w-14 h-14 bg-maroon text-white rounded-[22px] flex flex-col items-center justify-center shadow-lg shadow-maroon/20">
+                        <span className="text-[8px] font-black uppercase tracking-tighter opacity-70">From</span>
+                        <Calendar size={20} strokeWidth={2.5} />
+                      </div>
+                      <div className="ml-4 flex-1">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Pick Start</p>
+                        <input 
+                          type="date" 
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          className="bg-transparent text-sm font-black text-slate-900 focus:outline-none w-full cursor-pointer [color-scheme:light]"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-              <button 
-                type="submit"
-                className="bg-slate-900 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-maroon transition-all flex items-center gap-2 group ml-auto"
-              >
-                Generate Report <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-            </form>
+                  <div className="w-8 h-px bg-slate-200 hidden sm:block" />
+
+                  {/* End Date Card */}
+                  <div className="relative group flex-1 sm:flex-none">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-emerald-500/5 rounded-[32px] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <div className="relative flex items-center bg-white border border-slate-100 rounded-[28px] p-2 pr-6 shadow-sm hover:shadow-xl transition-all duration-500 min-w-[240px]">
+                      <div className="w-14 h-14 bg-slate-900 text-white rounded-[22px] flex flex-col items-center justify-center shadow-lg shadow-slate-900/20">
+                        <span className="text-[8px] font-black uppercase tracking-tighter opacity-70">To</span>
+                        <Calendar size={20} strokeWidth={2.5} />
+                      </div>
+                      <div className="ml-4 flex-1">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Pick End</p>
+                        <input 
+                          type="date" 
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          className="bg-transparent text-sm font-black text-slate-900 focus:outline-none w-full cursor-pointer [color-scheme:light]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={handleCustomFilter}
+                    className="h-14 px-10 bg-maroon text-white rounded-[22px] text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-maroon/30 hover:shadow-maroon/50 hover:scale-[1.02] active:scale-95 transition-all duration-500 flex items-center gap-3 group"
+                  >
+                    Run Audit <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+               </div>
+            </div>
           </div>
         </div>
 
