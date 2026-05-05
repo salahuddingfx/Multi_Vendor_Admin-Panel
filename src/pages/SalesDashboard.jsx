@@ -526,47 +526,23 @@ const SalesDashboard = () => {
             <div className="flex flex-col gap-3">
                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Audit Range Selection</span>
                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  {/* Start Date Card */}
-                  <div className="relative group flex-1 sm:flex-none">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-maroon/20 to-maroon/5 rounded-[32px] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                    <div className="relative flex items-center bg-white border border-slate-100 rounded-[28px] p-2 pr-6 shadow-sm hover:shadow-xl transition-all duration-500 min-w-[240px]">
-                      <div className="w-14 h-14 bg-maroon text-white rounded-[22px] flex flex-col items-center justify-center shadow-lg shadow-maroon/20">
-                        <span className="text-[8px] font-black uppercase tracking-tighter opacity-70">From</span>
-                        <Calendar size={20} strokeWidth={2.5} />
-                      </div>
-                      <div className="ml-4 flex-1">
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Pick Start</p>
-                        <input 
-                          type="date" 
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          className="bg-transparent text-sm font-black text-slate-900 focus:outline-none w-full cursor-pointer [color-scheme:light]"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  {/* Start Date Custom Calendar */}
+                  <CustomCalendar 
+                    label="From"
+                    value={startDate}
+                    onChange={setStartDate}
+                    color="maroon"
+                  />
 
                   <div className="w-8 h-px bg-slate-200 hidden sm:block" />
 
-                  {/* End Date Card */}
-                  <div className="relative group flex-1 sm:flex-none">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-emerald-500/5 rounded-[32px] blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                    <div className="relative flex items-center bg-white border border-slate-100 rounded-[28px] p-2 pr-6 shadow-sm hover:shadow-xl transition-all duration-500 min-w-[240px]">
-                      <div className="w-14 h-14 bg-slate-900 text-white rounded-[22px] flex flex-col items-center justify-center shadow-lg shadow-slate-900/20">
-                        <span className="text-[8px] font-black uppercase tracking-tighter opacity-70">To</span>
-                        <Calendar size={20} strokeWidth={2.5} />
-                      </div>
-                      <div className="ml-4 flex-1">
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Pick End</p>
-                        <input 
-                          type="date" 
-                          value={endDate}
-                          onChange={(e) => setEndDate(e.target.value)}
-                          className="bg-transparent text-sm font-black text-slate-900 focus:outline-none w-full cursor-pointer [color-scheme:light]"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  {/* End Date Custom Calendar */}
+                  <CustomCalendar 
+                    label="To"
+                    value={endDate}
+                    onChange={setEndDate}
+                    color="slate"
+                  />
 
                   <button 
                     onClick={handleCustomFilter}
