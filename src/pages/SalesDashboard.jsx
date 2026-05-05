@@ -104,10 +104,10 @@ const CustomCalendar = ({ value, onChange, label, color = "maroon" }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute bottom-full mb-4 left-0 w-[320px] bg-white rounded-[32px] shadow-2xl border border-slate-100 p-6 z-[100]"
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            className="absolute top-full mt-4 left-0 w-[320px] bg-white rounded-[32px] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] border border-slate-100 p-6 z-[999]"
           >
             <div className="flex items-center justify-between mb-6">
               <button onClick={handlePrevMonth} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
@@ -509,8 +509,8 @@ const SalesDashboard = () => {
       </div>
 
       {/* Master Audit & Transaction Timeline */}
-      <div className="mt-10 bg-white rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium overflow-hidden">
-        <div className="p-8 md:p-12 border-b border-slate-50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+      <div className="mt-10 bg-white rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium">
+        <div className="p-8 md:p-12 border-b border-slate-50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 relative z-[50]">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 bg-slate-900 text-white rounded-[24px] flex items-center justify-center shadow-xl">
               <Download className="w-7 h-7" />
