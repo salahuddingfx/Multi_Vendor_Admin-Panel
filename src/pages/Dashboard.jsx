@@ -63,7 +63,7 @@ const Dashboard = () => {
   const statCards = [
     { 
       label: 'Total Revenue', 
-      value: `৳${(stats.totalSales || 0).toLocaleString()}`, 
+      value: `৳${Number(stats.totalSales || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 
       icon: TrendingUp, 
       color: 'text-emerald-600', 
       bg: 'bg-emerald-50',
