@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { Plus, Edit2, Trash2, Check, X, FileText, Loader2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { toast } from 'sonner';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Pages = () => {
   const [pages, setPages] = useState([]);
@@ -14,6 +16,8 @@ const Pages = () => {
     slug: '',
     content: ''
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [pageToDelete, setPageToDelete] = useState(null);
 
   const { selectedStore } = useStore();
   const siteId = selectedStore === 'acharu' ? 1 : 2;
@@ -70,14 +74,16 @@ const Pages = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this page?")) {
-      try {
-        await api.deletePage(id);
-        fetchPages();
-      } catch (err) {
-        console.error(err);
-      }
+  const handleDelete = async () => {
+    if (!pageToDelete) return;
+    try {
+      await api.deletePage(pageToDelete);
+      fetchPages();
+      toast.success('Page deleted');
+      setShowDeleteConfirm(false);
+      setPageToDelete(null);
+    } catch (err) {
+      toast.error('Failed to delete page');
     }
   };
 
@@ -123,7 +129,13 @@ const Pages = () => {
                     <button onClick={() => handleOpenModal(page)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                       <Edit2 size={16} />
                     </button>
-                    <button onClick={() => handleDelete(page.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                    <button 
+                      onClick={() => {
+                        setPageToDelete(page.id);
+                        setShowDeleteConfirm(true);
+                      }}
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -164,6 +176,16 @@ const Pages = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Page?"
+        message="Are you sure you want to delete this page? This will permanently remove it from your store."
+        type="danger"
+        confirmText="Yes, Delete Page"
+      />
     </div>
   );
 };
