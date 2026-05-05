@@ -229,7 +229,10 @@ const Inventory = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     key={p.id} 
-                    className="hover:bg-slate-50/50 transition-all group"
+                    className={clsx(
+                      "hover:bg-slate-50/50 transition-all group",
+                      activeMenu === p.id ? "relative z-[60]" : "z-0"
+                    )}
                   >
                     <td className="px-10 py-8">
                       <div className="flex items-center gap-5">
