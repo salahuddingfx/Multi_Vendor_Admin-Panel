@@ -12,8 +12,6 @@ const Categories = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [name, setName] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -38,15 +36,10 @@ const Categories = () => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('is_featured', isFeatured ? 1 : 0);
-    if (image) formData.append('image', image);
     if (!editingCategory) formData.append('site_id', siteId);
 
     try {
       if (editingCategory) {
-        // Use POST with _method=PUT for multipart updates if needed, 
-        // but let's try direct put first or post if the API supports it.
-        // Actually, our API updateHeroSlide uses POST for this reason.
-        // Let's check if we should do the same for categories.
         await api.updateCategory(editingCategory.id, formData);
         toast.success('Category updated');
       } else {
@@ -56,8 +49,6 @@ const Categories = () => {
       setIsModalOpen(false);
       setName('');
       setIsFeatured(false);
-      setImage(null);
-      setImagePreview(null);
       setEditingCategory(null);
       fetchCategories();
     } catch (error) {
@@ -88,8 +79,6 @@ const Categories = () => {
             setEditingCategory(null); 
             setName(''); 
             setIsFeatured(false);
-            setImage(null);
-            setImagePreview(null);
             setIsModalOpen(true); 
           }}
           className="bg-maroon text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 shadow-xl shadow-maroon/20 hover:scale-105 active:scale-95 transition-all uppercase text-sm tracking-wider"
@@ -108,11 +97,7 @@ const Categories = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all overflow-hidden ${cat.is_featured ? 'bg-maroon text-white shadow-lg shadow-maroon/20' : 'bg-slate-50 text-slate-400'}`}>
-                    {cat.image_path ? (
-                      <img src={cat.image_path} className="w-full h-full object-cover" />
-                    ) : (
-                      <Tag size={24} />
-                    )}
+                    <Tag size={24} />
                   </div>
                   <div>
                     <div className="font-black text-slate-800 text-lg uppercase tracking-tight">{cat.name}</div>
@@ -132,8 +117,6 @@ const Categories = () => {
                       setEditingCategory(cat); 
                       setName(cat.name); 
                       setIsFeatured(cat.is_featured);
-                      setImage(null);
-                      setImagePreview(null);
                       setIsModalOpen(true); 
                     }}
                     className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-slate-800 transition-all"
@@ -169,38 +152,6 @@ const Categories = () => {
                   className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold text-slate-900"
                   placeholder="e.g. Spicy Pickles"
                   required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Category Image</label>
-                <div 
-                  onClick={() => document.getElementById('cat-image').click()}
-                  className="w-full aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:border-maroon/20 hover:bg-slate-100 transition-all overflow-hidden group"
-                >
-                  {imagePreview || (editingCategory && editingCategory.image_path) ? (
-                    <img src={imagePreview || editingCategory.image_path} className="w-full h-full object-cover" />
-                  ) : (
-                    <>
-                      <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform mb-3 shadow-sm">
-                        <Plus size={24} />
-                      </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Upload Cover Image</p>
-                    </>
-                  )}
-                </div>
-                <input 
-                  id="cat-image"
-                  type="file" 
-                  className="hidden" 
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      setImage(file);
-                      setImagePreview(URL.createObjectURL(file));
-                    }
-                  }}
                 />
               </div>
 
