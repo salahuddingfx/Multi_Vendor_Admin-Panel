@@ -407,6 +407,85 @@ const SalesDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Master Audit & Transaction Timeline */}
+      <div className="mt-10 bg-white rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium overflow-hidden">
+        <div className="p-8 md:p-12 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 bg-slate-900 text-white rounded-[24px] flex items-center justify-center shadow-xl">
+              <Download className="w-7 h-7" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Master Transaction Report</h3>
+              <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Audit log for selected period</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+              {data?.timeline?.length || 0} Total Activities
+            </span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/50">
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Activity</th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">ID</th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Subject</th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Details</th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Time</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {data?.timeline?.map((item, i) => (
+                <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="px-8 py-6">
+                    <div className="flex items-center gap-3">
+                      <div className={clsx(
+                        "w-8 h-8 rounded-lg flex items-center justify-center",
+                        item.type === 'order' ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
+                      )}>
+                        {item.type === 'order' ? <ShoppingBag size={14} /> : <RefreshCcw size={14} />}
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">{item.type}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6 text-xs font-black text-slate-900">#{item.id}</td>
+                  <td className="px-8 py-6 text-xs font-bold text-slate-600">{item.title}</td>
+                  <td className="px-8 py-6 text-sm font-black text-slate-900">{formatCurrency(item.value)}</td>
+                  <td className="px-8 py-6">
+                    <span className={clsx(
+                      "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest",
+                      item.type === 'order' 
+                        ? (item.detail === 'delivered' ? "bg-emerald-50 text-emerald-600" : "bg-blue-50 text-blue-600")
+                        : "bg-rose-50 text-rose-600"
+                    )}>
+                      {item.detail || 'Processed'}
+                    </span>
+                  </td>
+                  <td className="px-8 py-6 text-right">
+                    <div className="flex flex-col items-end">
+                      <span className="text-xs font-black text-slate-900">{new Date(item.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {(!data?.timeline || data.timeline.length === 0) && (
+                <tr>
+                  <td colSpan="6" className="px-8 py-20 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
+                    No transactions found for the selected period.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
