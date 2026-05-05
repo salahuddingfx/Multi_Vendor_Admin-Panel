@@ -37,7 +37,6 @@ const AdminLayout = () => {
     { name: 'Inventory', href: '/inventory', icon: Warehouse },
     { name: 'Categories', href: '/categories', icon: Globe },
     { name: 'Banners', href: '/banners', icon: ImageIcon },
-    { name: 'Pages', href: '/pages', icon: FileText },
     { name: 'Reviews', href: '/reviews', icon: Star },
     { name: 'Coupons', href: '/coupons', icon: Ticket },
     { name: 'Messages', href: '/messages', icon: Mail },
