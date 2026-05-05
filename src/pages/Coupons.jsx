@@ -12,6 +12,8 @@ import {
 import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Coupons = () => {
   const { selectedStore } = useStore();
@@ -26,6 +28,8 @@ const Coupons = () => {
     expires_at: '',
     is_active: true
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [couponToDelete, setCouponToDelete] = useState(null);
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -57,18 +61,20 @@ const Coupons = () => {
       fetchCoupons();
       closeModal();
     } catch (error) {
-      alert(error.response?.data?.message || 'Error saving coupon');
+      toast.error(error.response?.data?.message || 'Error saving coupon');
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this coupon?')) {
-      try {
-        await api.deleteCoupon(id);
-        fetchCoupons();
-      } catch (error) {
-        console.error('Error deleting coupon:', error);
-      }
+  const handleDelete = async () => {
+    if (!couponToDelete) return;
+    try {
+      await api.deleteCoupon(couponToDelete);
+      fetchCoupons();
+      toast.success('Coupon deleted');
+      setShowDeleteConfirm(false);
+      setCouponToDelete(null);
+    } catch (error) {
+      toast.error('Error deleting coupon');
     }
   };
 
@@ -158,7 +164,10 @@ const Coupons = () => {
                 Edit
               </button>
               <button 
-                onClick={() => handleDelete(coupon.id)}
+                onClick={() => {
+                  setCouponToDelete(coupon.id);
+                  setShowDeleteConfirm(true);
+                }}
                 className="w-11 h-11 bg-red-50 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
               >
                 <Trash2 size={18} />
@@ -268,6 +277,16 @@ const Coupons = () => {
           </div>
         )}
       </AnimatePresence>
+
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Coupon?"
+        message="Are you sure you want to delete this discount coupon? Customers will no longer be able to use it."
+        type="danger"
+        confirmText="Yes, Delete Coupon"
+      />
     </div>
   );
 };

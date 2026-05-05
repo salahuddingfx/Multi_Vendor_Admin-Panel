@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { api } from '../lib/api';
 import { Plus, Edit2, Trash2, Tag, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Categories = () => {
   const { selectedStore } = useStore();
@@ -12,6 +13,8 @@ const Categories = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [name, setName] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [catToDelete, setCatToDelete] = useState(null);
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -56,12 +59,14 @@ const Categories = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure? This will affect products in this category.')) return;
+  const handleDelete = async () => {
+    if (!catToDelete) return;
     try {
-      await api.deleteCategory(id);
+      await api.deleteCategory(catToDelete);
       toast.success('Category deleted');
       fetchCategories();
+      setShowDeleteConfirm(false);
+      setCatToDelete(null);
     } catch (error) {
       toast.error('Error deleting category');
     }
@@ -124,7 +129,10 @@ const Categories = () => {
                     <Edit2 size={16} />
                   </button>
                   <button 
-                    onClick={() => handleDelete(cat.id)}
+                    onClick={() => {
+                      setCatToDelete(cat.id);
+                      setShowDeleteConfirm(true);
+                    }}
                     className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-red-50 hover:text-white transition-all"
                   >
                     <Trash2 size={16} />
@@ -188,6 +196,17 @@ const Categories = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Category?"
+        message="Are you sure? This will affect products in this category. This action cannot be undone."
+        type="danger"
+        confirmText="Yes, Delete Category"
+      />
     </div>
   );
 };

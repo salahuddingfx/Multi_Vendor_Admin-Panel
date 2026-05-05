@@ -19,6 +19,7 @@ import {
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { toast } from 'sonner';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Products = () => {
   const { selectedStore } = useStore();
@@ -29,6 +30,8 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -61,15 +64,16 @@ const Products = () => {
     }
   };
 
-  const handleDeleteProduct = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        await api.deleteProduct(id);
-        toast.success('Product deleted successfully');
-        fetchProducts();
-      } catch (error) {
-        toast.error('Failed to delete product');
-      }
+  const handleDeleteProduct = async () => {
+    if (!productToDelete) return;
+    try {
+      await api.deleteProduct(productToDelete);
+      toast.success('Product deleted successfully');
+      fetchProducts();
+      setShowDeleteConfirm(false);
+      setProductToDelete(null);
+    } catch (error) {
+      toast.error('Failed to delete product');
     }
   };
 
@@ -210,7 +214,10 @@ const Products = () => {
                         <Edit2 size={18} />
                       </button>
                       <button 
-                        onClick={() => handleDeleteProduct(product.id)}
+                        onClick={() => {
+                          setProductToDelete(product.id);
+                          setShowDeleteConfirm(true);
+                        }}
                         className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
                       >
                         <Trash2 size={18} />
@@ -239,6 +246,17 @@ const Products = () => {
           siteId={selectedStore === 'acharu' ? 1 : 2}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteProduct}
+        title="Delete Product?"
+        message="Are you sure you want to delete this product? This action cannot be undone."
+        type="danger"
+        confirmText="Yes, Delete Product"
+      />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
 import { Plus, User, Shield, Mail, Trash2, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Users = () => {
   const { user: currentUser, updateUser } = useStore();
@@ -13,6 +14,8 @@ const Users = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'admin' });
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -63,12 +66,14 @@ const Users = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this admin?')) return;
+  const handleDelete = async () => {
+    if (!userToDelete) return;
     try {
-      await api.deleteUser(id);
+      await api.deleteUser(userToDelete);
       toast.success('User deleted');
       fetchUsers();
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error deleting user');
     }
@@ -140,7 +145,10 @@ const Users = () => {
                     <Edit2 size={16} /> Edit
                   </button>
                   <button 
-                    onClick={() => handleDelete(user.id)}
+                    onClick={() => {
+                      setUserToDelete(user.id);
+                      setShowDeleteConfirm(true);
+                    }}
                     className="w-12 h-12 bg-slate-50 text-red-400 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
                   >
                     <Trash2 size={18} />
@@ -232,6 +240,17 @@ const Users = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Admin User?"
+        message="Are you sure you want to delete this admin account? This will permanently remove their access to the system."
+        type="danger"
+        confirmText="Yes, Delete User"
+      />
     </div>
   );
 };
