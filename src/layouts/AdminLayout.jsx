@@ -23,7 +23,6 @@ import {
 import { clsx } from 'clsx';
 import { Toaster, toast } from 'sonner';
 import { useState, useEffect, useRef } from 'react';
-import echo from '../lib/echo';
 import { api } from '../lib/api';
 
 const AdminLayout = () => {
@@ -82,19 +81,31 @@ const AdminLayout = () => {
   }, []);
 
   useEffect(() => {
-    // Setup Echo Listener only when user ID is available
     if (user?.id) {
-      const channel = `App.Models.User.${user.id}`;
-      echo.private(channel)
-        .notification((notification) => {
-          setNotifications(prev => [notification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          
-          toast.info(notification.title, {
-            description: notification.message,
+      const interval = setInterval(() => {
+        fetchNotifications(true);
+      }, 1000); // 1 second polling as requested
+      return () => clearInterval(interval);
+    }
+  }, [user?.id, notifications?.[0]?.id]); 
+
+  const fetchNotifications = async (isPoll = false) => {
+    try {
+      const data = await api.getNotifications();
+      const newNotifications = data.notifications || [];
+      const oldNotifications = notifications;
+
+      // Detect new notification for toast
+      if (isPoll && newNotifications.length > 0 && oldNotifications.length > 0) {
+        const latestNew = newNotifications[0];
+        const latestOld = oldNotifications[0];
+
+        if (latestNew.id !== latestOld.id) {
+          toast.info(latestNew.data?.title || 'New Notification', {
+            description: latestNew.data?.message,
             action: {
               label: 'View',
-              onClick: () => window.location.href = notification.link || '#'
+              onClick: () => window.location.href = latestNew.data?.link || '#'
             },
             style: {
               background: themeColor,
@@ -102,19 +113,13 @@ const AdminLayout = () => {
               borderRadius: '20px'
             }
           });
-        });
+        }
+      }
 
-      return () => echo.leave(channel);
-    }
-  }, [user?.id]); // Only re-run if ID changes
-
-  const fetchNotifications = async () => {
-    try {
-      const data = await api.getNotifications();
-      setNotifications(data.notifications || []);
+      setNotifications(newNotifications);
       setUnreadCount(data.unread_count || 0);
     } catch (error) {
-      console.error('Failed to fetch notifications', error);
+      if (!isPoll) console.error('Failed to fetch notifications', error);
     }
   };
 
