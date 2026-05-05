@@ -144,7 +144,6 @@ const CustomCalendar = ({ value, onChange, label, color = "maroon" }) => {
   );
 };
 
-const COLORS = ['#800000', '#D4AF37', '#22C55E', '#3B82F6', '#F59E0B', '#EF4444'];
 
 const StatCard = ({ label, value, icon: Icon, color, isCurrency, formatCurrency, subtext }) => {
   const colors = {
