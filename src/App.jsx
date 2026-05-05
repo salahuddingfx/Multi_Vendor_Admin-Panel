@@ -13,7 +13,6 @@ import Categories from './pages/Categories';
 import Inventory from './pages/Inventory';
 import Messages from './pages/Messages';
 import Users from './pages/Users';
-import Pages from './pages/Pages';
 import Reviews from './pages/Reviews';
 import Banners from './pages/Banners';
 import Coupons from './pages/Coupons';
@@ -32,7 +31,6 @@ const App = () => {
         <Route path="sales" element={<SalesDashboard />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="banners" element={<Banners />} />
-        <Route path="pages" element={<Pages />} />
         <Route path="reviews" element={<Reviews />} />
         <Route path="coupons" element={<Coupons />} />
         <Route path="messages" element={<Messages />} />
