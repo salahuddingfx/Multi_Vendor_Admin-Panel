@@ -50,8 +50,15 @@ export const api = {
     return response.data.data;
   },
 
-  getSalesStats: async (siteId, range = 'monthly') => {
-    const response = await adminClient.get('/sales/stats', { params: { site_id: siteId, range } });
+  getSalesStats: async (siteId, range = 'monthly', startDate = null, endDate = null) => {
+    const response = await adminClient.get('/sales/stats', { 
+      params: { 
+        site_id: siteId, 
+        range,
+        start_date: startDate,
+        end_date: endDate
+      } 
+    });
     return response.data;
   },
 
