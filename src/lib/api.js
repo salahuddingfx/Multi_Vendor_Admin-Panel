@@ -102,6 +102,16 @@ export const api = {
     const response = await adminClient.put(`/orders/${orderId}/payment-status`, { payment_status: paymentStatus });
     return response.data;
   },
+  
+  updateOrder: async (id, data) => {
+    const response = await adminClient.put(`/orders/${id}`, data);
+    return response.data;
+  },
+
+  deleteOrder: async (id) => {
+    const response = await adminClient.delete(`/orders/${id}`);
+    return response.data;
+  },
 
   recordReturn: async (data) => {
     const response = await adminClient.post('/inventory/return', data);
