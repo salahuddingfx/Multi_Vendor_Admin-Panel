@@ -87,6 +87,27 @@ export const api = {
     return response.data.data;
   },
 
+  storeCategory: async (formData) => {
+    const response = await adminClient.post('/categories', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  updateCategory: async (id, formData) => {
+    // Laravel handles multipart/form-data via POST + _method=PUT
+    formData.append('_method', 'PUT');
+    const response = await adminClient.post(`/categories/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  deleteCategory: async (id) => {
+    const response = await adminClient.delete(`/categories/${id}`);
+    return response.data;
+  },
+
   // Orders & Inventory
   getOrders: async (siteId) => {
     const response = await adminClient.get('/orders', { params: { site_id: siteId } });
