@@ -294,19 +294,43 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
     }
   };
   const [imageFiles, setImageFiles] = useState([]);
-  const [previews, setPreviews] = useState([]);
-  const [primaryIndex, setPrimaryIndex] = useState(0);
+  const [previews, setPreviews] = useState(editingProduct?.images?.map(img => ({ 
+    id: img.id, 
+    url: img.image_path, 
+    isExisting: true 
+  })) || []);
+  const [deletedImageIds, setDeletedImageIds] = useState([]);
+  const [primaryIndex, setPrimaryIndex] = useState(
+    editingProduct?.images?.findIndex(img => img.is_primary) ?? 0
+  );
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImageFiles(files);
+    setImageFiles(prev => [...prev, ...files]);
     
-    // Generate previews
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setPreviews(newPreviews);
-    setPrimaryIndex(0); // Reset to first image by default
+    // Generate previews for new files
+    const newPreviews = files.map(file => ({
+      url: URL.createObjectURL(file),
+      isExisting: false,
+      file: file
+    }));
+    setPreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeImage = (index) => {
+    const previewToRemove = previews[index];
+    if (previewToRemove.isExisting) {
+      setDeletedImageIds(prev => [...prev, previewToRemove.id]);
+    } else {
+      // Find and remove from imageFiles
+      setImageFiles(prev => prev.filter(f => f !== previewToRemove.file));
+    }
+    
+    setPreviews(prev => prev.filter((_, i) => i !== index));
+    if (primaryIndex === index) setPrimaryIndex(0);
+    else if (primaryIndex > index) setPrimaryIndex(primaryIndex - 1);
   };
 
   useEffect(() => {
@@ -371,14 +395,34 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
       }
     });
     
+    // Append new images
     if (imageFiles.length > 0) {
-      imageFiles.forEach((file, index) => {
+      imageFiles.forEach((file) => {
         data.append('images[]', file);
-        if (index === primaryIndex) {
-          data.append('primary_image_index', index);
-        }
       });
     }
+
+    // Append deleted image IDs
+    if (deletedImageIds.length > 0) {
+      deletedImageIds.forEach(id => {
+        data.append('deleted_image_ids[]', id);
+      });
+    }
+
+    // Handle primary image index logic
+    // The primaryIndex is relative to the 'previews' array.
+    // If the primary image is a NEW one, we need to tell the backend which one it is in the 'images[]' array.
+    const primaryPreview = previews[primaryIndex];
+    if (primaryPreview && !primaryPreview.isExisting) {
+      const newImageIndex = previews
+        .filter((p, idx) => !p.isExisting && idx <= primaryIndex)
+        .length - 1;
+      data.append('primary_image_index', newImageIndex);
+    } else if (primaryPreview && primaryPreview.isExisting) {
+       // If it's an existing image, we might need a separate field like 'primary_image_id'
+       data.append('primary_image_id', primaryPreview.id);
+    }
+    
     if (!editingProduct) data.append('site_id', siteId);
 
     try {
@@ -550,45 +594,56 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                 id="product-image"
                 onChange={handleImageChange}
               />
-              <label 
-                htmlFor="product-image"
-                className="flex flex-col items-center justify-center w-full px-8 py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl cursor-pointer hover:border-maroon hover:bg-maroon/5 transition-all group"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-maroon group-hover:text-white group-hover:border-maroon transition-all mb-4">
+              <div className="flex flex-col items-center justify-center w-full px-8 py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl group">
+                <label 
+                  htmlFor="product-image"
+                  className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-maroon hover:text-white hover:border-maroon transition-all mb-4 cursor-pointer"
+                >
                   <Plus size={24} />
-                </div>
+                </label>
                 <span className="text-slate-800 font-bold mb-1">
-                  {imageFiles.length > 0 ? `${imageFiles.length} images selected` : 'Click to select multiple images'}
+                  Click the plus to add images
                 </span>
                 <span className="text-slate-400 text-sm font-medium text-center">
-                  {editingProduct ? 'Note: Uploading new images will replace existing ones.' : 'Hold Ctrl or Cmd to select multiple files'}
+                  You can select multiple images. Click an image to make it primary.
                 </span>
                 
                 {previews.length > 0 && (
                   <div className="grid grid-cols-4 md:grid-cols-6 gap-4 mt-6 w-full px-4">
-                    {previews.map((url, i) => (
+                    {previews.map((img, i) => (
                       <div 
                         key={i} 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPrimaryIndex(i);
-                        }}
                         className={clsx(
-                          "relative aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer",
-                          primaryIndex === i ? "border-maroon scale-105 shadow-lg shadow-maroon/20" : "border-transparent opacity-60 hover:opacity-100"
+                          "relative aspect-square rounded-xl overflow-hidden border-2 transition-all group/img",
+                          primaryIndex === i ? "border-maroon scale-105 shadow-lg shadow-maroon/20" : "border-transparent opacity-80 hover:opacity-100 hover:border-slate-300"
                         )}
                       >
-                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <img 
+                          src={img.url} 
+                          alt="" 
+                          className="w-full h-full object-cover cursor-pointer" 
+                          onClick={() => setPrimaryIndex(i)}
+                        />
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeImage(i);
+                          }}
+                          className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity shadow-lg"
+                        >
+                          <Plus size={14} className="rotate-45" />
+                        </button>
                         {primaryIndex === i && (
-                          <div className="absolute inset-0 bg-maroon/10 flex items-center justify-center">
-                            <span className="bg-maroon text-[8px] text-white font-black px-2 py-0.5 rounded-full uppercase">Front</span>
+                          <div className="absolute inset-x-0 bottom-0 bg-maroon text-[8px] text-white font-black py-1 text-center uppercase">
+                            Primary
                           </div>
                         )}
                       </div>
                     ))}
                   </div>
                 )}
-              </label>
+              </div>
             </div>
           </div>
 
