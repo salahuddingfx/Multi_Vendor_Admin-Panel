@@ -12,7 +12,7 @@ import {
 import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import ConfirmModal from '../components/ConfirmModal';
 
 const Coupons = () => {
