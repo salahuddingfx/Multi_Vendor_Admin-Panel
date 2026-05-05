@@ -218,13 +218,14 @@ const SalesDashboard = () => {
         ))}
       </div>
 
+      {/* Main Financial Visualization */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Revenue Chart */}
         <div className="lg:col-span-2 bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium relative overflow-hidden group">
           <div className="mb-12 flex justify-between items-start">
             <div>
               <h3 className="text-2xl font-black text-slate-900 tracking-tight">Financial Trajectory</h3>
-              <p className="text-slate-400 font-medium text-sm mt-1">Growth trends based on {range} data.</p>
+              <p className="text-slate-400 font-medium text-sm mt-1">Growth trends for the selected period.</p>
             </div>
             {selectedStore === 'all' && (
               <div className="flex gap-4">
@@ -260,7 +261,7 @@ const SalesDashboard = () => {
           </div>
         </div>
 
-        {/* Order Status Distribution */}
+        {/* Order Lifecycle Breakdown */}
         <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium flex flex-col">
           <div className="mb-12">
             <h3 className="text-2xl font-black text-slate-900 tracking-tight">Order Lifecycle</h3>
@@ -288,14 +289,17 @@ const SalesDashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-8 space-y-3">
+          <div className="mt-8 space-y-4">
             {data?.status_distribution?.map((item, i) => (
-              <div key={i} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
+              <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl">
+                <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                  <span className="font-black uppercase tracking-widest text-slate-500">{item.status}</span>
+                  <span className="font-black uppercase tracking-widest text-slate-500 text-[9px]">{item.status}</span>
                 </div>
-                <span className="font-black text-slate-900">{item.count}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-slate-900 text-sm">{item.count}</span>
+                  <span className="text-[10px] font-bold text-slate-400">Orders</span>
+                </div>
               </div>
             ))}
           </div>
@@ -303,80 +307,103 @@ const SalesDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Inventory Health */}
+        {/* Market Leaders (Deep Product Stats) */}
         <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium">
           <div className="flex items-center justify-between mb-12">
             <div className="flex items-center gap-5">
-              <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-[24px] flex items-center justify-center shadow-sm">
-                <AlertTriangle className="w-7 h-7" />
+              <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-[24px] flex items-center justify-center shadow-sm">
+                <Trophy className="w-7 h-7" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Inventory Health</h3>
-                <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Low Stock Warning</p>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Market Leaders</h3>
+                <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Top Performing SKUs</p>
               </div>
-            </div>
-            <button className="text-[10px] font-black uppercase tracking-widest text-maroon hover:underline">View All</button>
-          </div>
-
-          <div className="space-y-6">
-            {data?.low_stock_products?.map((product, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-[24px] border border-slate-50 hover:border-maroon/20 hover:bg-maroon/[0.02] transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden">
-                    <img src={product.image} alt="" className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-black text-slate-800">{product.name}</h4>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Store ID: {product.site_id}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="px-3 py-1 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-                    {product.stock} left
-                  </span>
-                </div>
-              </div>
-            ))}
-            {(!data?.low_stock_products || data.low_stock_products.length === 0) && (
-              <div className="text-center py-10 text-slate-400 text-[10px] font-black uppercase tracking-widest italic">
-                Inventory is healthy. All items well stocked.
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Top Products */}
-        <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium">
-          <div className="flex items-center gap-5 mb-12">
-            <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-[24px] flex items-center justify-center shadow-sm">
-              <Trophy className="w-7 h-7" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Market Leaders</h3>
-              <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Top Performing SKUs</p>
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {data?.top_products?.map((product, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-[24px] border border-slate-50 hover:bg-slate-50 transition-all">
-                <div className="flex items-center gap-5">
-                  <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-black shadow-lg">
-                    #{i + 1}
+              <div key={i} className="flex items-center justify-between p-6 rounded-[28px] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-xl transition-all duration-500 group">
+                <div className="flex items-center gap-6">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-sm font-black shadow-lg group-hover:rotate-6 transition-transform">
+                    {i + 1}
                   </div>
                   <div>
                     <h4 className="text-sm font-black text-slate-800 line-clamp-1">{product.name}</h4>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{product.units} Units Sold</p>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                        <ShoppingBag size={12} /> {product.units} Units Sold
+                      </span>
+                      <span className="w-1 h-1 bg-slate-300 rounded-full" />
+                      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1">
+                        <TrendingUp size={12} /> Trending
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-black text-slate-900">{formatCurrency(product.revenue)}</p>
-                  <div className="flex items-center justify-end gap-1.5 text-emerald-500 text-[10px] font-black uppercase tracking-widest mt-1">
-                    <TrendingUp size={12} />
-                  </div>
+                  <p className="text-base font-black text-slate-900">{formatCurrency(product.revenue)}</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Gross Revenue</p>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Financial Integrity (Loss & Returns Analysis) */}
+        <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium">
+          <div className="flex items-center gap-5 mb-12">
+            <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-[24px] flex items-center justify-center shadow-sm">
+              <RefreshCcw className="w-7 h-7" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">Financial Leakage</h3>
+              <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Loss & Return Analysis</p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="p-8 rounded-[32px] bg-rose-50/50 border border-rose-100 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-150 transition-transform duration-700">
+                <AlertTriangle size={80} />
+              </div>
+              <h4 className="text-xs font-black text-rose-400 uppercase tracking-[0.2em] mb-4">Total Value at Risk</h4>
+              <div className="flex items-end gap-3 mb-6">
+                <p className="text-5xl font-black text-rose-600 tracking-tighter">
+                  {formatCurrency((data?.total_returns || 0) + (data?.logistics_loss || 0))}
+                </p>
+                <p className="text-rose-400 font-bold text-sm mb-2 italic">Total Leakage</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-rose-50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Product Returns</p>
+                  <p className="text-lg font-black text-slate-800">{formatCurrency(data?.total_returns || 0)}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-rose-50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Logistics Loss</p>
+                  <p className="text-lg font-black text-slate-800">{formatCurrency(data?.logistics_loss || 0)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-8 rounded-[32px] bg-slate-50 border border-slate-100">
+               <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Integrity Summary</h4>
+               <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-slate-600">Successful Collections</span>
+                    <span className="text-sm font-black text-emerald-600">{formatCurrency(data?.total_revenue || 0)}</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-emerald-500 rounded-full" 
+                      style={{ width: `${(data?.total_revenue / (data?.total_revenue + data?.total_returns + data?.logistics_loss)) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mt-2">
+                    {Math.round((data?.total_revenue / (data?.total_revenue + data?.total_returns + data?.logistics_loss)) * 100)}% Revenue Integrity Score
+                  </p>
+               </div>
+            </div>
           </div>
         </div>
       </div>
