@@ -182,7 +182,10 @@ const AdminLayout = () => {
       )}>
         <div className="h-full flex flex-col bg-white rounded-[40px] shadow-premium border border-black/[0.02] overflow-hidden">
           {/* Logo Section */}
-          <div className="p-10 flex items-center gap-5 shrink-0">
+          <div className={clsx(
+            "flex items-center shrink-0 transition-all duration-700",
+            isSidebarOpen ? "p-10 gap-5" : "p-6 justify-center"
+          )}>
             <div 
               className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black italic shadow-2xl transition-all duration-700"
               style={{ 
@@ -212,7 +215,8 @@ const AdminLayout = () => {
                   key={item.name}
                   to={item.href}
                   className={clsx(
-                    "flex items-center gap-5 px-6 py-5 rounded-[28px] font-bold transition-all duration-500 group relative",
+                    "flex items-center font-bold transition-all duration-500 group relative",
+                    isSidebarOpen ? "gap-5 px-6 py-5 rounded-[28px]" : "justify-center p-5 rounded-[24px]",
                     isActive 
                       ? "text-white shadow-2xl scale-[1.02]" 
                       : "text-slate-400 hover:bg-slate-50 hover:text-slate-800"
