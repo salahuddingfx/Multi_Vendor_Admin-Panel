@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { Search, Filter, Printer, ExternalLink, ChevronRight, Package, Truck, CheckCircle, Clock } from 'lucide-react';
+import { Search, Filter, Printer, ExternalLink, ChevronRight, Package, Truck, CheckCircle, Clock, Edit2, Trash2, X } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import InvoiceTemplate from '../components/InvoiceTemplate';
 import { api } from '../lib/api';
@@ -85,6 +85,14 @@ const Orders = () => {
   const [activeOrder, setActiveOrder] = useState(null);
   const [printType, setPrintType] = useState('standard');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [editForm, setEditForm] = useState({
+    customer_name: '',
+    customer_phone: '',
+    customer_address: '',
+    location: ''
+  });
   const printRef = useRef();
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
@@ -142,6 +150,28 @@ const Orders = () => {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, payment_status: newStatus } : o));
     } catch (err) {
       alert('Failed to update payment status');
+      console.error(err);
+    }
+  };
+
+  const handleUpdateOrder = async () => {
+    try {
+      await api.updateOrder(editingOrder.id, editForm);
+      setOrders(prev => prev.map(o => o.id === editingOrder.id ? { ...o, ...editForm } : o));
+      setShowEditModal(false);
+    } catch (err) {
+      alert('Failed to update order details');
+      console.error(err);
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) return;
+    try {
+      await api.deleteOrder(orderId);
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+    } catch (err) {
+      alert('Failed to delete order');
       console.error(err);
     }
   };
@@ -388,6 +418,31 @@ const Orders = () => {
                       >
                         <ExternalLink size={18} />
                       </a>
+
+                      <button 
+                        onClick={() => {
+                          setEditingOrder(order);
+                          setEditForm({
+                            customer_name: order.customer_name,
+                            customer_phone: order.customer_phone,
+                            customer_address: order.customer_address,
+                            location: order.location
+                          });
+                          setShowEditModal(true);
+                        }}
+                        className="p-3 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
+                        title="Edit Customer Details"
+                      >
+                        <Edit2 size={18} />
+                      </button>
+
+                      <button 
+                        onClick={() => handleDeleteOrder(order.id)}
+                        className="p-3 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
+                        title="Delete Order"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -399,6 +454,72 @@ const Orders = () => {
 
       {/* Hidden Invoice Component for Printing */}
       <InvoiceTemplate ref={printRef} order={activeOrder} type={printType} />
+
+      {/* Edit Address Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+          <div className="bg-white w-full max-w-lg rounded-[40px] p-10 shadow-2xl relative">
+            <button onClick={() => setShowEditModal(false)} className="absolute top-6 right-6 p-2 text-slate-300 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-all">
+              <X size={24} />
+            </button>
+            
+            <div className="mb-8">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Edit Customer Details</h2>
+              <p className="text-slate-400 text-sm font-medium mt-1">Order: #{editingOrder?.tracking_id.toUpperCase()}</p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Customer Name</label>
+                <input 
+                  type="text" 
+                  value={editForm.customer_name}
+                  onChange={(e) => setEditForm({...editForm, customer_name: e.target.value})}
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold text-slate-800"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Phone Number</label>
+                <input 
+                  type="text" 
+                  value={editForm.customer_phone}
+                  onChange={(e) => setEditForm({...editForm, customer_phone: e.target.value})}
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold text-slate-800"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Shipping Address</label>
+                <textarea 
+                  value={editForm.customer_address}
+                  onChange={(e) => setEditForm({...editForm, customer_address: e.target.value})}
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-medium text-slate-700 h-24 resize-none"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Location</label>
+                <select 
+                  value={editForm.location}
+                  onChange={(e) => setEditForm({...editForm, location: e.target.value})}
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold text-slate-800 appearance-none"
+                >
+                  <option value="Cox">Cox's Bazar</option>
+                  <option value="Outside">Outside District</option>
+                </select>
+              </div>
+
+              <button 
+                onClick={handleUpdateOrder}
+                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-600 hover:shadow-xl transition-all"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
