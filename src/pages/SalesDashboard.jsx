@@ -1,17 +1,148 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, DollarSign, ShoppingBag, 
-  Users, RefreshCcw, Calendar, Download, Trophy, Star, X,
-  AlertTriangle, LayoutDashboard, Store, ArrowRight
+  Users, RefreshCcw, Calendar as CalendarIcon, Download, Trophy, Star, X,
+  AlertTriangle, LayoutDashboard, Store, ArrowRight, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
 import { toast } from 'react-hot-toast';
 import { clsx } from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const COLORS = ['#800000', '#D4AF37', '#22C55E', '#3B82F6', '#F59E0B', '#EF4444'];
+
+const CustomCalendar = ({ value, onChange, label, color = "maroon" }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [viewDate, setViewDate] = useState(value ? new Date(value) : new Date());
+  const calendarRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const firstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+  const handlePrevMonth = () => {
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1));
+  };
+
+  const handleNextMonth = () => {
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1));
+  };
+
+  const handleDateClick = (day) => {
+    const selectedDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
+    // Format to YYYY-MM-DD for consistency
+    const formattedDate = selectedDate.toISOString().split('T')[0];
+    onChange(formattedDate);
+    setIsOpen(false);
+  };
+
+  const renderDays = () => {
+    const days = [];
+    const totalDays = daysInMonth(viewDate.getFullYear(), viewDate.getMonth());
+    const firstDay = firstDayOfMonth(viewDate.getFullYear(), viewDate.getMonth());
+    const selectedDay = value ? new Date(value).getDate() : null;
+    const isSelectedMonth = value ? new Date(value).getMonth() === viewDate.getMonth() && new Date(value).getFullYear() === viewDate.getFullYear() : false;
+
+    // Empty spaces for first week
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="h-10" />);
+    }
+
+    for (let d = 1; d <= totalDays; d++) {
+      const isSelected = isSelectedMonth && selectedDay === d;
+      days.push(
+        <button
+          key={d}
+          onClick={() => handleDateClick(d)}
+          className={clsx(
+            "h-10 w-full rounded-xl text-xs font-black transition-all flex items-center justify-center",
+            isSelected 
+              ? (color === "maroon" ? "bg-maroon text-white shadow-lg shadow-maroon/20 scale-110" : "bg-slate-900 text-white shadow-lg scale-110")
+              : "text-slate-600 hover:bg-slate-100"
+          )}
+        >
+          {d}
+        </button>
+      );
+    }
+    return days;
+  };
+
+  return (
+    <div className="relative" ref={calendarRef}>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative flex items-center bg-white border border-slate-100 rounded-[28px] p-2 pr-6 shadow-sm hover:shadow-xl transition-all duration-500 min-w-[240px] cursor-pointer"
+      >
+        <div className={clsx(
+          "w-14 h-14 rounded-[22px] flex flex-col items-center justify-center shadow-lg transition-transform group-hover:scale-105",
+          color === "maroon" ? "bg-maroon text-white shadow-maroon/20" : "bg-slate-900 text-white shadow-slate-900/20"
+        )}>
+          <span className="text-[8px] font-black uppercase tracking-tighter opacity-70">{label}</span>
+          <CalendarIcon size={20} strokeWidth={2.5} />
+        </div>
+        <div className="ml-4 flex-1">
+          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Select Date</p>
+          <p className="text-sm font-black text-slate-900">{value || "Pick a date"}</p>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            className="absolute bottom-full mb-4 left-0 w-[320px] bg-white rounded-[32px] shadow-2xl border border-slate-100 p-6 z-[100]"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <button onClick={handlePrevMonth} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                <ChevronLeft size={20} className="text-slate-400" />
+              </button>
+              <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">
+                {viewDate.toLocaleString('default', { month: 'long' })} {viewDate.getFullYear()}
+              </h4>
+              <button onClick={handleNextMonth} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                <ChevronRight size={20} className="text-slate-400" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                <div key={day} className="h-8 flex items-center justify-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1">
+              {renderDays()}
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-slate-50 flex justify-between">
+               <button onClick={() => { onChange(''); setIsOpen(false); }} className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500">Clear</button>
+               <button onClick={() => { handleDateClick(new Date().getDate()); setIsOpen(false); }} className="text-[10px] font-black uppercase tracking-widest text-maroon">Today</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const COLORS = ['#800000', '#D4AF37', '#22C55E', '#3B82F6', '#F59E0B', '#EF4444'];
 
