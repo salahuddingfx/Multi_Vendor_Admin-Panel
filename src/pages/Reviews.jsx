@@ -17,6 +17,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
+import ConfirmModal from '../components/ConfirmModal';
 
 const Reviews = () => {
   const { selectedStore, stores } = useStore();
@@ -25,6 +26,8 @@ const Reviews = () => {
   const [search, setSearch] = useState('');
   const [replyText, setReplyText] = useState({});
   const [submittingReply, setSubmittingReply] = useState({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
 
   const currentStore = (stores || []).find(s => s.id === selectedStore);
   const siteId = selectedStore === 'acharu' ? 1 : 2;
@@ -57,12 +60,14 @@ const Reviews = () => {
     }
   };
 
-  const deleteReview = async (id) => {
-    if (!window.confirm('Delete this review permanently?')) return;
+  const deleteReview = async () => {
+    if (!reviewToDelete) return;
     try {
-      const data = await api.deleteReview(id);
-      setReviews(reviews.filter(r => r.id !== id));
+      await api.deleteReview(reviewToDelete);
+      setReviews(reviews.filter(r => r.id !== reviewToDelete));
       toast.success('Review deleted');
+      setShowDeleteConfirm(false);
+      setReviewToDelete(null);
     } catch (error) {
       toast.error('Failed to delete review');
     }
@@ -226,7 +231,10 @@ const Reviews = () => {
                   {review.is_approved ? 'Unapprove' : 'Approve'}
                 </button>
                 <button 
-                  onClick={() => deleteReview(review.id)}
+                  onClick={() => {
+                    setReviewToDelete(review.id);
+                    setShowDeleteConfirm(true);
+                  }}
                   className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-rose-50 text-rose-500 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-rose-100 transition-all"
                 >
                   <Trash2 size={14} />
@@ -247,6 +255,16 @@ const Reviews = () => {
           </div>
         )}
       </div>
+
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={deleteReview}
+        title="Delete Review?"
+        message="Are you sure you want to delete this customer review permanently? This cannot be undone."
+        type="danger"
+        confirmText="Yes, Delete Review"
+      />
     </div>
   );
 };
