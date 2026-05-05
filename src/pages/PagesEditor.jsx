@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { api } from '../lib/api';
 import { Plus, FileText, Edit3, Trash2, Globe, Eye } from 'lucide-react';
 import { toast } from 'sonner';
+import ConfirmModal from '../components/ConfirmModal';
 
 const PagesEditor = () => {
   const { selectedStore } = useStore();
@@ -11,6 +12,8 @@ const PagesEditor = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPage, setEditingPage] = useState(null);
   const [formData, setFormData] = useState({ title: '', content: '', is_active: true });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [pageToDelete, setPageToDelete] = useState(null);
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -49,12 +52,14 @@ const PagesEditor = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this page permanently?')) return;
+  const handleDelete = async () => {
+    if (!pageToDelete) return;
     try {
-      await api.deletePage(id);
+      await api.deletePage(pageToDelete);
       toast.success('Page deleted');
       fetchPages();
+      setShowDeleteConfirm(false);
+      setPageToDelete(null);
     } catch (error) {
       toast.error('Error deleting page');
     }
@@ -106,12 +111,15 @@ const PagesEditor = () => {
                 >
                   <Edit3 size={18} /> Edit Page
                 </button>
-                <button 
-                  onClick={() => handleDelete(page.id)}
-                  className="w-12 h-12 bg-slate-50 text-red-400 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
-                >
-                  <Trash2 size={20} />
-                </button>
+                 <button 
+                   onClick={() => {
+                     setPageToDelete(page.id);
+                     setShowDeleteConfirm(true);
+                   }}
+                   className="w-12 h-12 bg-slate-50 text-red-400 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
+                 >
+                   <Trash2 size={20} />
+                 </button>
               </div>
             </div>
           ))
@@ -179,6 +187,16 @@ const PagesEditor = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Delete Page?"
+        message="Are you sure you want to delete this content page permanently? This action cannot be undone."
+        type="danger"
+        confirmText="Yes, Delete Page"
+      />
     </div>
   );
 };
