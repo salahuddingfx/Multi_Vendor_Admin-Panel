@@ -158,7 +158,7 @@ const SalesDashboard = () => {
         </div>
         
         <div className="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto">
-          {/* Quick Range Selector */}
+          {/* Quick Range Selector stays at top for convenience */}
           <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] border border-black/[0.03] shadow-sm w-full md:w-auto overflow-x-auto scrollbar-hide">
             {ranges.map((r) => (
               <button
@@ -178,36 +178,6 @@ const SalesDashboard = () => {
               </button>
             ))}
           </div>
-
-          <div className="h-px md:h-10 w-full md:w-px bg-slate-200" />
-
-          {/* Custom Date Filter */}
-          <form onSubmit={handleCustomFilter} className="flex flex-wrap items-center gap-3 bg-white p-2 rounded-[24px] border border-slate-100 shadow-sm w-full md:w-auto">
-            <div className="flex items-center gap-2 px-3">
-              <Calendar size={14} className="text-slate-400" />
-              <input 
-                type="date" 
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="bg-transparent text-[10px] font-bold text-slate-600 focus:outline-none"
-              />
-            </div>
-            <div className="w-4 h-px bg-slate-200" />
-            <div className="flex items-center gap-2 px-3">
-              <input 
-                type="date" 
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="bg-transparent text-[10px] font-bold text-slate-600 focus:outline-none"
-              />
-            </div>
-            <button 
-              type="submit"
-              className="bg-maroon text-white px-6 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-widest hover:bg-maroon/90 transition-all flex items-center gap-2"
-            >
-              Filter <ArrowRight size={14} />
-            </button>
-          </form>
         </div>
       </div>
 
@@ -410,21 +380,55 @@ const SalesDashboard = () => {
 
       {/* Master Audit & Transaction Timeline */}
       <div className="mt-10 bg-white rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium overflow-hidden">
-        <div className="p-8 md:p-12 border-b border-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="p-8 md:p-12 border-b border-slate-50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 bg-slate-900 text-white rounded-[24px] flex items-center justify-center shadow-xl">
               <Download className="w-7 h-7" />
             </div>
             <div>
               <h3 className="text-2xl font-black text-slate-900 tracking-tight">Master Transaction Report</h3>
-              <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Audit log for selected period</p>
+              <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Audit log & event history</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <span className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">
-              {data?.timeline?.length || 0} Total Activities
-            </span>
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 sm:mb-0 sm:mr-4">Date Selection</div>
+            <form onSubmit={handleCustomFilter} className="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-[28px] border border-slate-100 w-full sm:w-auto">
+              <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-maroon/20 focus-within:border-maroon/50">
+                <Calendar size={16} className="text-maroon" />
+                <div className="flex flex-col">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Start Date</span>
+                  <input 
+                    type="date" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="bg-transparent text-[11px] font-black text-slate-900 focus:outline-none cursor-pointer"
+                  />
+                </div>
+              </div>
+              
+              <div className="w-4 h-px bg-slate-200 hidden sm:block" />
+              
+              <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-maroon/20 focus-within:border-maroon/50">
+                <Calendar size={16} className="text-maroon" />
+                <div className="flex flex-col">
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">End Date</span>
+                  <input 
+                    type="date" 
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="bg-transparent text-[11px] font-black text-slate-900 focus:outline-none cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <button 
+                type="submit"
+                className="bg-slate-900 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-maroon transition-all flex items-center gap-2 group ml-auto"
+              >
+                Generate Report <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </form>
           </div>
         </div>
 
