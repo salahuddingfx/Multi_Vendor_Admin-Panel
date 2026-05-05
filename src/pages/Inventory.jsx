@@ -313,7 +313,7 @@ const Inventory = () => {
                               <motion.div 
                                 initial={{ opacity: 0, scale: 0.9, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                className="fixed right-10 mt-12 w-56 bg-white rounded-[24px] shadow-2xl border border-slate-100 z-[110] overflow-hidden py-2"
+                                className="absolute right-0 top-full mt-2 w-56 bg-white rounded-[24px] shadow-2xl border border-slate-100 z-[110] overflow-hidden py-2"
                               >
                                 <button 
                                   onClick={() => {
