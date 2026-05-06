@@ -337,6 +337,7 @@ const Orders = () => {
                   <td className="px-8 py-6">
                     <div className="flex flex-col">
                       <span className="font-black text-slate-900">৳{order.total_amount}</span>
+                      <span className="text-[9px] text-slate-400 font-medium">Del: ৳{order.delivery_charge}</span>
                       <select 
                         value={order.payment_status || 'unpaid'}
                         onChange={(e) => handlePaymentStatusChange(order.id, e.target.value)}
