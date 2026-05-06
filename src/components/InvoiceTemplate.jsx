@@ -62,7 +62,9 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
             </div>
             {order.items.map((item, idx) => (
               <div key={idx} style={{ marginBottom: '5px' }}>
-                <div style={{ fontSize: '9px', fontWeight: '700', lineHeight: '1.1' }}>{item.quantity}x {item.name}</div>
+                <div style={{ fontSize: '9px', fontWeight: '700', lineHeight: '1.1' }}>
+                  {item.quantity}x {item.name} {item.variation_info && `(${item.variation_info})`}
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '8px', color: '#444' }}>
                   <span>@ ৳{item.price}</span>
                   <span style={{ fontWeight: 'bold', color: '#000' }}>৳{item.price * item.quantity}</span>
@@ -188,7 +190,9 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
             {order.items.map((item, idx) => (
               <tr key={idx} style={{ backgroundColor: '#fff' }}>
                 <td style={{ padding: '20px', borderRadius: '15px 0 0 15px', border: '1px solid #f1f5f9', borderRight: 'none' }}>
-                   <div style={{ fontWeight: '900', fontSize: '15px', color: '#1e293b' }}>{item.name}</div>
+                   <div style={{ fontWeight: '900', fontSize: '15px', color: '#1e293b' }}>
+                     {item.name} {item.variation_info && <span style={{fontSize: '13px', color: '#64748b', fontWeight: 'bold'}}>({item.variation_info})</span>}
+                   </div>
                    <div style={{ fontSize: '12px', color: brandColor, fontWeight: 'bold', marginTop: '4px' }}>Unit Price: ৳{item.price}</div>
                 </td>
                 <td style={{ textAlign: 'center', padding: '20px', border: '1px solid #f1f5f9', borderLeft: 'none', borderRight: 'none' }}>
