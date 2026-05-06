@@ -263,22 +263,27 @@ const Inventory = () => {
                         <div className="flex items-center gap-2">
                            <div className={clsx(
                              "w-2 h-2 rounded-full",
-                             p.stock < 10 ? "bg-rose-500 animate-pulse" : "bg-emerald-500"
+                             (p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) < 10 ? "bg-rose-500 animate-pulse" : "bg-emerald-500"
                            )} />
                            <span className={clsx(
                              "text-sm font-black",
-                             p.stock < 10 ? "text-rose-600" : "text-slate-900"
+                             (p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) < 10 ? "text-rose-600" : "text-slate-900"
                            )}>
-                            {p.stock} units
+                            {p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)} units total
                            </span>
                         </div>
-                        <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
+                        {p.variations?.length > 0 && (
+                          <div className="text-[9px] font-bold text-slate-400 mt-1">
+                            {p.variations.length} variations
+                          </div>
+                        )}
+                        <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden mt-1">
                            <div 
                              className={clsx(
                                "h-full rounded-full transition-all duration-1000",
-                               p.stock < 10 ? "bg-rose-500" : "bg-emerald-500"
+                               (p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) < 10 ? "bg-rose-500" : "bg-emerald-500"
                              )}
-                             style={{ width: `${Math.min(100, (p.stock / 50) * 100)}%` }}
+                             style={{ width: `${Math.min(100, ((p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) / 50) * 100)}%` }}
                            />
                         </div>
                       </div>
