@@ -37,7 +37,7 @@ const Banners = () => {
         api.getProducts(siteId)
       ]);
       setBanners(bannerData || []);
-      setProducts(productData || []);
+      setProducts(productData?.data || []);
     } catch (err) {
       console.error(err);
       toast.error('Failed to load data');
@@ -58,7 +58,9 @@ const Banners = () => {
     data.append('subtitle', formData.subtitle || '');
     data.append('badge', formData.badge || '');
     data.append('button_text', formData.button_text || 'Shop Now');
-    data.append('product_id', formData.product_id || '');
+    if (formData.product_id) {
+      data.append('product_id', formData.product_id);
+    }
     data.append('order', formData.order);
     if (formData.image) {
       data.append('image', formData.image);
@@ -78,7 +80,13 @@ const Banners = () => {
       fetchBanners();
     } catch (err) {
       console.error(err);
-      toast.error('Failed to save banner');
+      const data = err.response?.data;
+      const message = data?.errors 
+        ? Object.values(data.errors).flat().join(', ')
+        : data?.data
+        ? Object.values(data.data).flat().join(', ')
+        : 'Failed to save banner';
+      toast.error(message);
     }
   };
 
@@ -103,7 +111,19 @@ const Banners = () => {
           <p className="text-slate-500 mt-1 font-medium">Manage the hero slides for {selectedStore.toUpperCase()}</p>
         </div>
         <button 
-          onClick={() => { setEditingBanner(null); setIsModalOpen(true); }}
+          onClick={() => { 
+            setEditingBanner(null); 
+            setFormData({
+              title: '',
+              subtitle: '',
+              badge: '',
+              button_text: 'Shop Now',
+              product_id: '',
+              image: null,
+              order: banners.length > 0 ? Math.max(...banners.map(b => b.order || 0)) + 1 : 1
+            });
+            setIsModalOpen(true); 
+          }}
           className="flex items-center gap-2 bg-maroon text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-maroon/20 hover:scale-105 transition-all"
         >
           <Plus size={20} />
@@ -117,7 +137,7 @@ const Banners = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {banners.map((banner) => (
+          {[...banners].sort((a, b) => (a.order || 0) - (b.order || 0)).map((banner) => (
             <div key={banner.id} className="group relative bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
               <div className="aspect-[16/9] relative overflow-hidden bg-slate-100">
                 <img 
@@ -223,7 +243,7 @@ const Banners = () => {
                     className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-maroon/5 focus:border-maroon outline-none transition-all font-bold text-slate-900"
                   >
                     <option value="">No Link</option>
-                    {products.map(p => (
+                    {Array.isArray(products) && products.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
                   </select>
@@ -257,7 +277,7 @@ const Banners = () => {
                     <input 
                       type="number" 
                       value={formData.order}
-                      onChange={(e) => setFormData({...formData, order: parseInt(e.target.value)})}
+                      onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 0})}
                       className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-maroon/5 focus:border-maroon outline-none transition-all font-bold text-slate-900"
                     />
                  </div>
