@@ -329,7 +329,9 @@ const Orders = () => {
                       {order.items?.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-2">
                           <span className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">{item.quantity}x</span>
-                          <span className="text-xs font-medium text-slate-600 truncate max-w-[150px]">{item.name}</span>
+                          <span className="text-xs font-medium text-slate-600 truncate max-w-[150px]">
+                            {item.name} {item.variation_info && <span className="text-blue-500 font-bold ml-1">({item.variation_info})</span>}
+                          </span>
                         </div>
                       ))}
                     </div>
