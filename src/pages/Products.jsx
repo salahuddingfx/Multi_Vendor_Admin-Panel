@@ -148,6 +148,7 @@ const Products = () => {
               <tr className="bg-slate-50/50 border-b border-slate-100">
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Product</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Weight</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Price</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Stock</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
@@ -181,6 +182,9 @@ const Products = () => {
                     <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                       {typeof product.category === 'object' ? product.category?.name : product.category}
                     </span>
+                  </td>
+                  <td className="px-8 py-5 text-sm font-bold text-slate-500">
+                    {product.weight ? `${product.weight}kg` : '-'}
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex flex-col">
@@ -273,7 +277,8 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
     stock: editingProduct?.stock ?? '',
     description: editingProduct?.description ?? '',
     name_bn: editingProduct?.name_bn ?? '',
-    description_bn: editingProduct?.description_bn ?? ''
+    description_bn: editingProduct?.description_bn ?? '',
+    variations: editingProduct?.variations ?? []
   });
   const [translating, setTranslating] = useState(false);
 
@@ -390,7 +395,9 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
     // Only append fields that have values to avoid 422 validation errors
     Object.keys(formData).forEach(key => {
       const value = formData[key];
-      if (value !== '' && value !== null && value !== undefined) {
+      if (key === 'variations') {
+        data.append('variations', JSON.stringify(value));
+      } else if (value !== '' && value !== null && value !== undefined) {
         data.append(key, value);
       }
     });
@@ -678,6 +685,94 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
               value={formData.description_bn}
               onChange={(e) => setFormData({...formData, description_bn: e.target.value})}
             />
+          </div>
+
+          {/* Variations Section */}
+          <div className="space-y-6 p-8 bg-slate-50 rounded-[40px] border border-slate-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-maroon/10 text-maroon flex items-center justify-center">
+                  <Package size={18} />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Product Variations</h3>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setFormData(prev => ({
+                  ...prev,
+                  variations: [...prev.variations, { weight: '', price: '', stock: '', sku: '' }]
+                }))}
+                className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-maroon hover:bg-maroon hover:text-white transition-all shadow-sm"
+              >
+                + Add Variation
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {formData.variations.map((v, idx) => (
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white rounded-2xl border border-slate-100 relative group/var">
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Weight</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 500g"
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold"
+                      value={v.weight}
+                      onChange={(e) => {
+                        const newVars = [...formData.variations];
+                        newVars[idx].weight = e.target.value;
+                        setFormData({...formData, variations: newVars});
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Price</label>
+                    <input 
+                      type="number" 
+                      placeholder="Price"
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold"
+                      value={v.price}
+                      onChange={(e) => {
+                        const newVars = [...formData.variations];
+                        newVars[idx].price = e.target.value;
+                        setFormData({...formData, variations: newVars});
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Stock</label>
+                    <input 
+                      type="number" 
+                      placeholder="Stock"
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold"
+                      value={v.stock}
+                      onChange={(e) => {
+                        const newVars = [...formData.variations];
+                        newVars[idx].stock = e.target.value;
+                        setFormData({...formData, variations: newVars});
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-end pb-1.5">
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const newVars = formData.variations.filter((_, i) => i !== idx);
+                        setFormData({...formData, variations: newVars});
+                      }}
+                      className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all ml-auto"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {formData.variations.length === 0 && (
+                <div className="text-center py-6 text-slate-400 text-xs italic">
+                  No variations added. Using default price and weight.
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-4 pt-6">
