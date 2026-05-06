@@ -700,7 +700,7 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                 type="button"
                 onClick={() => setFormData(prev => ({
                   ...prev,
-                  variations: [...prev.variations, { weight: '', price: '', stock: '', sku: '' }]
+                  variations: [...prev.variations, { weight: '', price: '', original_price: '', stock: '', sku: '' }]
                 }))}
                 className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-maroon hover:bg-maroon hover:text-white transition-all shadow-sm"
               >
@@ -710,12 +710,13 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
 
             <div className="space-y-4">
               {formData.variations.map((v, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white rounded-2xl border border-slate-100 relative group/var">
+                <div key={idx} className="grid grid-cols-2 md:grid-cols-5 gap-3 p-4 bg-white rounded-2xl border border-slate-100 relative group/var">
+                  {/* Weight */}
                   <div className="space-y-1.5">
                     <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Weight</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. 500g"
+                      placeholder="e.g. 400g"
                       className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold"
                       value={v.weight}
                       onChange={(e) => {
@@ -725,11 +726,12 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                       }}
                     />
                   </div>
+                  {/* Selling Price */}
                   <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Price</label>
+                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Selling Price</label>
                     <input 
                       type="number" 
-                      placeholder="Price"
+                      placeholder="250"
                       className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold"
                       value={v.price}
                       onChange={(e) => {
@@ -739,6 +741,22 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                       }}
                     />
                   </div>
+                  {/* Original / MRP Price */}
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Regular Price (MRP)</label>
+                    <input 
+                      type="number" 
+                      placeholder="350"
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold text-rose-500"
+                      value={v.original_price || ''}
+                      onChange={(e) => {
+                        const newVars = [...formData.variations];
+                        newVars[idx].original_price = e.target.value;
+                        setFormData({...formData, variations: newVars});
+                      }}
+                    />
+                  </div>
+                  {/* Stock */}
                   <div className="space-y-1.5">
                     <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Stock</label>
                     <input 
@@ -753,6 +771,7 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                       }}
                     />
                   </div>
+                  {/* Delete */}
                   <div className="flex items-end pb-1.5">
                     <button 
                       type="button"
