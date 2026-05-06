@@ -726,21 +726,6 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                       }}
                     />
                   </div>
-                  {/* Selling Price */}
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Selling Price</label>
-                    <input 
-                      type="number" 
-                      placeholder="250"
-                      className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold"
-                      value={v.price}
-                      onChange={(e) => {
-                        const newVars = [...formData.variations];
-                        newVars[idx].price = e.target.value;
-                        setFormData({...formData, variations: newVars});
-                      }}
-                    />
-                  </div>
                   {/* Original / MRP Price */}
                   <div className="space-y-1.5">
                     <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Regular Price (MRP)</label>
@@ -752,6 +737,21 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
                       onChange={(e) => {
                         const newVars = [...formData.variations];
                         newVars[idx].original_price = e.target.value;
+                        setFormData({...formData, variations: newVars});
+                      }}
+                    />
+                  </div>
+                  {/* Selling Price */}
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-black uppercase text-slate-400 ml-2">Selling Price</label>
+                    <input 
+                      type="number" 
+                      placeholder="250"
+                      className="w-full px-4 py-3 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-maroon/10 text-sm font-bold text-emerald-600"
+                      value={v.price}
+                      onChange={(e) => {
+                        const newVars = [...formData.variations];
+                        newVars[idx].price = e.target.value;
                         setFormData({...formData, variations: newVars});
                       }}
                     />
