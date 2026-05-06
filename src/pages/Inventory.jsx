@@ -585,45 +585,68 @@ const Inventory = () => {
               </div>
               
               <div className="space-y-6">
-                {/* Stock Comparison Grid */}
-                <div className="grid grid-cols-2 gap-4 p-6 bg-slate-50/50 rounded-3xl border border-slate-100">
-                   <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Current</p>
-                      <p className="text-xl font-black text-slate-700">{selectedProduct?.stock} <span className="text-xs text-slate-400">units</span></p>
-                   </div>
-                   <div className="space-y-1 text-right">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Target</p>
-                      <p className="text-xl font-black text-maroon">{newStock} <span className="text-xs text-maroon/50">units</span></p>
-                   </div>
-                </div>
+                <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                  {/* Base Product */}
+                  <div className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100 flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Base Product</p>
+                      <p className="text-sm font-bold text-slate-800">{selectedProduct?.weight ? selectedProduct.weight + 'kg' : 'Default Size'}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => setNewStock(prev => Math.max(0, prev - 1))}
+                        className="w-10 h-10 rounded-full bg-white text-slate-600 flex items-center justify-center font-bold text-lg hover:bg-maroon hover:text-white transition-all shadow-sm border border-slate-200"
+                      >−</button>
+                      <input 
+                        type="number" 
+                        value={newStock}
+                        onChange={(e) => setNewStock(parseInt(e.target.value) || 0)}
+                        className="w-16 bg-white border border-slate-200 rounded-xl outline-none font-black text-slate-800 text-center py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none"
+                      />
+                      <button 
+                        onClick={() => setNewStock(prev => prev + 1)}
+                        className="w-10 h-10 rounded-full bg-white text-slate-600 flex items-center justify-center font-bold text-lg hover:bg-maroon hover:text-white transition-all shadow-sm border border-slate-200"
+                      >+</button>
+                    </div>
+                  </div>
 
-                {/* Spacious & Premium Input Controls */}
-                <div className="space-y-4">
-                  <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-2 block">Set New Level</label>
-                  <div className="flex items-center justify-between gap-6 px-2">
-                     <button 
-                       onClick={() => setNewStock(prev => Math.max(0, prev - 1))}
-                       className="w-14 h-14 rounded-full bg-slate-50 text-slate-600 flex items-center justify-center font-bold text-xl hover:bg-maroon hover:text-white transition-all shadow-sm border border-slate-100 active:scale-90"
-                     >
-                        <span>−</span>
-                     </button>
-                     
-                     <div className="flex-1 bg-slate-50/50 rounded-[28px] border border-slate-100 p-2 shadow-inner group-focus-within:border-maroon/20 transition-all">
+                  {/* Variations */}
+                  {variationStocks.map((v, idx) => (
+                    <div key={idx} className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100 flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Variation</p>
+                        <p className="text-sm font-bold text-slate-800">{v.weight}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button 
+                          onClick={() => {
+                            const newVars = [...variationStocks];
+                            newVars[idx].stock = Math.max(0, parseInt(newVars[idx].stock || 0) - 1);
+                            setVariationStocks(newVars);
+                          }}
+                          className="w-10 h-10 rounded-full bg-white text-slate-600 flex items-center justify-center font-bold text-lg hover:bg-maroon hover:text-white transition-all shadow-sm border border-slate-200"
+                        >−</button>
                         <input 
                           type="number" 
-                          value={newStock}
-                          onChange={(e) => setNewStock(parseInt(e.target.value) || 0)}
-                          className="w-full bg-transparent outline-none font-black text-slate-800 text-center text-3xl py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={v.stock}
+                          onChange={(e) => {
+                            const newVars = [...variationStocks];
+                            newVars[idx].stock = parseInt(e.target.value) || 0;
+                            setVariationStocks(newVars);
+                          }}
+                          className="w-16 bg-white border border-slate-200 rounded-xl outline-none font-black text-slate-800 text-center py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none"
                         />
-                     </div>
-                     
-                     <button 
-                       onClick={() => setNewStock(prev => prev + 1)}
-                       className="w-14 h-14 rounded-full bg-slate-50 text-slate-600 flex items-center justify-center font-bold text-xl hover:bg-maroon hover:text-white transition-all shadow-sm border border-slate-100 active:scale-90"
-                     >
-                        <span>+</span>
-                     </button>
-                  </div>
+                        <button 
+                          onClick={() => {
+                            const newVars = [...variationStocks];
+                            newVars[idx].stock = parseInt(newVars[idx].stock || 0) + 1;
+                            setVariationStocks(newVars);
+                          }}
+                          className="w-10 h-10 rounded-full bg-white text-slate-600 flex items-center justify-center font-bold text-lg hover:bg-maroon hover:text-white transition-all shadow-sm border border-slate-200"
+                        >+</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <button 
