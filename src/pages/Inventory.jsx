@@ -37,6 +37,7 @@ const Inventory = () => {
   const [newStock, setNewStock] = useState(0);
   const [activeMenu, setActiveMenu] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
+  const [variationStocks, setVariationStocks] = useState([]);
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -96,6 +97,9 @@ const Inventory = () => {
     try {
       const formData = new FormData();
       formData.append('stock', newStock);
+      if (variationStocks.length > 0) {
+        formData.append('variations', JSON.stringify(variationStocks));
+      }
       formData.append('_method', 'PUT'); // Ensure Laravel treats it as PUT
       await api.updateProduct(selectedProduct.id, formData);
       toast.success('Stock level adjusted successfully');
@@ -291,6 +295,7 @@ const Inventory = () => {
                           onClick={() => {
                             setSelectedProduct(p);
                             setNewStock(p.stock);
+                            setVariationStocks(p.variations ? p.variations.map(v => ({...v})) : []);
                             setShowEditModal(true);
                           }}
                           className="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-maroon hover:shadow-lg transition-all"
@@ -389,6 +394,7 @@ const Inventory = () => {
                       const p = products.find(prod => prod.id === parseInt(e.target.value));
                       setSelectedProduct(p);
                       setNewStock(p?.stock || 0);
+                      setVariationStocks(p?.variations ? p.variations.map(v => ({...v})) : []);
                     }}
                     className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all font-bold text-slate-800 appearance-none"
                   >
