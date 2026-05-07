@@ -186,14 +186,12 @@ const AdminLayout = () => {
             isSidebarOpen ? "p-10 gap-5" : "p-6 justify-center"
           )}>
             <div 
-              className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black italic shadow-2xl transition-all duration-700"
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-white shadow-2xl transition-all duration-700 overflow-hidden border border-slate-100"
               style={{ 
-                backgroundColor: themeColor, 
-                boxShadow: `0 12px 24px -6px ${themeColor}60`,
-                transform: isSidebarOpen ? 'rotate(0deg)' : 'rotate(45deg)'
+                transform: isSidebarOpen ? 'rotate(0deg)' : 'rotate(360deg)'
               }}
             >
-              {selectedStore === 'acharu' ? 'A' : 'T'}
+              <img src="/Acharu and TajaShutki.png" alt="Admin Logo" className="w-full h-full object-cover" />
             </div>
             {isSidebarOpen && (
               <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700">
