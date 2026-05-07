@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store/useStore';
 import AdminLayout from './layouts/AdminLayout';
@@ -19,6 +20,35 @@ import Coupons from './pages/Coupons';
 
 const App = () => {
   const { isAuthenticated } = useStore();
+
+  useEffect(() => {
+    // Round favicon logic for Admin
+    const roundFavicon = (src) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.beginPath();
+        ctx.arc(64, 64, 64, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        
+        ctx.drawImage(img, 0, 0, 128, 128);
+        
+        const link = document.getElementById('favicon');
+        if (link) {
+          link.href = canvas.toDataURL("image/png");
+        }
+      };
+      img.src = src + '?v=' + Date.now();
+    };
+    
+    const timer = setTimeout(() => roundFavicon('/Acharu and TajaShutki.png'), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <Routes>
