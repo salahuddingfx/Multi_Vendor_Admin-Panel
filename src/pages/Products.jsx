@@ -229,6 +229,16 @@ const Products = () => {
                     </div>
                   </td>
                   <td className="px-8 py-5">
+                    {product.is_featured ? (
+                      <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                        <Star size={12} className="fill-amber-500" />
+                        Featured
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-slate-300">—</span>
+                    )}
+                  </td>
+                  <td className="px-8 py-5">
                     <div className="flex items-center justify-end gap-2">
                       <button 
                         onClick={() => {
