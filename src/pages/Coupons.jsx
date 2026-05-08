@@ -16,6 +16,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import ConfirmModal from '../components/ConfirmModal';
 
+const scrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+  }
+`;
+
 const Coupons = () => {
   const { selectedStore } = useStore();
   const [coupons, setCoupons] = useState([]);
@@ -126,7 +142,8 @@ const Coupons = () => {
   if (loading) return <div className="p-8">Loading coupons...</div>;
 
   return (
-    <div className="p-4 md:p-8">
+    <div className="space-y-8">
+      <style>{scrollbarStyles}</style>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Coupons Management</h1>
@@ -202,9 +219,9 @@ const Coupons = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+              className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
-              <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+              <div className="p-6 md:p-8 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <h2 className="text-2xl font-bold text-slate-800">
                   {currentCoupon ? 'Edit Coupon' : 'Create New Coupon'}
                 </h2>
@@ -213,7 +230,8 @@ const Coupons = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-8 space-y-6">
+              <div className="overflow-y-auto custom-scrollbar">
+                <form id="coupon-form" onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Coupon Code</label>
                   <input 
@@ -329,23 +347,25 @@ const Coupons = () => {
                       ))}
                   </div>
                 </div>
+                </form>
+              </div>
 
-                <div className="pt-4 flex gap-4">
-                  <button 
-                    type="button"
-                    onClick={closeModal}
-                    className="flex-grow py-4 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 transition-all"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="flex-grow bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
-                  >
-                    {currentCoupon ? 'Update Coupon' : 'Create Coupon'}
-                  </button>
-                </div>
-              </form>
+              <div className="p-6 md:p-8 bg-slate-50 flex gap-4 shrink-0">
+                <button 
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 px-6 py-4 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  form="coupon-form"
+                  className="flex-1 px-6 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all"
+                >
+                  {currentCoupon ? 'Update Coupon' : 'Create Coupon'}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
