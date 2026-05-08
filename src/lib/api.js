@@ -18,9 +18,19 @@ adminClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Add a response interceptor to handle 401 errors
+// Add a response interceptor to handle 401 errors and broadcast data changes
 adminClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const method = response.config?.method;
+    if (['post', 'put', 'patch', 'delete'].includes(method)) {
+      try {
+        const channel = new BroadcastChannel('multivendor-storefront');
+        channel.postMessage({ type: 'data-changed', timestamp: Date.now() });
+        channel.close();
+      } catch (e) {}
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401 && !window.location.pathname.includes('/login')) {
       localStorage.removeItem('admin_token');
