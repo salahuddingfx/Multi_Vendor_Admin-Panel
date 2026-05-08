@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore';
 import { Search, Filter, Printer, ExternalLink, ChevronRight, Package, Truck, CheckCircle, Clock, Edit2, Trash2, X } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import InvoiceTemplate from '../components/InvoiceTemplate';
+import BulkInvoiceTemplate from '../components/BulkInvoiceTemplate';
 import { api } from '../lib/api';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
@@ -123,6 +124,7 @@ const Orders = () => {
   );
 
   const printRef = useRef();
+  const bulkPrintRef = useRef();
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
@@ -161,6 +163,10 @@ const Orders = () => {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
+  });
+
+  const handleBulkPrint = useReactToPrint({
+    contentRef: bulkPrintRef,
   });
 
   const handleStatusChange = async (orderId, newStatus) => {
@@ -736,7 +742,7 @@ const Orders = () => {
                 
                 <button 
                   className="px-6 py-3 bg-white text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-maroon hover:text-white transition-all shadow-xl hover:shadow-maroon/20 flex items-center gap-2 group"
-                  onClick={() => toast.info('Bulk printing feature coming soon!')}
+                  onClick={handleBulkPrint}
                 >
                   <Printer size={14} className="group-hover:scale-110 transition-transform" />
                   Bulk Print
@@ -746,6 +752,12 @@ const Orders = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <BulkInvoiceTemplate 
+        ref={bulkPrintRef} 
+        orders={orders.filter(o => selectedOrderIds.includes(o.id))} 
+        type={printType} 
+      />
     </div>
   );
 };
