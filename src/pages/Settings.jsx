@@ -1,7 +1,27 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { api } from '../lib/api';
-import { Save, Globe, Palette, Layout, Bell, Loader2, Users, Clock, Plus, Trash2 } from 'lucide-react';
+import { 
+  Save, 
+  Globe, 
+  Palette, 
+  Layout, 
+  Bell, 
+  Loader2, 
+  Users, 
+  Clock, 
+  Plus, 
+  Trash2,
+  MonitorPlay,
+  BarChart3,
+  Timer,
+  Users2,
+  ShoppingBag,
+  Sparkles,
+  RotateCw,
+  Mail,
+  Share2
+} from 'lucide-react';
 import { clsx } from 'clsx';
 import { toast } from 'sonner';
 
@@ -281,7 +301,7 @@ const Settings = () => {
               {/* Hero Section */}
               <div>
                 <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
-                  🎬 Hero Section
+                  <MonitorPlay size={20} className="text-slate-400" /> Hero Section
                 </h3>
                 <div className="space-y-4">
                   <div>
@@ -308,7 +328,7 @@ const Settings = () => {
               {/* Stats */}
               <div>
                 <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
-                  📊 Stats Bar (4 items)
+                  <BarChart3 size={20} className="text-slate-400" /> Stats Bar (4 items)
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(settings.about.stats || []).map((stat, idx) => (
@@ -343,7 +363,9 @@ const Settings = () => {
               {/* Timeline */}
               <div>
                 <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
-                  <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">⏳ Timeline Events</h3>
+                  <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <Timer size={20} className="text-slate-400" /> Timeline Events
+                  </h3>
                   <button
                     onClick={addTimelineItem}
                     className="flex items-center gap-1 text-xs font-black text-maroon bg-maroon/5 hover:bg-maroon/10 px-3 py-2 rounded-xl transition-colors"
@@ -400,7 +422,9 @@ const Settings = () => {
               {/* Team Members */}
               <div>
                 <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
-                  <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">👥 Team Members</h3>
+                  <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <Users2 size={20} className="text-slate-400" /> Team Members
+                  </h3>
                   <button
                     onClick={addTeamMember}
                     className="flex items-center gap-1 text-xs font-black text-maroon bg-maroon/5 hover:bg-maroon/10 px-3 py-2 rounded-xl transition-colors"
@@ -469,7 +493,9 @@ const Settings = () => {
 
               {/* CTA Section */}
               <div>
-                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100">🛍️ Bottom CTA</h3>
+                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
+                  <ShoppingBag size={20} className="text-slate-400" /> Bottom CTA
+                </h3>
                 <div className="space-y-4">
                   <div>
                     <label className={labelCls}>CTA Title</label>
@@ -503,7 +529,9 @@ const Settings = () => {
               {/* Why Us Section */}
               <div>
                 <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
-                  <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">🌟 Why Us Cards (Max 6)</h3>
+                  <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <Sparkles size={20} className="text-slate-400" /> Why Us Cards (Max 6)
+                  </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(settings.home.why_us || []).map((item, idx) => (
@@ -557,7 +585,9 @@ const Settings = () => {
 
               {/* Process Section */}
               <div>
-                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100">🔄 Process Steps (4)</h3>
+                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
+                  <RotateCw size={20} className="text-slate-400" /> Process Steps (4)
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(settings.home.process || []).map((step, idx) => (
                     <div key={idx} className="bg-slate-50 rounded-2xl p-5 space-y-3">
@@ -600,7 +630,9 @@ const Settings = () => {
 
               {/* Newsletter Section */}
               <div>
-                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100">📧 Newsletter</h3>
+                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
+                  <Mail size={20} className="text-slate-400" /> Newsletter
+                </h3>
                 <div className="space-y-4">
                   <div>
                     <label className={labelCls}>Main Title</label>
@@ -632,7 +664,7 @@ const Settings = () => {
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                <div>
                 <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
-                  📱 Social Media Links
+                  <Share2 size={20} className="text-slate-400" /> Social Media Links
                 </h3>
                 <p className="text-slate-500 text-sm mb-8">Leave blank to hide the icon from your store footer.</p>
                 
