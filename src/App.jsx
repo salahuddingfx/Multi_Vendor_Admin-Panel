@@ -50,7 +50,7 @@ const App = () => {
       img.src = src + '?v=' + Date.now();
     };
     
-    const timer = setTimeout(() => updateFavicon('/Nexus.png'), 500);
+    const timer = setTimeout(() => updateFavicon('/Acharu and TajaShutki.png'), 500);
     return () => clearTimeout(timer);
   }, []);
 
