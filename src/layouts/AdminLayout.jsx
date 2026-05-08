@@ -272,13 +272,6 @@ const AdminLayout = () => {
                {isSidebarOpen && <span className="text-sm">Sign Out</span>}
              </button>
 
-             {isSidebarOpen && (
-               <div className="pt-4 text-center">
-                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
-                   Developed by <span style={{ color: themeColor }}>Salah Uddin Kader</span>
-                 </p>
-               </div>
-             )}
           </div>
         </div>
       </aside>
