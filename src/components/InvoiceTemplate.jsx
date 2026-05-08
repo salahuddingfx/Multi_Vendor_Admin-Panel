@@ -50,6 +50,11 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
             <p style={{ margin: '0', fontWeight: '900', fontSize: '10px' }}>{order.customer_name}</p>
             <p style={{ margin: '1px 0', fontWeight: '700' }}>{order.customer_phone}</p>
             <p style={{ margin: '1px 0', fontSize: '8px', lineHeight: '1.2' }}>{order.customer_address}, {order.location}</p>
+            {order.customer_notes && (
+              <p style={{ margin: '4px 0 0', fontSize: '7px', fontWeight: '900', color: '#000', backgroundColor: '#eee', padding: '2px 4px', borderRadius: '2px', display: 'inline-block' }}>
+                NOTE: {order.customer_notes}
+              </p>
+            )}
             <div style={{ marginTop: '4px', display: 'inline-block', padding: '1px 5px', backgroundColor: '#000', color: '#fff', borderRadius: '2px', fontSize: '8px', fontWeight: 'bold' }}>
                 {order.location === 'Cox' ? 'LOCAL HUB' : 'OUTSIDE'}
             </div>
@@ -194,6 +199,12 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
             <p style={{ fontSize: '18px', fontWeight: '900', color: '#0f172a', marginBottom: '5px' }}>{order.customer_name}</p>
             <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#475569', marginBottom: '10px' }}>{order.customer_phone}</p>
             <p style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.6', fontWeight: '500' }}>{order.customer_address}, {order.location}</p>
+            {order.customer_notes && (
+              <div style={{ marginTop: '15px', padding: '10px 15px', backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px' }}>
+                <p style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', color: brandColor, marginBottom: '4px', opacity: 0.7 }}>Special Note:</p>
+                <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e293b' }}>{order.customer_notes}</p>
+              </div>
+            )}
           </div>
           <div>
             <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#94a3b8', fontWeight: '900', letterSpacing: '0.1em', margin: '0 0 15px' }}>Order Summary</h4>
