@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store/useStore';
+import AdminSkeleton from './components/AdminSkeleton';
 import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
