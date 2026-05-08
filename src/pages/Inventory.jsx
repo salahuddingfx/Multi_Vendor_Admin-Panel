@@ -506,17 +506,31 @@ const Inventory = () => {
                 {auditLogs.length > 0 ? auditLogs.map((log, i) => (
                   <div key={i} className="flex gap-6 p-6 bg-slate-50 rounded-3xl border border-slate-100 relative group">
                     <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                       <RefreshCcw size={20} className="text-blue-500" />
+                       <RefreshCcw size={20} className={
+                          log.type === 'return' ? 'text-orange-500' :
+                          log.type === 'shipment' ? 'text-emerald-500' :
+                          'text-blue-500'
+                       } />
                     </div>
                     <div>
                        <div className="flex items-center gap-3 mb-1">
-                          <span className="text-sm font-black text-slate-900">Return Recorded</span>
+                          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                             log.type === 'return' ? 'bg-orange-100 text-orange-600' :
+                             log.type === 'shipment' ? 'bg-emerald-100 text-emerald-600' :
+                             'bg-blue-100 text-blue-600'
+                          }`}>
+                             {log.type || 'Return'}
+                          </span>
+                          <span className="text-sm font-black text-slate-900">
+                             {log.type === 'return' ? 'Stock Returned' : log.type === 'shipment' ? 'New Shipment' : 'Manual Adjustment'}
+                          </span>
                           <span className="text-[10px] font-bold text-slate-400 px-2 py-0.5 bg-white rounded-full border border-slate-100">
                              {new Date(log.created_at).toLocaleDateString()}
                           </span>
                        </div>
                        <p className="text-xs text-slate-500 font-medium mb-3">
-                          {log.product_name || `Product ID #${log.product_id}`} — Added {log.quantity} units back to stock.
+                          {log.product_name || `Product ID #${log.product_id}`} — {log.quantity > 0 ? 'Added' : 'Removed'} {Math.abs(log.quantity)} units. 
+                          <span className="ml-2 text-slate-400">({log.previous_stock} → {log.new_stock})</span>
                        </p>
                        {log.reason && (
                          <div className="text-[10px] bg-white p-3 rounded-xl border border-slate-100 text-slate-400 italic">
