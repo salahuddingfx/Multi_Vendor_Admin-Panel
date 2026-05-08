@@ -64,6 +64,32 @@ const Products = () => {
     }
   };
 
+  const Skeleton = () => (
+    <div className="space-y-8 animate-pulse">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="space-y-2">
+          <div className="h-10 w-48 bg-slate-100 rounded-xl" />
+          <div className="h-4 w-64 bg-slate-100 rounded-lg" />
+        </div>
+        <div className="h-14 w-40 bg-slate-100 rounded-2xl" />
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="h-14 w-full md:w-96 bg-slate-100 rounded-2xl" />
+        <div className="flex gap-3">
+          <div className="h-14 w-48 bg-slate-100 rounded-2xl" />
+          <div className="h-14 w-24 bg-slate-100 rounded-2xl" />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-[32px] h-[600px] bg-slate-50/50" />
+    </div>
+  );
+
+  if (loading) {
+    return <div className="p-4 md:p-8"><Skeleton /></div>;
+  }
+
   const handleDeleteProduct = async () => {
     if (!productToDelete) return;
     try {
@@ -155,13 +181,7 @@ const Products = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {loading ? (
-                [1,2,3,4,5].map(i => (
-                  <tr key={i} className="animate-pulse">
-                    <td colSpan="5" className="px-8 py-6 h-20 bg-slate-50/50" />
-                  </tr>
-                ))
-              ) : filteredProducts.map((product) => (
+              {filteredProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-slate-50/30 transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">

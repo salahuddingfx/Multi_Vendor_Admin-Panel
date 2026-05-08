@@ -119,6 +119,33 @@ const Inventory = () => {
 
   const lowStockCount = products.filter(p => p.stock < 10).length;
 
+  const Skeleton = () => (
+    <div className="space-y-10 animate-pulse">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-2">
+          <div className="h-10 w-64 bg-slate-100 rounded-2xl" />
+          <div className="h-4 w-48 bg-slate-100 rounded-xl" />
+        </div>
+        <div className="flex gap-3">
+          <div className="h-12 w-40 bg-slate-100 rounded-2xl" />
+          <div className="h-12 w-40 bg-slate-100 rounded-2xl" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-40 bg-slate-100 rounded-[40px]" />
+        ))}
+      </div>
+
+      <div className="bg-white rounded-[48px] h-[500px] bg-slate-50/50" />
+    </div>
+  );
+
+  if (loading) {
+    return <div className="p-4 md:p-8"><Skeleton /></div>;
+  }
+
   return (
     <div className="space-y-10 pb-20">
       {/* Header */}

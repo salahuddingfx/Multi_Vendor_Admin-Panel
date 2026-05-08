@@ -97,6 +97,29 @@ const Orders = () => {
     customer_address: '',
     location: ''
   });
+  const Skeleton = () => (
+    <div className="space-y-8 animate-pulse">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="h-8 w-64 bg-slate-100 rounded-xl" />
+          <div className="h-4 w-48 bg-slate-100 rounded-lg" />
+        </div>
+        <div className="flex gap-3">
+          <div className="h-12 w-40 bg-slate-100 rounded-2xl" />
+          <div className="h-12 w-40 bg-slate-100 rounded-2xl" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="h-28 bg-slate-100 rounded-[32px]" />
+        ))}
+      </div>
+
+      <div className="bg-white rounded-[40px] border border-slate-100 h-[600px] bg-slate-50/50" />
+    </div>
+  );
+
   const printRef = useRef();
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
@@ -203,6 +226,10 @@ const Orders = () => {
     a.download = `orders-${selectedStore}-${new Date().toLocaleDateString()}.csv`;
     a.click();
   };
+
+  if (loading) {
+    return <div className="p-4 md:p-8"><Skeleton /></div>;
+  }
 
   return (
     <div className="space-y-8 pb-20">

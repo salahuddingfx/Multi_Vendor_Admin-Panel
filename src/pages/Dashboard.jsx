@@ -51,11 +51,36 @@ const Dashboard = () => {
     }
   };
 
+  const Skeleton = () => (
+    <div className="space-y-10 animate-pulse">
+      {/* Welcome Skeleton */}
+      <div className="flex justify-between items-end">
+        <div className="space-y-2">
+          <div className="h-10 w-64 bg-slate-100 rounded-2xl" />
+          <div className="h-4 w-48 bg-slate-100 rounded-xl" />
+        </div>
+        <div className="h-12 w-48 bg-slate-100 rounded-2xl hidden md:block" />
+      </div>
+
+      {/* Stats Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="h-40 bg-slate-100 rounded-[32px]" />
+        ))}
+      </div>
+
+      {/* Charts & Recent Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 h-[450px] bg-slate-100 rounded-[40px]" />
+        <div className="h-[450px] bg-slate-100 rounded-[40px]" />
+      </div>
+    </div>
+  );
+
   if (loading || !stats) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <Loader2 className="w-12 h-12 text-slate-400 animate-spin" />
-        <p className="text-slate-500 font-medium">Crunching numbers...</p>
+      <div className="p-4 md:p-8">
+        <Skeleton />
       </div>
     );
   }

@@ -241,11 +241,32 @@ const SalesDashboard = () => {
   };
 
   if (loading && !data) return (
-    <div className="space-y-12 animate-pulse">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-        {[1,2,3,4].map(i => <div key={i} className="aspect-square bg-white rounded-[32px] border border-slate-50" />)}
+    <div className="space-y-12 animate-pulse p-4 md:p-8">
+      {/* Header Skeleton */}
+      <div className="flex justify-between items-end">
+        <div className="space-y-4">
+          <div className="h-6 w-40 bg-slate-100 rounded-full" />
+          <div className="h-16 w-80 bg-slate-100 rounded-2xl" />
+          <div className="flex gap-3">
+             <div className="h-10 w-24 bg-slate-100 rounded-full" />
+             <div className="h-10 w-24 bg-slate-100 rounded-full" />
+          </div>
+        </div>
+        <div className="h-16 w-64 bg-slate-100 rounded-[28px] hidden xl:block" />
       </div>
-      <div className="h-[600px] bg-white rounded-[50px] border border-slate-50" />
+
+      {/* Stats Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="aspect-square bg-slate-100 rounded-[32px]" />
+        ))}
+      </div>
+
+      {/* Charts Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2 h-[500px] bg-slate-100 rounded-[50px]" />
+        <div className="h-[500px] bg-slate-100 rounded-[50px]" />
+      </div>
     </div>
   );
 
