@@ -200,9 +200,9 @@ const AdminLayout = () => {
             {isSidebarOpen && (
               <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700">
                 <span className="font-display font-black text-2xl text-slate-800 tracking-tight leading-none">
-                  Global <span style={{ color: themeColor }}>Admin</span>
+                  Nexus <span style={{ color: themeColor }}>Admin</span>
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mt-2">NextGen Control</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 mt-2.5">Unified Ecosystem</span>
               </div>
             )}
           </div>
@@ -226,7 +226,7 @@ const AdminLayout = () => {
                   style={isActive ? { backgroundColor: themeColor, boxShadow: `0 12px 24px -10px ${themeColor}80` } : {}}
                 >
                   <item.icon size={isActive ? 22 : 20} className={clsx(isActive ? "text-white" : "text-slate-400 group-hover:text-slate-900 transition-colors")} />
-                  {isSidebarOpen && <span className="tracking-tight text-sm">{item.name}</span>}
+                  {isSidebarOpen && <span className="tracking-tight text-sm font-display font-bold">{item.name}</span>}
                 </Link>
               );
             })}
@@ -243,10 +243,10 @@ const AdminLayout = () => {
                      user?.name?.split(' ').map(n => n[0]).join('') || 'AD'
                    )}
                  </div>
-                 <div className="flex-grow overflow-hidden">
-                   <p className="font-bold text-slate-800 text-xs truncate">{user?.name || 'Admin User'}</p>
-                   <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest truncate">{user?.role || 'Administrator'}</p>
-                 </div>
+                  <div className="flex-grow overflow-hidden">
+                    <p className="font-black text-slate-800 text-xs truncate font-display tracking-tight">{user?.name || 'Admin User'}</p>
+                    <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest truncate">{user?.role || 'Administrator'}</p>
+                  </div>
                </div>
              ) : (
                <div className="w-12 h-12 mx-auto rounded-2xl bg-white shadow-sm flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
