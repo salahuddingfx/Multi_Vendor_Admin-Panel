@@ -46,10 +46,10 @@ const defaultAbout = {
     { year: '2025', title: 'Premium Collection', description: 'Launched flagship Premium Collection for the true connoisseur.' },
   ],
   team: [
-    { name: 'Rahima Begum', role: 'Founder & Master Pickler', bio: 'With 30+ years of culinary experience, Rahima is the heart and soul of our brand.', initials: 'RB' },
-    { name: 'Kamal Hossain', role: 'Head of Operations', bio: 'Kamal ensures every order is packed fresh and dispatched on time.', initials: 'KH' },
-    { name: 'Sadia Islam', role: 'Quality & Sourcing', bio: 'Sadia works directly with farmers to source the finest, freshest ingredients.', initials: 'SI' },
-    { name: 'Tariq Miah', role: 'Customer Experience', bio: 'Tariq is obsessed with customer happiness. Fast replies, always.', initials: 'TM' },
+    { name: 'Rahima Begum', role: 'Founder & Master Pickler', bio: 'With 30+ years of culinary experience, Rahima is the heart and soul of our brand.', initials: 'RB', image: '' },
+    { name: 'Kamal Hossain', role: 'Head of Operations', bio: 'Kamal ensures every order is packed fresh and dispatched on time.', initials: 'KH', image: '' },
+    { name: 'Sadia Islam', role: 'Quality & Sourcing', bio: 'Sadia works directly with farmers to source the finest, freshest ingredients.', initials: 'SI', image: '' },
+    { name: 'Tariq Miah', role: 'Customer Experience', bio: 'Tariq is obsessed with customer happiness. Fast replies, always.', initials: 'TM', image: '' },
   ],
   cta_title: 'Taste the Heritage',
   cta_subtitle: 'Every jar is a chapter in our story. Now it\'s time to make it yours.',
@@ -185,7 +185,7 @@ const Settings = () => {
   };
 
   const addTeamMember = () => {
-    updateAbout('team', [...settings.about.team, { name: '', role: '', bio: '', initials: '' }]);
+    updateAbout('team', [...settings.about.team, { name: '', role: '', bio: '', initials: '', image: '' }]);
   };
 
   const removeTeamMember = (idx) => {
