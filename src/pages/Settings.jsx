@@ -4,7 +4,6 @@ import { api } from '../lib/api';
 import { 
   Save, 
   Globe, 
-  Palette, 
   Layout, 
   Bell, 
   Loader2, 
@@ -21,8 +20,7 @@ import {
   RotateCw,
   Mail,
   Share2,
-  Camera,
-  Image as ImageIcon
+  Camera
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { toast } from 'sonner';
