@@ -689,6 +689,34 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
             </div>
           </div>
 
+          <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[32px] border border-slate-100">
+            <div className="flex items-center gap-4">
+              <div className={clsx(
+                "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
+                formData.is_featured ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400"
+              )}>
+                <Star size={22} className={formData.is_featured ? "fill-amber-500" : ""} />
+              </div>
+              <div>
+                <h3 className="font-black text-slate-800 text-sm">Featured Product</h3>
+                <p className="text-xs font-medium text-slate-400">Show this product in the featured collection on the homepage.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, is_featured: !prev.is_featured }))}
+              className={clsx(
+                "relative w-16 h-8 rounded-full transition-all duration-300",
+                formData.is_featured ? "bg-amber-500" : "bg-slate-200"
+              )}
+            >
+              <div className={clsx(
+                "absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300",
+                formData.is_featured ? "left-9" : "left-1"
+              )} />
+            </button>
+          </div>
+
           <div className="space-y-3">
             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Detailed Description</label>
             <textarea 
