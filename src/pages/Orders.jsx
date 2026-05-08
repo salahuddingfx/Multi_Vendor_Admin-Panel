@@ -7,6 +7,7 @@ import BulkInvoiceTemplate from '../components/BulkInvoiceTemplate';
 import { api } from '../lib/api';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
+import { usePolling } from '../hooks/usePolling';
 import ConfirmModal from '../components/ConfirmModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -83,28 +84,31 @@ const Orders = () => {
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const res = await api.getOrders(siteId);
-        // Extra safe check for Laravel Paginated response structure
-        if (res && res.data && Array.isArray(res.data.data)) {
-          setOrders(res.data.data);
-        } else if (res && Array.isArray(res.data)) {
-          setOrders(res.data);
-        } else {
-          setOrders([]);
-        }
-      } catch (err) {
-        console.error('Failed to fetch orders:', err);
+  const fetchOrders = async (isSilent = false) => {
+    if (!orders.length && !isSilent) setLoading(true);
+    try {
+      const res = await api.getOrders(siteId);
+      if (res && res.data && Array.isArray(res.data.data)) {
+        setOrders(res.data.data);
+      } else if (res && Array.isArray(res.data)) {
+        setOrders(res.data);
+      } else {
         setOrders([]);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+      if (!isSilent) setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchOrders();
   }, [selectedStore]);
+
+  // Auto-refresh orders every 10 seconds
+  usePolling(() => fetchOrders(true), 10000, [selectedStore]);
 
   const filteredOrders = (Array.isArray(orders) ? orders : []).filter(order => {
     const customerName = order.customer_name || '';
