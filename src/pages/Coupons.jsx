@@ -37,31 +37,32 @@ const Coupons = () => {
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
-  useEffect(() => {
-    fetchCoupons();
-    fetchProducts();
-  }, [selectedStore]);
-
-  const fetchCoupons = async () => {
+  async function fetchCoupons() {
     try {
       setLoading(true);
       const data = await api.getCoupons(siteId);
-      setCoupons(data);
+      setCoupons(Array.isArray(data) ? data : (data.data || []));
     } catch (error) {
       console.error('Error fetching coupons:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const fetchProducts = async () => {
+  async function fetchProducts() {
     try {
       const data = await api.getProducts(siteId);
-      setProducts(data);
+      // Backend returns a paginated object for products in admin
+      setProducts(data?.data?.data || data?.data || data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
-  };
+  }
+
+  useEffect(() => {
+    fetchCoupons();
+    fetchProducts();
+  }, [selectedStore]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
