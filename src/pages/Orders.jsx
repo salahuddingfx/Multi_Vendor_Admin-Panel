@@ -437,10 +437,24 @@ const Orders = () => {
                   <td className="px-8 py-8">
                     <div className="flex flex-col">
                       <span className="font-black text-slate-900 text-lg tracking-tight">৳{order.total_amount}</span>
-                      <div className="flex items-center gap-1.5 mt-1.5 mb-2">
-                         <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Delivery:</span>
-                         <span className="text-[10px] text-slate-600 font-bold">৳{order.delivery_charge}</span>
+                      
+                      <div className="flex flex-col gap-1 mt-2.5 mb-3 p-2 bg-slate-50/50 rounded-xl border border-slate-100/50">
+                         <div className="flex justify-between items-center gap-4">
+                           <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Subtotal:</span>
+                           <span className="text-[10px] text-slate-600 font-bold">৳{order.subtotal}</span>
+                         </div>
+                         <div className="flex justify-between items-center gap-4">
+                           <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Delivery:</span>
+                           <span className="text-[10px] text-slate-600 font-bold">৳{order.delivery_charge}</span>
+                         </div>
+                         {parseFloat(order.discount_amount) > 0 && (
+                           <div className="flex justify-between items-center gap-4">
+                             <span className="text-[8px] text-emerald-500 font-black uppercase tracking-widest">Discount:</span>
+                             <span className="text-[10px] text-emerald-600 font-bold">-৳{order.discount_amount}</span>
+                           </div>
+                         )}
                       </div>
+
                       <div className="flex items-center gap-2">
                         <div className={clsx("w-1.5 h-1.5 rounded-full animate-pulse", order.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-rose-500')} />
                         <select 
