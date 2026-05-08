@@ -127,14 +127,14 @@ const Settings = () => {
           delivery_per_kg: data.delivery_per_kg || '10',
           bkash_number: data.bkash_number || '',
           free_delivery_threshold: data.free_delivery_threshold || '2500',
-          social_links: data.social_links ? (typeof data.social_links === 'string' ? JSON.parse(data.social_links) : data.social_links) : {
+          social_links: data.social_links ? (typeof data.social_links === 'string' ? (() => { try { return JSON.parse(data.social_links); } catch { return {}; } })() : data.social_links) : {
             facebook: '',
             instagram: '',
             tiktok: '',
             youtube: ''
           },
-          about: data.about ? (typeof data.about === 'string' ? JSON.parse(data.about) : data.about) : defaultAbout,
-          home: data.home ? (typeof data.home === 'string' ? JSON.parse(data.home) : data.home) : defaultHome,
+          about: data.about ? (typeof data.about === 'string' ? (() => { try { return JSON.parse(data.about); } catch { return {}; } })() : data.about) : defaultAbout,
+          home: data.home ? (typeof data.home === 'string' ? (() => { try { return JSON.parse(data.home); } catch { return {}; } })() : data.home) : defaultHome,
         });
       }
     } catch (error) {
