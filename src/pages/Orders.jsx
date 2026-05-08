@@ -228,6 +228,65 @@ const Orders = () => {
     a.click();
   };
 
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+
+  const toggleSelectAll = () => {
+    if (selectedOrderIds.length === filteredOrders.length) {
+      setSelectedOrderIds([]);
+    } else {
+      setSelectedOrderIds(filteredOrders.map(o => o.id));
+    }
+  };
+
+  const toggleSelectOrder = (id) => {
+    setSelectedOrderIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkStatusUpdate = async (newStatus) => {
+    if (!selectedOrderIds.length) return;
+    setIsBulkUpdating(true);
+    try {
+      // We could ideally have a bulk endpoint, but for now we can iterate or just assume we'll add one.
+      // Let's assume we use a loop for now or I'll add a bulk endpoint if I have backend access.
+      // To be safe and efficient, I'll update them one by one but wrapped in a toast.
+      const promises = selectedOrderIds.map(id => api.updateOrderStatus(id, newStatus));
+      await Promise.all(promises);
+      
+      setOrders(prev => prev.map(o => 
+        selectedOrderIds.includes(o.id) ? { ...o, status: newStatus } : o
+      ));
+      
+      toast.success(`Bulk updated ${selectedOrderIds.length} orders to ${newStatus}`);
+      setSelectedOrderIds([]);
+    } catch (err) {
+      toast.error('Failed to bulk update some orders');
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!selectedOrderIds.length) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedOrderIds.length} orders?`)) return;
+    
+    setIsBulkUpdating(true);
+    try {
+      const promises = selectedOrderIds.map(id => api.deleteOrder(id));
+      await Promise.all(promises);
+      
+      setOrders(prev => prev.filter(o => !selectedOrderIds.includes(o.id)));
+      toast.success(`Deleted ${selectedOrderIds.length} orders`);
+      setSelectedOrderIds([]);
+    } catch (err) {
+      toast.error('Failed to delete some orders');
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
   if (loading) {
     return <div className="p-4 md:p-8"><Skeleton /></div>;
   }
@@ -315,7 +374,15 @@ const Orders = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Order Details</th>
+                <th className="px-8 py-5 w-10">
+                  <input 
+                    type="checkbox" 
+                    className="w-5 h-5 rounded-lg border-slate-200 text-maroon focus:ring-maroon cursor-pointer transition-all"
+                    checked={selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
+                <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Order Details</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Customer</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Products</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Total</th>
@@ -325,7 +392,18 @@ const Orders = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-slate-50/30 transition-colors group">
+                <tr key={order.id} className={clsx(
+                  "hover:bg-slate-50/30 transition-colors group",
+                  selectedOrderIds.includes(order.id) && "bg-slate-50"
+                )}>
+                  <td className="px-8 py-8">
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 rounded-lg border-slate-200 text-maroon focus:ring-maroon cursor-pointer transition-all"
+                      checked={selectedOrderIds.includes(order.id)}
+                      onChange={() => toggleSelectOrder(order.id)}
+                    />
+                  </td>
                   <td className="px-8 py-8">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2 mb-1">
@@ -591,6 +669,70 @@ const Orders = () => {
         type="danger"
         confirmText="Yes, Delete Order"
       />
+
+      {/* Floating Bulk Action Bar */}
+      <AnimatePresence>
+        {selectedOrderIds.length > 0 && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-4xl"
+          >
+            <div className="bg-slate-900 text-white rounded-[32px] p-4 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center justify-between gap-6 border border-white/10 backdrop-blur-xl">
+              <div className="flex items-center gap-6 px-4">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Selected Orders</span>
+                  <span className="text-xl font-black">{selectedOrderIds.length < 10 ? `0${selectedOrderIds.length}` : selectedOrderIds.length}</span>
+                </div>
+                <button 
+                  onClick={() => setSelectedOrderIds([])}
+                  className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
+                >
+                  Clear Selection
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-px bg-white/10 hidden md:block" />
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">Bulk Status:</span>
+                  <select 
+                    onChange={(e) => handleBulkStatusUpdate(e.target.value)}
+                    disabled={isBulkUpdating}
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-maroon transition-all"
+                  >
+                    <option value="" className="bg-slate-900">Change Status...</option>
+                    <option value="confirmed" className="bg-slate-900">Confirmed</option>
+                    <option value="packed" className="bg-slate-900">Packed</option>
+                    <option value="shipped" className="bg-slate-900">Shipped</option>
+                    <option value="delivered" className="bg-slate-900">Delivered</option>
+                    <option value="returned" className="bg-slate-900">Returned</option>
+                    <option value="cancelled" className="bg-slate-900">Cancelled</option>
+                  </select>
+                </div>
+
+                <button 
+                  onClick={handleBulkDelete}
+                  disabled={isBulkUpdating}
+                  className="p-3 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all"
+                  title="Bulk Delete"
+                >
+                  <Trash2 size={20} />
+                </button>
+                
+                <button 
+                  className="px-8 py-3 bg-white text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-maroon hover:text-white transition-all shadow-lg"
+                  onClick={() => toast.info('Bulk printing feature coming soon!')}
+                >
+                  Bulk Print
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
