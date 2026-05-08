@@ -14,6 +14,7 @@ import Categories from './pages/Categories';
 import Inventory from './pages/Inventory';
 import Messages from './pages/Messages';
 import Users from './pages/Users';
+import Customers from './pages/Customers';
 import Reviews from './pages/Reviews';
 import Banners from './pages/Banners';
 import Coupons from './pages/Coupons';
@@ -65,6 +66,7 @@ const App = () => {
         <Route path="coupons" element={<Coupons />} />
         <Route path="messages" element={<Messages />} />
         <Route path="users" element={<Users />} />
+        <Route path="customers" element={<Customers />} />
         <Route path="categories" element={<Categories />} />
         <Route path="settings" element={<Settings />} />
       </Route>
