@@ -516,7 +516,7 @@ const Inventory = () => {
                           </span>
                        </div>
                        <p className="text-xs text-slate-500 font-medium mb-3">
-                          Product ID #{log.product_id} — Added {log.quantity} units back to stock.
+                          {log.product_name || `Product ID #${log.product_id}`} — Added {log.quantity} units back to stock.
                        </p>
                        {log.reason && (
                          <div className="text-[10px] bg-white p-3 rounded-xl border border-slate-100 text-slate-400 italic">
