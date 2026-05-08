@@ -18,6 +18,7 @@ import Customers from './pages/Customers';
 import Reviews from './pages/Reviews';
 import Banners from './pages/Banners';
 import Coupons from './pages/Coupons';
+import NotFound from './pages/NotFound';
 
 const App = () => {
   const { isAuthenticated } = useStore();
@@ -72,7 +73,7 @@ const App = () => {
       </Route>
 
       {/* Catch all */}
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
