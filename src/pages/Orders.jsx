@@ -7,6 +7,7 @@ import { api } from '../lib/api';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
 import ConfirmModal from '../components/ConfirmModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const mockOrders = [
   {
