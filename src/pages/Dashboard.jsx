@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { api } from '../lib/api';
+import { usePolling } from '../hooks/usePolling';
 import { 
   TrendingUp, 
   ShoppingBag, 
@@ -39,8 +40,11 @@ const Dashboard = () => {
     fetchStats();
   }, [selectedStore]);
 
-  const fetchStats = async () => {
-    setLoading(true);
+  // Auto-refresh stats every 10 seconds to keep dashboard "live"
+  usePolling(() => fetchStats(true), 10000, [selectedStore]);
+
+  const fetchStats = async (isSilent = false) => {
+    if (!stats && !isSilent) setLoading(true);
     try {
       const data = await api.getDashboardStats(selectedStore);
       setStats(data);
