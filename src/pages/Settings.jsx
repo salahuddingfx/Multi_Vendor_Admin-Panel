@@ -95,8 +95,10 @@ const Settings = () => {
     social_links: {
       facebook: '',
       instagram: '',
+      twitter: '',
       tiktok: '',
-      youtube: ''
+      youtube: '',
+      whatsapp: ''
     },
     about: defaultAbout,
     home: defaultHome,
@@ -128,8 +130,10 @@ const Settings = () => {
           social_links: data.social_links ? (typeof data.social_links === 'string' ? (() => { try { return JSON.parse(data.social_links); } catch { return {}; } })() : data.social_links) : {
             facebook: '',
             instagram: '',
+            twitter: '',
             tiktok: '',
-            youtube: ''
+            youtube: '',
+            whatsapp: ''
           },
           about: data.about ? (typeof data.about === 'string' ? (() => { try { return JSON.parse(data.about); } catch { return {}; } })() : data.about) : defaultAbout,
           home: data.home ? (typeof data.home === 'string' ? (() => { try { return JSON.parse(data.home); } catch { return {}; } })() : data.home) : defaultHome,
@@ -705,8 +709,10 @@ const Settings = () => {
                   {[
                     ['Facebook Page URL', 'facebook'],
                     ['Instagram Profile URL', 'instagram'],
+                    ['Twitter (X) URL', 'twitter'],
                     ['TikTok Profile URL', 'tiktok'],
                     ['YouTube Channel URL', 'youtube'],
+                    ['WhatsApp Number (with country code)', 'whatsapp'],
                   ].map(([label, key]) => (
                     <div key={key} className="space-y-2">
                       <label className={labelCls}>{label}</label>
