@@ -249,7 +249,7 @@ const AdminLayout = () => {
                  </div>
                </div>
              ) : (
-               <div className="w-12 h-12 mx-auto rounded-xl bg-white shadow-sm flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
+               <div className="w-12 h-12 mx-auto rounded-2xl bg-white shadow-sm flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
                  {user?.image_path ? (
                    <img src={user.image_path} alt={user.name} className="w-full h-full object-cover" />
                  ) : (
