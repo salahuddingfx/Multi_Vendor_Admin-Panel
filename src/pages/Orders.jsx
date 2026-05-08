@@ -146,8 +146,9 @@ const Orders = () => {
 
   const handleUpdateOrder = async () => {
     try {
-      await api.updateOrder(editingOrder.id, editForm);
-      setOrders(prev => prev.map(o => o.id === editingOrder.id ? { ...o, ...editForm } : o));
+      const res = await api.updateOrder(editingOrder.id, editForm);
+      const updatedOrder = res.data;
+      setOrders(prev => prev.map(o => o.id === editingOrder.id ? { ...o, ...updatedOrder } : o));
       setShowEditModal(false);
       toast.success('Order details updated');
     } catch (err) {
