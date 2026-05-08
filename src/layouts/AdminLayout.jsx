@@ -178,7 +178,7 @@ const AdminLayout = () => {
       {/* Sidebar - Floating Aesthetic */}
       <aside className={clsx(
         "fixed inset-y-0 left-0 z-50 p-4 transition-all duration-700 h-full shrink-0",
-        isSidebarOpen ? "w-80" : "w-28 -translate-x-full md:translate-x-0"
+        isSidebarOpen ? "w-80" : "w-[100px] -translate-x-full md:translate-x-0"
       )}>
         <div className="h-full flex flex-col bg-white rounded-[40px] shadow-premium border border-black/[0.02] overflow-hidden">
           {/* Logo Section */}
@@ -187,7 +187,10 @@ const AdminLayout = () => {
             isSidebarOpen ? "p-10 gap-5" : "p-6 justify-center"
           )}>
             <div 
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-white shadow-2xl transition-all duration-700 overflow-hidden border border-slate-100"
+              className={clsx(
+                "rounded-full flex items-center justify-center bg-white shadow-2xl transition-all duration-700 overflow-hidden border border-slate-100 shrink-0",
+                isSidebarOpen ? "w-14 h-14" : "w-12 h-12"
+              )}
               style={{ 
                 transform: isSidebarOpen ? 'rotate(0deg)' : 'rotate(360deg)'
               }}
@@ -215,7 +218,7 @@ const AdminLayout = () => {
                   title={!isSidebarOpen ? item.name : ''}
                   className={clsx(
                     "flex items-center font-bold transition-all duration-300 group relative",
-                    isSidebarOpen ? "gap-5 px-6 py-4 rounded-[24px]" : "justify-center p-5 rounded-[20px]",
+                    isSidebarOpen ? "gap-5 px-6 py-4 rounded-[24px]" : "justify-center w-14 h-14 mx-auto rounded-2xl",
                     isActive 
                       ? "text-white shadow-lg" 
                       : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
@@ -224,11 +227,6 @@ const AdminLayout = () => {
                 >
                   <item.icon size={isActive ? 22 : 20} className={clsx(isActive ? "text-white" : "text-slate-400 group-hover:text-slate-900 transition-colors")} />
                   {isSidebarOpen && <span className="tracking-tight text-sm">{item.name}</span>}
-                  
-                  {/* Subtle active indicator dot */}
-                  {!isSidebarOpen && isActive && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
-                  )}
                 </Link>
               );
             })}
@@ -288,7 +286,7 @@ const AdminLayout = () => {
       {/* Spacer for Fixed Sidebar on Desktop */}
       <div className={clsx(
         "hidden md:block transition-all duration-700 shrink-0",
-        isSidebarOpen ? "w-80" : "w-28"
+        isSidebarOpen ? "w-80" : "w-[100px]"
       )} />
 
       {/* Main Content Area - Independently Scrollable */}
