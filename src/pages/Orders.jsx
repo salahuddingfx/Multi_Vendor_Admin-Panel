@@ -46,6 +46,7 @@ const Orders = () => {
   const [filterStatus, setFilterStatus] = useState('All');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [editingOrder, setEditingOrder] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -234,9 +235,10 @@ const Orders = () => {
 
   const handleBulkDelete = async () => {
     if (!selectedOrderIds.length) return;
-    if (!window.confirm(`Are you sure you want to delete ${selectedOrderIds.length} orders?`)) return;
-    
-    setIsBulkUpdating(true);
+    setShowBulkDeleteConfirm(true);
+  };
+
+  const executeBulkDelete = async () => {
     try {
       const promises = selectedOrderIds.map(id => api.deleteOrder(id));
       await Promise.all(promises);
@@ -630,6 +632,16 @@ const Orders = () => {
         message={`Are you sure you want to delete order #${orderToDelete?.tracking_id?.toUpperCase()}? This action cannot be undone and will remove all associated data.`}
         type="danger"
         confirmText="Yes, Delete Order"
+      />
+
+      <ConfirmModal 
+        isOpen={showBulkDeleteConfirm}
+        onClose={() => setShowBulkDeleteConfirm(false)}
+        onConfirm={executeBulkDelete}
+        title="Delete Multiple Orders?"
+        message={`Are you sure you want to delete ${selectedOrderIds.length} selected orders? This action will permanently remove these orders from the system.`}
+        type="danger"
+        confirmText={`Delete ${selectedOrderIds.length} Orders`}
       />
 
       {/* Floating Bulk Action Bar */}
