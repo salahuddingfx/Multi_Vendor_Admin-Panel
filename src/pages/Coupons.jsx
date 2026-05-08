@@ -42,6 +42,9 @@ const Coupons = () => {
     code: '',
     type: 'fixed',
     value: '',
+    max_uses: '',
+    per_user_limit: 1,
+    first_order_only: false,
     expires_at: '',
     is_active: true,
     product_ids: []
@@ -116,6 +119,9 @@ const Coupons = () => {
         code: coupon.code,
         type: coupon.type,
         value: coupon.value,
+        max_uses: coupon.max_uses ?? '',
+        per_user_limit: coupon.per_user_limit ?? 1,
+        first_order_only: coupon.first_order_only ?? false,
         expires_at: coupon.expires_at ? coupon.expires_at.split('T')[0] : '',
         is_active: coupon.is_active,
         product_ids: coupon.products ? coupon.products.map(p => p.id) : []
@@ -208,6 +214,25 @@ const Coupons = () => {
                 <Calendar size={14} />
                 <span>Expires: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'Never'}</span>
               </div>
+              {coupon.usages_count !== undefined && (
+                <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+                  <Ticket size={14} />
+                  <span>
+                    Used {coupon.usages_count} time{coupon.usages_count !== 1 ? 's' : ''}
+                    {coupon.max_uses && ` / ${coupon.max_uses} max`}
+                  </span>
+                </div>
+              )}
+              {coupon.first_order_only && (
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md text-[10px] font-black uppercase tracking-widest">
+                  First Order Only
+                </div>
+              )}
+              {coupon.per_user_limit && coupon.per_user_limit > 0 && (
+                <div className="text-[10px] font-medium text-slate-400">
+                  Per user: {coupon.per_user_limit} use{coupon.per_user_limit > 1 ? 's' : ''}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
