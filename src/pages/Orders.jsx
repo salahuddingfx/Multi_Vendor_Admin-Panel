@@ -324,164 +324,183 @@ const Orders = () => {
             <tbody className="divide-y divide-slate-50">
               {filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-slate-50/30 transition-colors group">
-                  <td className="px-8 py-6">
+                  <td className="px-8 py-8">
                     <div className="flex flex-col">
-                      <span className="font-black text-slate-900 text-sm">#{order.tracking_id.toUpperCase()}</span>
-                      <span className="text-slate-400 text-[10px] mt-1">{new Date(order.created_at).toLocaleString()}</span>
-                      <div className="mt-2 flex flex-col gap-1">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded w-fit">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-black text-slate-900 text-base tracking-tight">#{order.tracking_id.toUpperCase()}</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                        <span className="text-slate-400 text-[10px] font-bold uppercase">{new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
+                      </div>
+                      <span className="text-slate-400 text-[9px] font-medium mb-3">{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      
+                      <div className="flex flex-wrap gap-1.5">
+                        <span className={clsx(
+                          "text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg",
+                          order.payment_method?.toLowerCase() === 'bkash' ? "bg-pink-50 text-pink-600" : "bg-slate-100 text-slate-500"
+                        )}>
                           {order.payment_method?.toUpperCase()}
                         </span>
-                        {order.transaction_id && (
-                          <span className="text-[10px] font-medium text-slate-400">Trx: {order.transaction_id}</span>
-                        )}
-                        {order.sender_number && (
-                          <span className="text-[10px] font-medium text-slate-400">From: {order.sender_number}</span>
+                        {(order.transaction_id || order.sender_number) && (
+                          <div className="flex flex-col gap-0.5 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
+                             {order.transaction_id && <span className="text-[8px] font-black text-slate-400 tracking-tighter">TRX: {order.transaction_id}</span>}
+                             {order.sender_number && <span className="text-[8px] font-black text-slate-400 tracking-tighter">FROM: {order.sender_number}</span>}
+                          </div>
                         )}
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-6">
-                    <div className="flex flex-col max-w-[200px]">
-                      <span className="font-bold text-slate-800 text-sm">{order.customer_name}</span>
-                      <span className="text-slate-400 text-[10px] mt-0.5">{order.customer_phone}</span>
-                      <span className="text-[10px] text-slate-500 mt-1 line-clamp-2" title={order.customer_address}>
+                  <td className="px-8 py-8">
+                    <div className="flex flex-col">
+                      <span className="font-black text-slate-800 text-sm leading-none mb-1.5">{order.customer_name}</span>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-slate-500 text-[11px] font-bold">{order.customer_phone}</span>
+                        <span className={clsx(
+                          "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest",
+                          order.location?.toLowerCase() === 'cox' ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"
+                        )}>
+                          {order.location}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-medium max-w-[220px] leading-relaxed italic" title={order.customer_address}>
                         {order.customer_address}
-                      </span>
-                      <span className="text-[9px] font-black uppercase text-slate-300 mt-1">{order.location}</span>
+                      </p>
                     </div>
                   </td>
-                  <td className="px-8 py-6">
-                    <div className="flex flex-col gap-1">
+                  <td className="px-8 py-8">
+                    <div className="flex flex-col gap-2.5">
                       {order.items?.map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">{item.quantity}x</span>
-                          <span className="text-xs font-medium text-slate-600 truncate max-w-[150px]">
-                            {item.name} {item.variation_info && <span className="text-blue-500 font-bold ml-1">({item.variation_info})</span>}
-                          </span>
+                        <div key={idx} className="flex items-start gap-3 group/item">
+                          <div className="w-6 h-6 shrink-0 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500 group-hover/item:bg-slate-900 group-hover/item:text-white transition-colors">
+                            {item.quantity}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-black text-slate-700 tracking-tight leading-none group-hover/item:text-slate-900 transition-colors">
+                              {item.name}
+                            </span>
+                            {item.variation_info && (
+                              <span className="text-[9px] font-bold text-blue-500 uppercase tracking-widest mt-1">
+                                {item.variation_info}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
                   </td>
-                  <td className="px-8 py-6">
+                  <td className="px-8 py-8">
                     <div className="flex flex-col">
-                      <span className="font-black text-slate-900">৳{order.total_amount}</span>
-                      <span className="text-[9px] text-slate-400 font-medium">Del: ৳{order.delivery_charge}</span>
-                      <select 
-                        value={order.payment_status || 'unpaid'}
-                        onChange={(e) => handlePaymentStatusChange(order.id, e.target.value)}
-                        className={clsx(
-                          "text-[10px] font-black uppercase mt-1 bg-transparent border-none outline-none cursor-pointer",
-                          order.payment_status === 'paid' ? 'text-emerald-500' : 'text-rose-500'
-                        )}
-                      >
-                        <option value="unpaid">Unpaid</option>
-                        <option value="paid">Paid</option>
-                      </select>
+                      <span className="font-black text-slate-900 text-lg tracking-tight">৳{order.total_amount}</span>
+                      <div className="flex items-center gap-1.5 mt-1.5 mb-2">
+                         <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Delivery:</span>
+                         <span className="text-[10px] text-slate-600 font-bold">৳{order.delivery_charge}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={clsx("w-1.5 h-1.5 rounded-full animate-pulse", order.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-rose-500')} />
+                        <select 
+                          value={order.payment_status || 'unpaid'}
+                          onChange={(e) => handlePaymentStatusChange(order.id, e.target.value)}
+                          className={clsx(
+                            "text-[10px] font-black uppercase tracking-[0.1em] bg-transparent border-none outline-none cursor-pointer p-0",
+                            order.payment_status === 'paid' ? 'text-emerald-500' : 'text-rose-500'
+                          )}
+                        >
+                          <option value="unpaid">Unpaid</option>
+                          <option value="paid">Paid</option>
+                        </select>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-8 py-6">
-                    <select 
-                      value={order.status}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                      className={clsx(
-                        "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border outline-none cursor-pointer",
-                        getStatusStyle(order.status)
-                      )}
-                    >
-                      <option value="placed">Placed</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="packed">Packed</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
+                  <td className="px-8 py-8">
+                    <div className="relative group/status">
+                      <select 
+                        value={order.status}
+                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                        className={clsx(
+                          "appearance-none px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] border shadow-sm transition-all duration-500 cursor-pointer outline-none w-full text-center pr-10",
+                          getStatusStyle(order.status)
+                        )}
+                      >
+                        <option value="placed">Placed</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="packed">Packed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                      <ChevronRight size={14} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/status:translate-x-1 transition-transform" />
+                    </div>
                   </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
+                  <td className="px-8 py-8 text-right">
+                    <div className="flex items-center justify-end gap-3">
+                      {/* Print Actions Group */}
+                      <div className="flex items-center bg-slate-50 p-1.5 rounded-2xl border border-slate-100 group/print hover:bg-white hover:shadow-lg transition-all duration-500">
                         <button 
                           onClick={() => { 
                             setActiveOrder(order); 
                             setPrintType('standard');
                             setTimeout(() => handlePrint(), 150);
                           }}
-                          className="p-2 text-slate-400 hover:text-slate-900 hover:bg-white rounded-lg transition-all"
-                          title="Print A4 Invoice"
+                          className="p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
+                          title="A4 Invoice"
                         >
-                          <Printer size={16} />
+                          <Printer size={18} />
                         </button>
-                        <button 
-                          onClick={() => { 
-                            setActiveOrder(order); 
-                            setPrintType('1.75');
-                            setTimeout(() => handlePrint(), 150);
-                          }}
-                          className="px-2 py-1 text-[10px] font-bold text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
-                          title="Print 1.75in Label"
+                        <div className="flex gap-1 ml-1 pl-1 border-l border-slate-200">
+                          {['1.75', '2.0', '1.5'].map((type) => (
+                            <button 
+                              key={type}
+                              onClick={() => { 
+                                setActiveOrder(order); 
+                                setPrintType(type);
+                                setTimeout(() => handlePrint(), 150);
+                              }}
+                              className="px-2.5 py-1.5 text-[9px] font-black text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            >
+                              {type}"
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <a 
+                          href={`http://127.0.0.1:8000/orders/${order.id}/invoice`} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="p-3.5 text-slate-400 hover:text-maroon hover:bg-maroon/5 rounded-2xl transition-all"
+                          title="Open PDF"
                         >
-                          1.75"
+                          <ExternalLink size={18} />
+                        </a>
+
+                        <button 
+                          onClick={() => {
+                            setEditingOrder(order);
+                            setEditForm({
+                              customer_name: order.customer_name,
+                              customer_phone: order.customer_phone,
+                              customer_address: order.customer_address,
+                              location: order.location
+                            });
+                            setShowEditModal(true);
+                          }}
+                          className="p-3.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+                          title="Edit"
+                        >
+                          <Edit2 size={18} />
                         </button>
+
                         <button 
-                          onClick={() => { 
-                            setActiveOrder(order); 
-                            setPrintType('2.0');
-                            setTimeout(() => handlePrint(), 150);
+                          onClick={() => {
+                            setOrderToDelete(order);
+                            setShowDeleteConfirm(true);
                           }}
-                          className="px-2 py-1 text-[10px] font-bold text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
-                          title="Print 2.0in Label"
+                          className="p-3.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+                          title="Delete"
                         >
-                          2.0"
-                        </button>
-                        <button 
-                          onClick={() => { 
-                            setActiveOrder(order); 
-                            setPrintType('1.5');
-                            setTimeout(() => handlePrint(), 150);
-                          }}
-                          className="px-2 py-1 text-[10px] font-bold text-slate-400 hover:text-orange-600 hover:bg-white rounded-lg transition-all"
-                          title="Print 1.5in Receipt"
-                        >
-                          1.5"
+                          <Trash2 size={18} />
                         </button>
                       </div>
-                      <a 
-                        href={`http://127.0.0.1:8000/orders/${order.id}/invoice`} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="p-3 text-slate-400 hover:text-maroon hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
-                        title="Backend Invoice (HTML)"
-                      >
-                        <ExternalLink size={18} />
-                      </a>
-
-                      <button 
-                        onClick={() => {
-                          setEditingOrder(order);
-                          setEditForm({
-                            customer_name: order.customer_name,
-                            customer_phone: order.customer_phone,
-                            customer_address: order.customer_address,
-                            location: order.location
-                          });
-                          setShowEditModal(true);
-                        }}
-                        className="p-3 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
-                        title="Edit Customer Details"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-
-                      <button 
-                        onClick={() => {
-                          setOrderToDelete(order);
-                          setShowDeleteConfirm(true);
-                        }}
-                        className="p-3 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-100 transition-all shadow-none hover:shadow-sm"
-                        title="Delete Order"
-                      >
-                        <Trash2 size={18} />
-                      </button>
                     </div>
                   </td>
                 </tr>
