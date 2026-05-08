@@ -20,7 +20,7 @@ const Login = () => {
       const response = await apiLogin.login({ email, password });
       localStorage.setItem('admin_token', response.data.token);
       login(response.data.user);
-      toast.success('Welcome back, ' + response.user.name + '!');
+      toast.success('Welcome back, ' + response.data.user.name + '!');
       navigate('/');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Invalid credentials');
