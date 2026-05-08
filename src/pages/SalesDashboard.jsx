@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
