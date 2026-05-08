@@ -26,15 +26,19 @@ const Coupons = () => {
     type: 'fixed',
     value: '',
     expires_at: '',
-    is_active: true
+    is_active: true,
+    product_ids: []
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [couponToDelete, setCouponToDelete] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [searchProduct, setSearchProduct] = useState('');
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
   useEffect(() => {
     fetchCoupons();
+    fetchProducts();
   }, [selectedStore]);
 
   const fetchCoupons = async () => {
@@ -86,7 +90,8 @@ const Coupons = () => {
         type: coupon.type,
         value: coupon.value,
         expires_at: coupon.expires_at ? coupon.expires_at.split('T')[0] : '',
-        is_active: coupon.is_active
+        is_active: coupon.is_active,
+        product_ids: coupon.products ? coupon.products.map(p => p.id) : []
       });
     } else {
       setCurrentCoupon(null);
@@ -95,7 +100,8 @@ const Coupons = () => {
         type: 'fixed',
         value: '',
         expires_at: '',
-        is_active: true
+        is_active: true,
+        product_ids: []
       });
     }
     setIsModalOpen(true);
@@ -255,6 +261,62 @@ const Coupons = () => {
                   <label htmlFor="is_active" className="text-sm font-bold text-slate-700 cursor-pointer selection:bg-none">
                     Coupon is active and ready to use
                   </label>
+                </div>
+
+                <div className="border-t border-slate-100 pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block text-sm font-bold text-slate-700">Restricted Products (Optional)</label>
+                    {formData.product_ids.length > 0 && (
+                      <button 
+                        type="button"
+                        onClick={() => setFormData({...formData, product_ids: []})}
+                        className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-700"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400 mb-4 font-medium">If selected, the coupon will only apply to these products. Leave empty for all products.</p>
+                  
+                  <div className="relative mb-3">
+                    <input 
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchProduct}
+                      onChange={(e) => setSearchProduct(e.target.value)}
+                      className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-indigo-600"
+                    />
+                  </div>
+
+                  <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                    {products
+                      .filter(p => (p.name || '').toLowerCase().includes(searchProduct.toLowerCase()))
+                      .map(product => (
+                        <label key={product.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-all border border-transparent hover:border-slate-100">
+                          <input 
+                            type="checkbox"
+                            checked={formData.product_ids.includes(product.id)}
+                            onChange={(e) => {
+                              const newIds = e.target.checked 
+                                ? [...formData.product_ids, product.id]
+                                : formData.product_ids.filter(id => id !== product.id);
+                              setFormData({...formData, product_ids: newIds});
+                            }}
+                            className="w-4 h-4 text-indigo-600 border-none rounded bg-slate-200 focus:ring-indigo-600"
+                          />
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden shrink-0">
+                              {product.images?.[0]?.image_path ? (
+                                <img src={product.images[0].image_path} className="w-full h-full object-cover" />
+                              ) : (
+                                <ImageIcon size={14} className="text-slate-300" />
+                              )}
+                            </div>
+                            <span className="text-xs font-bold text-slate-700 truncate max-w-[200px]">{product.name}</span>
+                          </div>
+                        </label>
+                      ))}
+                  </div>
                 </div>
 
                 <div className="pt-4 flex gap-4">
