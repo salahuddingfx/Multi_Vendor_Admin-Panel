@@ -146,8 +146,8 @@ export const api = {
     return response.data;
   },
   
-  getReturns: async () => {
-    const response = await adminClient.get('/inventory/returns');
+  getReturns: async (siteId) => {
+    const response = await adminClient.get('/inventory/returns', { params: { site_id: siteId } });
     return response.data;
   },
 

@@ -68,7 +68,7 @@ const Inventory = () => {
   const fetchAuditLogs = async () => {
     try {
       // For now, we fetch returns as audit logs
-      const res = await api.getReturns();
+      const res = await api.getReturns(siteId);
       setAuditLogs(res?.data || []);
     } catch (error) {
       console.error('Failed to fetch audit logs:', error);
@@ -81,7 +81,8 @@ const Inventory = () => {
       await api.recordReturn({
         product_id: selectedProduct.id,
         quantity: returnQty,
-        reason: returnReason
+        reason: returnReason,
+        site_id: siteId
       });
       toast.success('Return recorded and stock updated');
       setShowReturnModal(false);
