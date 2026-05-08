@@ -6,7 +6,7 @@ import {
 import { 
   TrendingUp, TrendingDown, DollarSign, ShoppingBag, 
   Users, RefreshCcw, Calendar as CalendarIcon, Download, Trophy, Star, X,
-  AlertTriangle, LayoutDashboard, Store, ArrowRight, ChevronLeft, ChevronRight
+  AlertTriangle, LayoutDashboard, ArrowRight, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
