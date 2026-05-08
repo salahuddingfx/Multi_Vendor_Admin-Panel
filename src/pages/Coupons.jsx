@@ -316,6 +316,44 @@ const Coupons = () => {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Max Total Uses</label>
+                    <input 
+                      type="number"
+                      min="1"
+                      value={formData.max_uses}
+                      onChange={(e) => setFormData({...formData, max_uses: e.target.value})}
+                      className="w-full bg-slate-50 border-none rounded-xl px-5 py-4 font-bold text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-600 transition-all"
+                      placeholder="Leave empty for unlimited"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Per User Limit</label>
+                    <input 
+                      type="number"
+                      min="1"
+                      value={formData.per_user_limit}
+                      onChange={(e) => setFormData({...formData, per_user_limit: e.target.value})}
+                      className="w-full bg-slate-50 border-none rounded-xl px-5 py-4 font-bold text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-600 transition-all"
+                      placeholder="1"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input 
+                    type="checkbox"
+                    id="first_order_only"
+                    checked={formData.first_order_only}
+                    onChange={(e) => setFormData({...formData, first_order_only: e.target.checked})}
+                    className="w-5 h-5 text-indigo-600 border-none rounded bg-slate-100 focus:ring-indigo-600"
+                  />
+                  <label htmlFor="first_order_only" className="text-sm font-bold text-slate-700 cursor-pointer">
+                    First-time customers only (phone must have 0 previous orders)
+                  </label>
+                </div>
+
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2">Expiry Date (Optional)</label>
                   <input 
