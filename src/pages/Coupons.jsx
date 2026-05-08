@@ -7,7 +7,8 @@ import {
   X, 
   Check, 
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Image as ImageIcon
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
@@ -50,6 +51,15 @@ const Coupons = () => {
       console.error('Error fetching coupons:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const data = await api.getProducts(siteId);
+      setProducts(data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
     }
   };
 
