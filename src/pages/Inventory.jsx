@@ -47,6 +47,7 @@ const Inventory = () => {
   }, [selectedStore]);
 
   const fetchProducts = async () => {
+    if (!siteId) return;
     try {
       setLoading(true);
       const res = await api.getProducts(siteId);
@@ -66,6 +67,7 @@ const Inventory = () => {
   };
 
   const fetchAuditLogs = async () => {
+    if (!siteId) return;
     try {
       // For now, we fetch returns as audit logs
       const res = await api.getReturns(siteId);
