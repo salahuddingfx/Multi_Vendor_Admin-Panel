@@ -74,6 +74,7 @@ const getStatusStyle = (status) => {
     case 'packed': return 'bg-purple-50 text-purple-600 border-purple-100';
     case 'shipped': return 'bg-amber-50 text-amber-600 border-amber-100';
     case 'delivered': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+    case 'returned': return 'bg-orange-50 text-orange-600 border-orange-100';
     case 'cancelled': return 'bg-rose-50 text-rose-600 border-rose-100';
     default: return 'bg-slate-50 text-slate-600 border-slate-100';
   }
@@ -252,6 +253,7 @@ const Orders = () => {
               <option value="packed">Packed</option>
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
+              <option value="returned">Returned</option>
               <option value="cancelled">Cancelled</option>
             </select>
             <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
@@ -425,6 +427,7 @@ const Orders = () => {
                         <option value="packed">Packed</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
+                        <option value="returned">Returned</option>
                         <option value="cancelled">Cancelled</option>
                       </select>
                       <ChevronRight size={14} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/status:translate-x-1 transition-transform" />
