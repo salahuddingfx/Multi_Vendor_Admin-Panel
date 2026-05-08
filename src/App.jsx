@@ -2,6 +2,7 @@ import { useEffect, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store/useStore';
 import AdminSkeleton from './components/AdminSkeleton';
+import ErrorBoundary from './components/ErrorBoundary';
 import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
@@ -56,6 +57,7 @@ const App = () => {
   }, []);
 
   return (
+    <ErrorBoundary>
     <Suspense fallback={<AdminSkeleton />}>
       <Routes>
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
@@ -80,6 +82,7 @@ const App = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 };
 
