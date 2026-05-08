@@ -82,7 +82,7 @@ const getStatusStyle = (status) => {
 };
 
 const Orders = () => {
-  const { selectedStore } = useStore();
+  const { selectedStore, isSidebarOpen } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
