@@ -138,6 +138,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                             <span>৳{order.delivery_charge}</span>
                         </div>
                         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px', marginTop: '15px' }}>
+                            <p style={{ margin: '0 0 5px', fontSize: '11px', textTransform: 'uppercase', opacity: 0.5, fontWeight: '900', letterSpacing: '0.1em' }}>{order.payment_status === 'paid' ? 'Total Paid Amount' : 'Total Payable Amount'}</p>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                                 <span style={{ fontSize: '32px', fontWeight: '900' }}>৳{order.total_amount}</span>
                             </div>
@@ -165,8 +166,8 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                       </div>
                     ))}
                   </div>
-                  <div style={{ fontSize: '12px', fontWeight: '900', textAlign: 'right' }}>
-                    TOTAL: ৳{order.total_amount}
+                  <div style={{ fontSize: '10px', fontWeight: '900', textAlign: 'right', marginTop: '4px' }}>
+                    <span style={{ fontSize: '7px', textTransform: 'uppercase', opacity: 0.6 }}>{order.payment_status === 'paid' ? 'Paid:' : 'Payable:'}</span> ৳{order.total_amount}
                   </div>
                   {order.payment_status === 'paid' && (
                     <div style={{ 
