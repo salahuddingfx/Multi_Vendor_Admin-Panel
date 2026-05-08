@@ -31,7 +31,28 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
             }}>
               {/* Standard Layout */}
               {isStandard ? (
-                <div className="print-standard">
+                <div className="print-standard" style={{ position: 'relative' }}>
+                  {order.payment_status === 'paid' && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '250px',
+                      right: '50px',
+                      border: '8px double #15803d',
+                      borderRadius: '15px',
+                      color: '#15803d',
+                      fontSize: '52px',
+                      fontWeight: '900',
+                      padding: '10px 40px',
+                      transform: 'rotate(-15deg)',
+                      opacity: '0.15',
+                      textTransform: 'uppercase',
+                      letterSpacing: '8px',
+                      zIndex: 0,
+                      pointerEvents: 'none'
+                    }}>
+                      PAID
+                    </div>
+                  )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `8px solid ${brandColor}`, paddingBottom: '30px', marginBottom: '40px' }}>
                     <div>
                       <h1 style={{ margin: 0, fontSize: '42px', fontWeight: 900, letterSpacing: '-0.05em', color: brandColor }}>
@@ -67,6 +88,10 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
                               <span style={{ color: '#64748b', fontWeight: 'bold' }}>Payment:</span>
                               <span style={{ fontWeight: '900', textTransform: 'uppercase', color: '#0f172a' }}>{order.payment_method}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                              <span style={{ color: '#64748b', fontWeight: 'bold' }}>Payment Status:</span>
+                              <span style={{ fontWeight: '900', textTransform: 'uppercase', color: order.payment_status === 'paid' ? '#15803d' : '#b45309' }}>{order.payment_status}</span>
                           </div>
                       </div>
                     </div>
@@ -143,6 +168,21 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                   <div style={{ fontSize: '12px', fontWeight: '900', textAlign: 'right' }}>
                     TOTAL: ৳{order.total_amount}
                   </div>
+                  {order.payment_status === 'paid' && (
+                    <div style={{ 
+                        marginTop: '4px', 
+                        padding: '4px', 
+                        backgroundColor: '#15803d', 
+                        color: '#fff', 
+                        borderRadius: '4px', 
+                        fontSize: '10px', 
+                        textAlign: 'center',
+                        fontWeight: '900',
+                        letterSpacing: '2px'
+                    }}>
+                        PAID
+                    </div>
+                  )}
                 </div>
               )}
             </div>
