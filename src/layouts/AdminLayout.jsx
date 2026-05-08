@@ -41,6 +41,7 @@ const AdminLayout = () => {
     { name: 'Coupons', href: '/coupons', icon: Ticket },
     { name: 'Messages', href: '/messages', icon: Mail },
     { name: 'Users', href: '/users', icon: Users },
+    { name: 'Customers', href: '/customers', icon: Users },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
