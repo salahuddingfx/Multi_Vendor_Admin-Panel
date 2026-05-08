@@ -62,10 +62,12 @@ const mockOrders = [
 
 const statuses = [
   { value: 'all', label: 'All Orders' },
-  { value: 'received', label: 'Received' },
-  { value: 'processed', label: 'Processed' },
+  { value: 'placed', label: 'Placed' },
+  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'packed', label: 'Packed' },
   { value: 'shipped', label: 'Shipped' },
   { value: 'delivered', label: 'Delivered' },
+  { value: 'returned', label: 'Returned' },
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
@@ -157,7 +159,7 @@ const Orders = () => {
     
     const matchesSearch = customerName.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          trackingId.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filterStatus === 'All' || order.status === filterStatus;
+    const matchesFilter = filterStatus === 'all' || filterStatus === 'All' || order.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
@@ -268,6 +270,9 @@ const Orders = () => {
       
       toast.success(`Bulk updated ${selectedOrderIds.length} orders to ${newStatus}`);
       setSelectedOrderIds([]);
+      // Reset dropdown
+      const select = document.querySelector('select[disabled]');
+      if (select) select.value = "";
     } catch (err) {
       toast.error('Failed to bulk update some orders');
     } finally {
@@ -498,24 +503,22 @@ const Orders = () => {
                     </div>
                   </td>
                   <td className="px-8 py-8">
-                    <div className="relative group/status">
+                    <div className="relative group/status w-40 mx-auto">
                       <select 
-                        value={order.status}
+                        value={order.status.toLowerCase()}
                         onChange={(e) => handleStatusChange(order.id, e.target.value)}
                         className={clsx(
-                          "appearance-none px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] border shadow-sm transition-all duration-500 cursor-pointer outline-none w-full text-center pr-10",
-                          getStatusStyle(order.status)
+                          "appearance-none px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] border shadow-sm transition-all duration-500 cursor-pointer outline-none w-full text-center pr-10 hover:shadow-md",
+                          getStatusStyle(order.status.toLowerCase())
                         )}
                       >
-                        <option value="placed">Placed</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="packed">Packed</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="returned">Returned</option>
-                        <option value="cancelled">Cancelled</option>
+                        {statuses.filter(s => s.value !== 'all').map(s => (
+                          <option key={s.value} value={s.value} className="bg-white text-slate-900">{s.label}</option>
+                        ))}
                       </select>
-                      <ChevronRight size={14} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover/status:translate-x-1 transition-transform" />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover/status:translate-y-[-40%] transition-transform">
+                        <ChevronDown size={14} />
+                      </div>
                     </div>
                   </td>
                   <td className="px-8 py-8 text-right">
