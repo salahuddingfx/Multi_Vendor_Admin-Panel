@@ -205,28 +205,29 @@ const AdminLayout = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-grow px-6 space-y-3 overflow-y-auto custom-scrollbar pt-2 pb-10">
+          <nav className="flex-grow px-6 space-y-2 overflow-y-auto custom-scrollbar pt-2 pb-10">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
+                  title={!isSidebarOpen ? item.name : ''}
                   className={clsx(
-                    "flex items-center font-bold transition-all duration-500 group relative",
-                    isSidebarOpen ? "gap-5 px-6 py-5 rounded-[28px]" : "justify-center p-5 rounded-[24px]",
+                    "flex items-center font-bold transition-all duration-300 group relative",
+                    isSidebarOpen ? "gap-5 px-6 py-4 rounded-[24px]" : "justify-center p-5 rounded-[20px]",
                     isActive 
-                      ? "text-white shadow-2xl scale-[1.02]" 
-                      : "text-slate-400 hover:bg-slate-50 hover:text-slate-800"
+                      ? "text-white shadow-lg" 
+                      : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
                   )}
-                  style={isActive ? { backgroundColor: themeColor, boxShadow: `0 15px 30px -10px ${themeColor}80` } : {}}
+                  style={isActive ? { backgroundColor: themeColor, boxShadow: `0 12px 24px -10px ${themeColor}80` } : {}}
                 >
-                  <item.icon size={22} className={clsx(isActive ? "text-white" : "text-slate-400 group-hover:scale-110 group-hover:rotate-6 transition-all")} />
-                  {isSidebarOpen && <span className="tracking-tight text-base">{item.name}</span>}
+                  <item.icon size={isActive ? 22 : 20} className={clsx(isActive ? "text-white" : "text-slate-400 group-hover:text-slate-900 transition-colors")} />
+                  {isSidebarOpen && <span className="tracking-tight text-sm">{item.name}</span>}
                   
-                  {/* Subtle Glow Effect for Active */}
-                  {isActive && (
-                    <div className="absolute inset-0 rounded-[28px] bg-white/10 blur-xl animate-pulse" />
+                  {/* Subtle active indicator dot */}
+                  {!isSidebarOpen && isActive && (
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
                   )}
                 </Link>
               );
