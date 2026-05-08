@@ -194,26 +194,7 @@ export const api = {
     return response.data;
   },
 
-  // Dynamic Pages
-  getPages: async (siteId) => {
-    const response = await adminClient.get('/pages', { params: { site_id: siteId } });
-    return response.data.data;
-  },
 
-  storePage: async (pageData) => {
-    const response = await adminClient.post('/pages', pageData);
-    return response.data;
-  },
-
-  updatePage: async (id, pageData) => {
-    const response = await adminClient.put(`/pages/${id}`, pageData);
-    return response.data;
-  },
-
-  deletePage: async (id) => {
-    const response = await adminClient.delete(`/pages/${id}`);
-    return response.data;
-  },
 
   // Reviews
   getReviews: async (siteId) => {

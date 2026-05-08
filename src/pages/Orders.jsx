@@ -10,55 +10,7 @@ import { clsx } from 'clsx';
 import ConfirmModal from '../components/ConfirmModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const mockOrders = [
-  {
-    id: 'ord-8291-xa',
-    siteId: 'acharu',
-    customerName: 'Rahat Islam',
-    phone: '01712-345678',
-    address: 'House 12, Road 4, Sector 7, Uttara, Dhaka',
-    items: [
-      { name: 'Naga King Pickle', price: 450, quantity: 2, weight: '500g' },
-      { name: 'Garlic Special Pickle', price: 350, quantity: 1, weight: '500g' }
-    ],
-    subtotal: 1250,
-    shipping: 60,
-    total: 1310,
-    status: 'Processed',
-    date: '2026-05-01T08:12:00Z'
-  },
-  {
-    id: 'ord-7162-bt',
-    siteId: 'tajashutki',
-    customerName: 'Anika Rahman',
-    phone: '01822-987654',
-    address: 'Flat 4A, Green View Tower, GEC, Chittagong',
-    items: [
-      { name: 'Sun-Dried Loitta', price: 650, quantity: 1, weight: '500g' },
-      { name: 'Premium Rupchanda', price: 1200, quantity: 1, weight: '250g' }
-    ],
-    subtotal: 1850,
-    shipping: 100,
-    total: 1950,
-    status: 'Order Received',
-    date: '2026-05-01T09:45:00Z'
-  },
-  {
-    id: 'ord-9921-cc',
-    siteId: 'acharu',
-    customerName: 'Farhan Ahmed',
-    phone: '01911-223344',
-    address: 'Road 12, Banani, Dhaka',
-    items: [
-      { name: 'Mango Khatta Pickle', price: 280, quantity: 3, weight: '250g' }
-    ],
-    subtotal: 840,
-    shipping: 60,
-    total: 900,
-    status: 'Delivered',
-    date: '2026-04-30T14:20:00Z'
-  }
-];
+
 
 const statuses = [
   { value: 'all', label: 'All Orders' },
