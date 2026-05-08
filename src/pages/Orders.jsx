@@ -239,6 +239,7 @@ const Orders = () => {
   };
 
   const executeBulkDelete = async () => {
+    setIsBulkUpdating(true);
     try {
       const promises = selectedOrderIds.map(id => api.deleteOrder(id));
       await Promise.all(promises);
