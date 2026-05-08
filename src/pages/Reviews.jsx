@@ -20,7 +20,7 @@ import { clsx } from 'clsx';
 import ConfirmModal from '../components/ConfirmModal';
 
 const Reviews = () => {
-  const { selectedStore, stores } = useStore();
+  const { selectedStore } = useStore();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -29,7 +29,6 @@ const Reviews = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState(null);
 
-  const currentStore = (stores || []).find(s => s.id === selectedStore);
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
   useEffect(() => {
