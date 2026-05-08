@@ -15,7 +15,10 @@ export const useStore = create(
       setSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
       
       login: (userData) => set({ user: userData, isAuthenticated: true }),
-      logout: () => set({ user: null, isAuthenticated: false }),
+      logout: () => {
+        localStorage.removeItem('admin_token');
+        set({ user: null, isAuthenticated: false });
+      },
       updateUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
       
       // Theme Helper
