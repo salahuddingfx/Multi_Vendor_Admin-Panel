@@ -299,5 +299,10 @@ export const api = {
   deleteUser: async (id) => {
     const response = await adminClient.delete(`/users/${id}`);
     return response.data;
+  },
+
+  getCustomers: async (siteId) => {
+    const response = await adminClient.get('/customers', { params: { site_id: siteId } });
+    return response.data;
   }
 };
