@@ -33,13 +33,18 @@ Nexus Admin is more than just a dashboard; it's a **Premium Visual Experience** 
 ---
 
 ## 🛰️ Ecosystem Connectivity
-Designed to work in perfect harmony with the **[Nexus Core Backend](https://github.com/salahuddingfx/Multi-Vendor-Backend)**.
+Designed to work in perfect harmony with the **[Nexus Core Backend](https://github.com/salahuddingfx/Multi_Vedor_Backend)**.
 
 ### 🌟 Key Modules
 - **📦 Order Lifecycle**: Real-time tracking from entry to completion.
 - **👥 User Management**: Global control over admins and store users.
 - **⚙️ Store Orchestration**: Configure site-specific settings, banners, and dynamic pages.
 - **🔔 Pulse Notifications**: Real-time websocket-driven alerts for business events.
+
+---
+
+## 📜 License
+This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -53,6 +58,8 @@ npm run build
 
 ---
 <p align="center">
+  <img src="https://img.shields.io/badge/License-Apache_2.0-maroon?style=for-the-badge" />
   <img src="https://img.shields.io/badge/UI-Modern_Glassmorphism-800000?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Performance-Optimized-blue?style=for-the-badge" />
 </p>
+
