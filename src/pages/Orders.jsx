@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { Search, Filter, Printer, ExternalLink, ChevronRight, Package, Truck, CheckCircle, Clock, Edit2, Trash2, X } from 'lucide-react';
+import { Search, Filter, Printer, ExternalLink, ChevronRight, ChevronDown, Package, Truck, CheckCircle, Clock, Edit2, Trash2, X } from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
 import InvoiceTemplate from '../components/InvoiceTemplate';
 import BulkInvoiceTemplate from '../components/BulkInvoiceTemplate';
