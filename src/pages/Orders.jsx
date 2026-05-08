@@ -675,10 +675,15 @@ const Orders = () => {
       <AnimatePresence>
         {selectedOrderIds.length > 0 && (
           <motion.div 
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-4xl"
+            initial={{ y: 100, opacity: 0, x: '-50%' }}
+            animate={{ 
+              y: 0, 
+              opacity: 1,
+              x: isSidebarOpen ? 'calc(-50% + 160px)' : 'calc(-50% + 56px)' 
+            }}
+            exit={{ y: 100, opacity: 0, x: '-50%' }}
+            className="fixed bottom-10 left-1/2 z-[100] w-[90%] max-w-4xl"
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           >
             <div className="bg-slate-900 text-white rounded-[40px] px-6 py-4 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.6)] flex flex-col lg:flex-row items-center justify-between gap-4 border border-white/10 backdrop-blur-2xl ring-1 ring-white/5">
               {/* Left Side: Count & Clear */}
