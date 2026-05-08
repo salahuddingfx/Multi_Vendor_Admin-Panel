@@ -9,9 +9,6 @@ import {
   MessageSquare, 
   Search,
   Loader2,
-  AlertTriangle,
-  Image as ImageIcon,
-  Video,
   PlayCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
