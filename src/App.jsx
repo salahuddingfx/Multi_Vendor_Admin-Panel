@@ -55,28 +55,47 @@ const App = () => {
   }, []);
 
   return (
-    <Routes>
-      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-      
-      <Route path="/" element={isAuthenticated ? <AdminLayout /> : <Navigate to="/login" />}>
-        <Route index element={<Dashboard />} />
-        <Route path="products" element={<Products />} />
-        <Route path="orders" element={<Orders />} />
-        <Route path="sales" element={<SalesDashboard />} />
-        <Route path="inventory" element={<Inventory />} />
-        <Route path="banners" element={<Banners />} />
-        <Route path="reviews" element={<Reviews />} />
-        <Route path="coupons" element={<Coupons />} />
-        <Route path="messages" element={<Messages />} />
-        <Route path="users" element={<Users />} />
-        <Route path="customers" element={<Customers />} />
-        <Route path="categories" element={<Categories />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="relative">
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.05, 0.15] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0 bg-slate-900 rounded-full blur-2xl"
+          />
+          <motion.div 
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="relative w-24 h-24 bg-white rounded-full p-3 shadow-2xl border-4 border-slate-200 flex items-center justify-center overflow-hidden"
+          >
+            <img src="/Acharu and TajaShutki.png" alt="Admin Loading..." className="w-full h-full object-contain rounded-full" />
+          </motion.div>
+        </div>
+      </div>
+    }>
+      <Routes>
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+        
+        <Route path="/" element={isAuthenticated ? <AdminLayout /> : <Navigate to="/login" />}>
+          <Route index element={<Dashboard />} />
+          <Route path="products" element={<Products />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="sales" element={<SalesDashboard />} />
+          <Route path="inventory" element={<Inventory />} />
+          <Route path="banners" element={<Banners />} />
+          <Route path="reviews" element={<Reviews />} />
+          <Route path="coupons" element={<Coupons />} />
+          <Route path="messages" element={<Messages />} />
+          <Route path="users" element={<Users />} />
+          <Route path="customers" element={<Customers />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
 
-      {/* Catch all */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* Catch all */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 
