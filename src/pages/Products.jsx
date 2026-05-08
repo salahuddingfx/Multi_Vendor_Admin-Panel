@@ -14,7 +14,8 @@ import {
   Eye,
   Save,
   Sparkles,
-  Languages
+  Languages,
+  Star
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -298,7 +299,8 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
     description: editingProduct?.description ?? '',
     name_bn: editingProduct?.name_bn ?? '',
     description_bn: editingProduct?.description_bn ?? '',
-    variations: editingProduct?.variations ?? []
+    variations: editingProduct?.variations ?? [],
+    is_featured: editingProduct?.is_featured ?? false
   });
   const [translating, setTranslating] = useState(false);
 
@@ -428,6 +430,8 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
         data.append('images[]', file);
       });
     }
+
+    data.append('is_featured', formData.is_featured ? 1 : 0);
 
     // Append deleted image IDs
     if (deletedImageIds.length > 0) {
