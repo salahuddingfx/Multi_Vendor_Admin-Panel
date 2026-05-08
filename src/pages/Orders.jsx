@@ -680,31 +680,37 @@ const Orders = () => {
             exit={{ y: 100, opacity: 0 }}
             className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-4xl"
           >
-            <div className="bg-slate-900 text-white rounded-[32px] p-4 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center justify-between gap-6 border border-white/10 backdrop-blur-xl">
-              <div className="flex items-center gap-6 px-4">
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Selected Orders</span>
-                  <span className="text-xl font-black">{selectedOrderIds.length < 10 ? `0${selectedOrderIds.length}` : selectedOrderIds.length}</span>
+            <div className="bg-slate-900 text-white rounded-[40px] px-6 py-4 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.6)] flex flex-col lg:flex-row items-center justify-between gap-4 border border-white/10 backdrop-blur-2xl ring-1 ring-white/5">
+              {/* Left Side: Count & Clear */}
+              <div className="flex items-center gap-5">
+                <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 leading-tight">Selected</span>
+                    <span className="text-xl font-black tabular-nums leading-none">{selectedOrderIds.length < 10 ? `0${selectedOrderIds.length}` : selectedOrderIds.length}</span>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedOrderIds([])}
+                    className="p-2 hover:bg-white/10 rounded-full transition-all text-slate-400 hover:text-white"
+                    title="Clear Selection"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => setSelectedOrderIds([])}
-                  className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-                >
-                  Clear Selection
-                </button>
+                <div className="h-8 w-px bg-white/10 hidden lg:block" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden xl:block">Orders Ready for Action</span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-px bg-white/10 hidden md:block" />
-                
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">Bulk Status:</span>
+              {/* Right Side: Actions */}
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">Bulk Status:</span>
                   <select 
                     onChange={(e) => handleBulkStatusUpdate(e.target.value)}
                     disabled={isBulkUpdating}
-                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-maroon transition-all"
+                    className="bg-transparent border-none text-xs font-black uppercase tracking-widest outline-none focus:ring-0 cursor-pointer appearance-none pr-6 relative"
+                    style={{ backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%2364748b\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right center', backgroundSize: '1.5em' }}
                   >
-                    <option value="" className="bg-slate-900">Change Status...</option>
+                    <option value="" className="bg-slate-900">Change...</option>
                     <option value="confirmed" className="bg-slate-900">Confirmed</option>
                     <option value="packed" className="bg-slate-900">Packed</option>
                     <option value="shipped" className="bg-slate-900">Shipped</option>
@@ -717,16 +723,17 @@ const Orders = () => {
                 <button 
                   onClick={handleBulkDelete}
                   disabled={isBulkUpdating}
-                  className="p-3 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all"
+                  className="p-3 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white rounded-2xl transition-all border border-rose-500/20"
                   title="Bulk Delete"
                 >
                   <Trash2 size={20} />
                 </button>
                 
                 <button 
-                  className="px-8 py-3 bg-white text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-maroon hover:text-white transition-all shadow-lg"
+                  className="px-6 py-3 bg-white text-slate-900 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-maroon hover:text-white transition-all shadow-xl hover:shadow-maroon/20 flex items-center gap-2 group"
                   onClick={() => toast.info('Bulk printing feature coming soon!')}
                 >
+                  <Printer size={14} className="group-hover:scale-110 transition-transform" />
                   Bulk Print
                 </button>
               </div>
