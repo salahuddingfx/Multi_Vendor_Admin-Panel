@@ -20,7 +20,9 @@ import {
   Sparkles,
   RotateCw,
   Mail,
-  Share2
+  Share2,
+  Camera,
+  Image as ImageIcon
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { toast } from 'sonner';
@@ -188,6 +190,19 @@ const Settings = () => {
 
   const removeTeamMember = (idx) => {
     updateAbout('team', settings.about.team.filter((_, i) => i !== idx));
+  };
+
+  const handleTeamImageUpload = async (idx, file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      toast.loading('Uploading image...', { id: 'team-img' });
+      const data = await api.uploadSettingsMedia(formData);
+      updateTeamMember(idx, 'image', data.url);
+      toast.success('Image uploaded', { id: 'team-img' });
+    } catch (error) {
+      toast.error('Upload failed', { id: 'team-img' });
+    }
   };
 
   const updateStat = (idx, field, value) => {
@@ -442,8 +457,39 @@ const Settings = () => {
                         <Trash2 size={16} />
                       </button>
                       <div className="space-y-3">
-                        <div className="grid grid-cols-3 gap-2">
-                          <div className="col-span-2">
+                        <div className="flex items-center gap-4 mb-2">
+                           <div className="relative group">
+                              <div className="w-16 h-16 rounded-2xl bg-slate-200 overflow-hidden flex items-center justify-center border-2 border-white shadow-sm">
+                                 {member.image ? (
+                                   <img src={member.image} alt="" className="w-full h-full object-cover" />
+                                 ) : (
+                                   <span className="text-slate-400 font-black">{member.initials || '?'}</span>
+                                 )}
+                              </div>
+                              <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg border border-slate-100 flex items-center justify-center cursor-pointer hover:scale-110 transition-all">
+                                <Camera size={14} className="text-slate-600" />
+                                <input 
+                                  type="file" 
+                                  className="hidden" 
+                                  accept="image/*"
+                                  onChange={(e) => e.target.files?.[0] && handleTeamImageUpload(idx, e.target.files[0])}
+                                />
+                              </label>
+                           </div>
+                           <div className="flex-1">
+                             <label className={labelCls}>Initials</label>
+                             <input
+                               type="text"
+                               maxLength={2}
+                               value={member.initials}
+                               onChange={(e) => updateTeamMember(idx, 'initials', e.target.value.toUpperCase())}
+                               className={inputCls + ' text-center font-black !py-1'}
+                               placeholder="AB"
+                             />
+                           </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2">
+                          <div>
                             <label className={labelCls}>Name</label>
                             <input
                               type="text"
@@ -451,17 +497,6 @@ const Settings = () => {
                               onChange={(e) => updateTeamMember(idx, 'name', e.target.value)}
                               className={inputCls}
                               placeholder="Full name"
-                            />
-                          </div>
-                          <div>
-                            <label className={labelCls}>Initials</label>
-                            <input
-                              type="text"
-                              maxLength={2}
-                              value={member.initials}
-                              onChange={(e) => updateTeamMember(idx, 'initials', e.target.value.toUpperCase())}
-                              className={inputCls + ' text-center font-black'}
-                              placeholder="AB"
                             />
                           </div>
                         </div>

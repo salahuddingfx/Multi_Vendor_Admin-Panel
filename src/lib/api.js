@@ -162,6 +162,13 @@ export const api = {
     return response.data;
   },
 
+  uploadSettingsMedia: async (formData) => {
+    const response = await adminClient.post('/settings/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data.data;
+  },
+
   // Hero Slides (Banners)
   getHeroSlides: async (siteId) => {
     const response = await adminClient.get('/hero-slides', { params: { site_id: siteId } });
