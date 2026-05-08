@@ -95,7 +95,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                 marginTop: '6px', 
                 paddingTop: '6px' 
             }}>
-              <div style={{ fontSize: '7px', fontWeight: '900', textTransform: 'uppercase', color: '#444' }}>Total Payable Amount:</div>
+              <div style={{ fontSize: '7px', fontWeight: '900', textTransform: 'uppercase', color: '#444' }}>{order.payment_status === 'paid' ? 'Total Paid Amount:' : 'Total Payable Amount:'}</div>
               <div style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.03em' }}>৳{order.total_amount}</div>
             </div>
             
@@ -269,7 +269,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                   </div>
                 )}
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px', marginTop: '15px' }}>
-                    <p style={{ margin: '0 0 5px', fontSize: '11px', textTransform: 'uppercase', opacity: 0.5, fontWeight: '900', letterSpacing: '0.1em' }}>Total Payable Amount</p>
+                    <p style={{ margin: '0 0 5px', fontSize: '11px', textTransform: 'uppercase', opacity: 0.5, fontWeight: '900', letterSpacing: '0.1em' }}>{order.payment_status === 'paid' ? 'Total Paid Amount' : 'Total Payable Amount'}</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                         <span style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-0.05em' }}>৳{order.total_amount}</span>
                         <span style={{ fontSize: '12px', fontWeight: 'bold', opacity: 0.4 }}>Inc. VAT</span>
