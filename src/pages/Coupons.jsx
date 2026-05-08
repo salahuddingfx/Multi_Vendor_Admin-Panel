@@ -139,7 +139,16 @@ const Coupons = () => {
     setCurrentCoupon(null);
   };
 
-  if (loading) return <div className="p-8">Loading coupons...</div>;
+  const Skeleton = () => (
+    <div className="animate-pulse space-y-6">
+      <div className="h-20 bg-slate-100 rounded-3xl" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="h-64 bg-slate-100 rounded-3xl" />
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-8">
@@ -158,8 +167,20 @@ const Coupons = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {coupons.map((coupon) => (
+      {loading ? (
+        <Skeleton />
+      ) : coupons.length === 0 ? (
+        <div className="bg-white p-20 rounded-3xl text-center border border-dashed border-slate-200">
+          <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Ticket size={40} className="text-slate-300" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">No coupons yet</h3>
+          <p className="text-slate-500 mb-8">Start by creating your first discount code</p>
+          <button onClick={() => openModal()} className="btn-primary">Create Now</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {coupons.map((coupon) => (
           <motion.div 
             key={coupon.id}
             initial={{ opacity: 0, y: 20 }}
@@ -210,6 +231,7 @@ const Coupons = () => {
           </motion.div>
         ))}
       </div>
+      )}
 
       {/* Modal */}
       <AnimatePresence>
