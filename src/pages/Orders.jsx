@@ -413,9 +413,17 @@ const Orders = () => {
                           {order.location}
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-400 font-medium max-w-[220px] leading-relaxed italic" title={order.customer_address}>
+                      <p className="text-[10px] text-slate-400 font-medium max-w-[220px] leading-relaxed italic mb-1" title={order.customer_address}>
                         {order.customer_address}
                       </p>
+                      {order.customer_notes && (
+                        <div className="mt-1 p-2 bg-blue-50/50 rounded-lg border border-blue-100/50 max-w-[220px]">
+                          <p className="text-[9px] text-blue-600 font-bold leading-tight">
+                            <span className="uppercase tracking-widest text-[8px] opacity-60 block mb-0.5">Note:</span>
+                            {order.customer_notes}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td className="px-8 py-8">
