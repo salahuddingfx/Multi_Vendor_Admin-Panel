@@ -268,7 +268,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
 
         <div style={{ display: 'flex', width: '100%', marginBottom: '60px' }}>
           <div style={{ width: '55%', paddingRight: '20px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', marginBottom: '15px' }}>Thank you for your business</div>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', marginBottom: '15px' }}>Thank you for shopping with us</div>
             
             <div style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b', marginBottom: '5px', marginTop: '15px' }}>Terms & Conditions</div>
             <div style={{ fontSize: '9px', color: '#475569', lineHeight: 1.5, fontWeight: 500, width: '80%' }}>
