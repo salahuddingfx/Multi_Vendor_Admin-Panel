@@ -31,22 +31,22 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
             }}>
               {/* Standard Layout */}
               {isStandard ? (
-                <div className="print-standard" style={{ position: 'relative' }}>
+                <div className="print-standard" style={{ position: 'relative', height: '100%' }}>
                   {order.payment_status === 'paid' && (
                     <div style={{
                       position: 'absolute',
-                      top: '250px',
-                      right: '50px',
-                      border: '8px double #15803d',
-                      borderRadius: '15px',
-                      color: '#15803d',
-                      fontSize: '52px',
+                      top: '220px',
+                      right: '80px',
+                      border: '8px double #10b981',
+                      borderRadius: '20px',
+                      color: '#10b981',
+                      fontSize: '60px',
                       fontWeight: '900',
                       padding: '10px 40px',
                       transform: 'rotate(-15deg)',
                       opacity: '0.15',
                       textTransform: 'uppercase',
-                      letterSpacing: '8px',
+                      letterSpacing: '10px',
                       zIndex: 0,
                       pointerEvents: 'none'
                     }}>
@@ -58,14 +58,16 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                       <h1 style={{ margin: 0, fontSize: '42px', fontWeight: 900, letterSpacing: '-0.05em', color: brandColor }}>
                           {order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI'}
                       </h1>
-                      <p style={{ margin: '5px 0 0', fontSize: '14px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Premium Artisanal Collection</p>
+                      <p style={{ margin: '8px 0 0', fontSize: '14px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px' }}>
+                        {order.site_id === 1 ? 'Premium Artisanal Collection' : 'Freshness Delivered Daily'}
+                      </p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 900, color: '#1e293b' }}>TAX INVOICE</h2>
-                      <div style={{ marginTop: '10px', padding: '5px 15px', backgroundColor: '#f1f5f9', borderRadius: '8px', display: 'inline-block' }}>
+                      <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '1px' }}>Tax Invoice</h2>
+                      <div style={{ marginTop: '12px', padding: '8px 16px', backgroundColor: '#f1f5f9', borderRadius: '8px', display: 'inline-block' }}>
                           <p style={{ margin: 0, fontSize: '14px', fontWeight: '900', color: brandColor }}>#{order.tracking_id}</p>
                       </div>
-                      <p style={{ margin: '8px 0 0', fontSize: '12px', fontWeight: 'bold', color: '#94a3b8' }}>
+                      <p style={{ margin: '8px 0 0', fontSize: '12px', fontWeight: '700', color: '#94a3b8' }}>
                           {new Date(order.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
@@ -73,34 +75,34 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '60px', marginBottom: '50px' }}>
                     <div style={{ backgroundColor: '#f8fafc', padding: '30px', borderRadius: '20px', border: '1px solid #f1f5f9' }}>
-                      <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: brandColor, fontWeight: '900', letterSpacing: '0.1em', margin: '0 0 15px' }}>Recipient Information</h4>
-                      <p style={{ fontSize: '18px', fontWeight: '900', color: '#0f172a', marginBottom: '5px' }}>{order.customer_name}</p>
-                      <p style={{ fontSize: '15px', fontWeight: 'bold', color: '#475569', marginBottom: '10px' }}>{order.customer_phone}</p>
-                      <p style={{ fontSize: '14px', color: '#64748b', lineHeight: '1.6', fontWeight: '500' }}>{order.customer_address}, {order.location}</p>
+                      <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: brandColor, fontWeight: '900', letterSpacing: '1px', margin: '0 0 15px', opacity: 0.8 }}>Billed To</h4>
+                      <p style={{ fontSize: '20px', fontWeight: '900', color: '#0f172a', marginBottom: '6px' }}>{order.customer_name}</p>
+                      <p style={{ fontSize: '14px', fontWeight: '600', color: '#475569', marginBottom: '0' }}>{order.customer_phone}</p>
+                      <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.6', fontWeight: '600', marginTop: '4px' }}>{order.customer_address}, {order.location}</p>
                     </div>
                     <div>
-                      <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#94a3b8', fontWeight: '900', letterSpacing: '0.1em', margin: '0 0 15px' }}>Order Summary</h4>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: brandColor, fontWeight: '900', letterSpacing: '1px', margin: '0 0 15px', opacity: 0.8 }}>Order Details</h4>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', paddingBottom: '8px', borderBottom: '1px solid #f1f5f9' }}>
-                              <span style={{ color: '#64748b', fontWeight: 'bold' }}>Status:</span>
+                              <span style={{ color: '#64748b', fontWeight: '700' }}>Status</span>
                               <span style={{ fontWeight: '900', textTransform: 'uppercase', color: '#0f172a' }}>{order.status}</span>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
-                              <span style={{ color: '#64748b', fontWeight: 'bold' }}>Payment:</span>
+                              <span style={{ color: '#64748b', fontWeight: '700' }}>Payment</span>
                               <span style={{ fontWeight: '900', textTransform: 'uppercase', color: '#0f172a' }}>{order.payment_method}</span>
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
-                              <span style={{ color: '#64748b', fontWeight: 'bold' }}>Payment Status:</span>
-                              <span style={{ fontWeight: '900', textTransform: 'uppercase', color: order.payment_status === 'paid' ? '#15803d' : '#b45309' }}>{order.payment_status}</span>
+                              <span style={{ color: '#64748b', fontWeight: '700' }}>Payment Status</span>
+                              <span style={{ fontWeight: '900', textTransform: 'uppercase', color: order.payment_status === 'paid' ? '#059669' : '#b91c1c' }}>{order.payment_status}</span>
                           </div>
                       </div>
                     </div>
                   </div>
 
-                  <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 10px', marginBottom: '40px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 12px', marginBottom: '40px' }}>
                     <thead>
-                      <tr style={{ color: '#94a3b8', fontSize: '11px', textTransform: 'uppercase', fontWeight: '900', letterSpacing: '0.1em' }}>
-                        <th style={{ textAlign: 'left', padding: '0 0 10px 20px' }}>Item Details</th>
+                      <tr style={{ color: '#94a3b8', fontSize: '11px', textTransform: 'uppercase', fontWeight: '900', letterSpacing: '1px' }}>
+                        <th style={{ textAlign: 'left', padding: '0 0 10px 20px' }}>Description</th>
                         <th style={{ textAlign: 'center', padding: '0 0 10px' }}>Qty</th>
                         <th style={{ textAlign: 'right', padding: '0 20px 10px 0' }}>Total</th>
                       </tr>
@@ -110,12 +112,12 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         <tr key={idx} style={{ backgroundColor: '#fff' }}>
                           <td style={{ padding: '20px', borderRadius: '15px 0 0 15px', border: '1px solid #f1f5f9', borderRight: 'none' }}>
                              <div style={{ fontWeight: '900', fontSize: '15px', color: '#1e293b' }}>{item.name}</div>
-                             <div style={{ fontSize: '12px', color: brandColor, fontWeight: 'bold' }}>৳{item.price}</div>
+                             <div style={{ fontSize: '12px', color: brandColor, fontWeight: '700', marginTop: '4px' }}>৳{item.price}</div>
                           </td>
                           <td style={{ textAlign: 'center', padding: '20px', border: '1px solid #f1f5f9', borderLeft: 'none', borderRight: 'none' }}>
-                              <span style={{ padding: '5px 12px', backgroundColor: '#f8fafc', borderRadius: '8px', fontWeight: '900' }}>{item.quantity}</span>
+                              <span style={{ padding: '6px 12px', backgroundColor: '#f8fafc', borderRadius: '8px', fontWeight: '900', color: '#1e293b' }}>{item.quantity}</span>
                           </td>
-                          <td style={{ textAlign: 'right', padding: '20px', borderRadius: '0 15px 15px 0', border: '1px solid #f1f5f9', borderLeft: 'none', fontWeight: '900', fontSize: '16px' }}>
+                          <td style={{ textAlign: 'right', padding: '20px', borderRadius: '0 15px 15px 0', border: '1px solid #f1f5f9', borderLeft: 'none', fontWeight: '900', fontSize: '16px', color: '#0f172a' }}>
                               ৳{item.price * item.quantity}
                           </td>
                         </tr>
@@ -124,26 +126,34 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                   </table>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
-                    <div style={{ padding: '20px', backgroundColor: '#fdf2f2', borderRadius: '20px', border: `1px dashed ${brandColor}40` }}>
-                        <h5 style={{ margin: '0 0 10px', fontSize: '12px', fontWeight: '900', color: brandColor, textTransform: 'uppercase' }}>Note:</h5>
-                        <p style={{ margin: 0, fontSize: '11px', color: '#64748b', lineHeight: '1.5' }}>Please check items upon delivery.</p>
+                    <div style={{ padding: '25px', backgroundColor: order.site_id === 1 ? '#fef2f2' : '#f0fdf4', borderRadius: '20px', border: `1px dashed ${brandColor}`, opacity: 0.9 }}>
+                        <h5 style={{ margin: '0 0 10px', fontSize: '11px', fontWeight: '900', color: brandColor, textTransform: 'uppercase', letterSpacing: '1px' }}>Notice</h5>
+                        <p style={{ margin: 0, fontSize: '11px', color: '#475569', lineHeight: '1.5', fontWeight: '600' }}>Please check items upon delivery.</p>
                     </div>
-                    <div style={{ padding: '20px 30px', backgroundColor: '#0f172a', borderRadius: '25px', color: '#fff' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '14px', opacity: 0.6 }}>
-                            <span>Subtotal</span>
-                            <span>৳{order.subtotal}</span>
+                    <div style={{ padding: '30px', backgroundColor: '#0f172a', borderRadius: '25px', color: '#fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '14px', opacity: 0.7 }}>
+                            <span style={{ fontWeight: '600' }}>Subtotal</span>
+                            <span style={{ fontWeight: '700' }}>৳{order.subtotal}</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '14px', opacity: 0.6 }}>
-                            <span>Delivery</span>
-                            <span>৳{order.delivery_charge}</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '14px', opacity: 0.7 }}>
+                            <span style={{ fontWeight: '600' }}>Delivery Charge</span>
+                            <span style={{ fontWeight: '700' }}>৳{order.delivery_charge}</span>
                         </div>
-                        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '15px', marginTop: '15px' }}>
-                            <p style={{ margin: '0 0 5px', fontSize: '11px', textTransform: 'uppercase', opacity: 0.5, fontWeight: '900', letterSpacing: '0.1em' }}>{order.payment_status === 'paid' ? 'Total Paid Amount' : 'Total Payable Amount'}</p>
+                        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', marginTop: '20px' }}>
+                            <p style={{ margin: '0 0 5px', fontSize: '11px', textTransform: 'uppercase', opacity: 0.6, fontWeight: '900', letterSpacing: '1px' }}>
+                                {order.payment_status === 'paid' ? 'Total Amount Paid' : 'Total Payable Amount'}
+                            </p>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                <span style={{ fontSize: '32px', fontWeight: '900' }}>৳{order.total_amount}</span>
+                                <span style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-1px' }}>৳{order.total_amount}</span>
                             </div>
                         </div>
                     </div>
+                  </div>
+
+                  <div style={{ marginTop: '80px', textAlign: 'center', borderTop: '2px solid #f1f5f9', paddingTop: '30px' }}>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#1e293b', fontWeight: '900' }}>Thank you for your patronage!</p>
+                    <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#94a3b8', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px' }}>Authentic Flavors • Artisanal Craft • Pure Heritage</p>
+                    <div style={{ marginTop: '20px', fontSize: '9px', color: '#cbd5e1', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px' }}>Computer Generated Invoice • No Signature Required</div>
                   </div>
                 </div>
               ) : (
