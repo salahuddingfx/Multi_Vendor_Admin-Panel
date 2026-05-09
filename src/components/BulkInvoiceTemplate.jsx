@@ -237,7 +237,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                 /* Thermal Layout */
                 <div className="print-receipt">
                   <div style={{ textAlign: 'center', borderBottom: '1.5px solid #000', paddingBottom: '6px', marginBottom: '8px' }}>
-                    <h1 style={{ margin: 0, fontSize: '16px', fontWeight: '900' }}>{order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI'}</h1>
+                    <h1 style={{ margin: 0, fontSize: '16px', fontWeight: '900' }}>{storeName}</h1>
                     <p style={{ margin: '2px 0 0', fontSize: '9px', fontWeight: 'bold' }}>#{order.tracking_id?.slice(-8)}</p>
                   </div>
                   <div style={{ fontSize: '10px', marginBottom: '10px' }}>
