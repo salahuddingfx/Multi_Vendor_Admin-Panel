@@ -111,9 +111,17 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>Invoice From:</div>
                         <div style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', marginBottom: '2px' }}>{order.site?.name || (order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI')}</div>
                         <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600, lineHeight: 1.5 }}>
-                          {order.site?.settings?.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
-                          {order.site?.settings?.support_phone || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
-                          {order.site?.settings?.store_email || `support@${order.site_id === 1 ? 'acharu' : 'tajashutki'}.com`}
+                          {(() => {
+                            let settings = {};
+                            try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
+                            return (
+                              <>
+                                {settings.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
+                                {settings.support_phone || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
+                                {settings.store_email || `support@${order.site_id === 1 ? 'acharu' : 'tajashutki'}.com`}
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
