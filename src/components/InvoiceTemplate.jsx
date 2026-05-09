@@ -231,7 +231,15 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
 
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>Invoice From:</div>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', marginBottom: '2px' }}>{order.site?.name || (order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI')}</div>
+              {(() => {
+                let settings = {};
+                try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
+                return (
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', marginBottom: '2px' }}>
+                    {settings.store_name || order.site?.name || (order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI')}
+                  </div>
+                );
+              })()}
               <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600, lineHeight: 1.5 }}>
                 {(() => {
                   let settings = {};
@@ -239,7 +247,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                   return (
                     <>
                       {settings.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
-                      {settings.support_phone || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
+                      {settings.support_phone || settings.contact || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
                       {settings.store_email || `support@${order.site_id === 1 ? 'acharu' : 'tajashutki'}.com`}
                     </>
                   );
@@ -342,7 +350,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                 try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
                 return (
                   <>
-                    {settings.support_phone || (order.site_id === 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
+                    {settings.support_phone || settings.contact || (order.site_id === 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
                     {settings.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
                     {settings.website || (order.site_id === 1 ? 'www.acharu.com' : 'www.tajashutki.com')}
                   </>
