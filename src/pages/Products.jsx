@@ -176,6 +176,7 @@ const Products = () => {
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Product</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Weight</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Price</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Stock</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Featured</th>
@@ -208,6 +209,7 @@ const Products = () => {
                   <td className="px-8 py-5 text-sm font-bold text-slate-500">
                     {product.weight ? `${product.weight}kg` : '-'}
                   </td>
+                  <td className="px-8 py-5">
                     <div className="flex flex-col">
                       <span className="font-display font-bold text-slate-800">৳{product.price}</span>
                       {product.original_price > product.price && (
