@@ -203,7 +203,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     </div>
                   </div>
 
-                  <div style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: 'calc(100% - 1.5in)' }}>
+                  <div className="print-footer" style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: 'calc(100% - 1.5in)' }}>
                     <div style={{ width: '60%' }}>
                       <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
                       <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>

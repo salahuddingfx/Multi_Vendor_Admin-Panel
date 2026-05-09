@@ -325,7 +325,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
           </div>
         </div>
 
-        <div style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: 'calc(100% - 1.5in)' }}>
+        <div className="print-footer" style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: 'calc(100% - 1.5in)' }}>
           <div style={{ width: '60%' }}>
             <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
             <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>
@@ -342,10 +342,11 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
       </div>
       <style>{`
         @media print {
-          @page { size: A4; margin: 0; }
+          @page { size: A4; margin: 0.75in; }
           body * { visibility: hidden; }
           .print-standard, .print-standard * { visibility: visible; }
-          .print-standard { position: absolute !important; left: 0; top: 0; width: 210mm !important; min-height: 297mm !important; padding: 0.75in !important; box-sizing: border-box !important; }
+          .print-standard { position: absolute !important; left: 0; top: 0; width: 100% !important; min-height: auto !important; padding: 0 !important; box-sizing: border-box !important; box-shadow: none !important; }
+          .print-footer { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
         }
       `}</style>
     </div>
