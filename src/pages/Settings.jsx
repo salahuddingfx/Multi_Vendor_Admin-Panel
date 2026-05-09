@@ -92,6 +92,8 @@ const Settings = () => {
     delivery_per_kg: '10',
     bkash_number: '',
     free_delivery_threshold: '2500',
+    website: '',
+    logo_url: '',
     social_links: {
       facebook: '',
       instagram: '',
@@ -115,6 +117,10 @@ const Settings = () => {
     try {
       const data = await api.getSettings(siteId);
       if (data) {
+        const parsedSocial = data.social_links ? (typeof data.social_links === 'string' ? JSON.parse(data.social_links) : data.social_links) : {};
+        const parsedAbout = data.about ? (typeof data.about === 'string' ? JSON.parse(data.about) : data.about) : {};
+        const parsedHome = data.home ? (typeof data.home === 'string' ? JSON.parse(data.home) : data.home) : {};
+
         setSettings({
           store_name: data.store_name || '',
           store_email: data.store_email || '',
@@ -127,16 +133,19 @@ const Settings = () => {
           delivery_per_kg: data.delivery_per_kg || '10',
           bkash_number: data.bkash_number || '',
           free_delivery_threshold: data.free_delivery_threshold || '2500',
-          social_links: data.social_links ? (typeof data.social_links === 'string' ? (() => { try { return JSON.parse(data.social_links); } catch { return {}; } })() : data.social_links) : {
+          website: data.website || (selectedStore === 'acharu' ? 'www.acharu.com' : 'www.tajashutki.com'),
+          logo_url: data.logo_url || '',
+          social_links: {
             facebook: '',
             instagram: '',
             twitter: '',
             tiktok: '',
             youtube: '',
-            whatsapp: ''
+            whatsapp: '',
+            ...parsedSocial
           },
-          about: data.about ? (typeof data.about === 'string' ? (() => { try { return JSON.parse(data.about); } catch { return {}; } })() : data.about) : defaultAbout,
-          home: data.home ? (typeof data.home === 'string' ? (() => { try { return JSON.parse(data.home); } catch { return {}; } })() : data.home) : defaultHome,
+          about: { ...defaultAbout, ...parsedAbout },
+          home: { ...defaultHome, ...parsedHome },
         });
       }
     } catch (error) {
@@ -204,6 +213,19 @@ const Settings = () => {
       toast.success('Image uploaded', { id: 'team-img' });
     } catch (error) {
       toast.error('Upload failed', { id: 'team-img' });
+    }
+  };
+
+  const handleLogoUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      toast.loading('Uploading logo...', { id: 'logo-upload' });
+      const data = await api.uploadSettingsMedia(formData);
+      setSettings(prev => ({ ...prev, logo_url: data.url }));
+      toast.success('Logo updated', { id: 'logo-upload' });
+    } catch (error) {
+      toast.error('Upload failed', { id: 'logo-upload' });
     }
   };
 
@@ -275,12 +297,12 @@ const Settings = () => {
           {activeTab === 'general' && (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[
                   ['Store Name', 'store_name', 'text'],
                   ['Store Email', 'store_email', 'email'],
                   ['Support Phone', 'support_phone', 'text'],
                   ['Currency Symbol', 'currency', 'text'],
                   ['WhatsApp Number', 'whatsapp_number', 'text'],
+                  ['Store Website', 'website', 'text'],
                   ['Delivery Charge (Inside City)', 'delivery_inside', 'text'],
                   ['Delivery Charge (Outside City)', 'delivery_outside', 'text'],
                   ['Per KG Extra Charge', 'delivery_per_kg', 'text'],
@@ -298,6 +320,36 @@ const Settings = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Logo Upload Section */}
+              <div className="bg-slate-50 rounded-[32px] p-8 border border-slate-100">
+                <h4 className={labelCls + " mb-4"}>Store Logo</h4>
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="w-32 h-32 rounded-3xl bg-white border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden">
+                    {settings.logo_url ? (
+                      <img src={settings.logo_url} alt="Store Logo" className="w-full h-full object-contain" />
+                    ) : (
+                      <Layout size={32} className="text-slate-200" />
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <p className="text-xs font-medium text-slate-500 max-w-xs">
+                      Upload your store logo. Recommended size: 512x512px. Supports PNG, JPG, WEBP.
+                    </p>
+                    <label className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 cursor-pointer hover:bg-slate-50 transition-all shadow-sm">
+                      <Camera size={18} />
+                      Choose Image
+                      <input 
+                        type="file" 
+                        className="hidden" 
+                        accept="image/*"
+                        onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className={labelCls}>Store Address</label>
                 <textarea
@@ -734,8 +786,66 @@ const Settings = () => {
             </div>
           )}
 
-          {/* Placeholder tabs */}
-          {!['general', 'about', 'home', 'social'].includes(activeTab) && (
+          {/* ── ALERTS / NOTIFICATIONS TAB ── */}
+          {activeTab === 'notifications' && (
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div>
+                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
+                  <Bell size={20} className="text-slate-400" /> Store Alerts & Notifications
+                </h3>
+                <p className="text-slate-500 text-sm mb-8">Configure how your store communicates with you and your customers.</p>
+                
+                <div className="space-y-8 max-w-2xl">
+                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                    <h4 className="text-sm font-black text-slate-800 uppercase tracking-wider mb-4">Admin Alerts</h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100">
+                        <div>
+                          <p className="font-bold text-slate-800">New Order Email</p>
+                          <p className="text-xs text-slate-500">Receive an email for every new order.</p>
+                        </div>
+                        <div className="w-12 h-6 bg-slate-900 rounded-full flex items-center px-1">
+                          <div className="w-4 h-4 bg-white rounded-full translate-x-6"></div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100">
+                        <div>
+                          <p className="font-bold text-slate-800">Low Stock Alerts</p>
+                          <p className="text-xs text-slate-500">Notify when products fall below 10 units.</p>
+                        </div>
+                        <div className="w-12 h-6 bg-slate-900 rounded-full flex items-center px-1">
+                          <div className="w-4 h-4 bg-white rounded-full translate-x-6"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-maroon/5 rounded-2xl p-6 border border-maroon/10">
+                    <h4 className="text-sm font-black text-maroon uppercase tracking-wider mb-2">Notice Bar (Storefront)</h4>
+                    <p className="text-xs text-slate-500 mb-4">Display a high-visibility message at the top of your website.</p>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className={labelCls}>Notice Text</label>
+                        <input 
+                          type="text" 
+                          className={inputCls} 
+                          placeholder="e.g. Free shipping on orders over ৳2500!"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-maroon focus:ring-maroon" />
+                        <span className="text-sm font-bold text-slate-700">Enable Notice Bar</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <SaveButton />
+            </div>
+          )}
+
+          {/* Placeholder tabs for any others */}
+          {!['general', 'about', 'home', 'social', 'notifications'].includes(activeTab) && (
             <div className="py-20 text-center space-y-4">
               <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
                 <Layout className="text-slate-200" size={32} />
