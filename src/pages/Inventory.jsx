@@ -237,7 +237,18 @@ const Inventory = () => {
             />
           </div>
           <div className="flex items-center gap-3">
-             <button className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-100 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-800 transition-all">
+             <button 
+               onClick={() => setShowLowStockOnly(!showLowStockOnly)}
+               className={clsx(
+                 "flex items-center gap-2 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border",
+                 showLowStockOnly 
+                   ? "bg-rose-50 text-rose-600 border-rose-200 shadow-lg shadow-rose-200/50" 
+                   : "bg-white text-slate-400 border-slate-100 hover:text-slate-800"
+               )}
+             >
+                <Star size={18} className={showLowStockOnly ? "fill-rose-500" : ""} /> {showLowStockOnly ? "Low Stock Active" : "Low Stock Only"}
+             </button>
+             <button className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-800 transition-all">
                 <Filter size={18} /> Filters
              </button>
           </div>
