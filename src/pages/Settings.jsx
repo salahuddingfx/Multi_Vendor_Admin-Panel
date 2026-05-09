@@ -68,8 +68,8 @@ const defaultHome = {
     { step: '03', title: 'Quality Checked', desc: 'Every jar passes a rigorous taste check.', color: '#b45309' },
     { step: '04', title: 'At Your Door', desc: 'Vacuum-sealed for maximum freshness.', color: '#7c3aed' },
   ],
-  newsletter_title: 'Stay in the Loop',
-  newsletter_subtitle: 'Get notified about new flavors and seasonal specials.',
+  newsletter_title: '',
+  newsletter_subtitle: '',
 };
 
 const inputCls = "w-full px-4 py-3 bg-slate-50 border border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all font-medium text-slate-800 text-sm";
@@ -730,32 +730,7 @@ const Settings = () => {
                 </div>
               </div>
 
-              {/* Newsletter Section */}
-              <div>
-                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
-                  <Mail size={20} className="text-slate-400" /> Newsletter
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className={labelCls}>Main Title</label>
-                    <input 
-                      type="text" 
-                      value={settings.home.newsletter_title} 
-                      onChange={(e) => updateHome('newsletter_title', e.target.value)}
-                      className={inputCls} 
-                    />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Subtitle</label>
-                    <input 
-                      type="text" 
-                      value={settings.home.newsletter_subtitle} 
-                      onChange={(e) => updateHome('newsletter_subtitle', e.target.value)}
-                      className={inputCls} 
-                    />
-                  </div>
-                </div>
-              </div>
+
 
               <SaveButton />
             </div>
