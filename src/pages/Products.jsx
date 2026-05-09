@@ -176,7 +176,7 @@ const Products = () => {
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Product</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Weight</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Price</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Stock</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Featured</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
@@ -208,7 +208,6 @@ const Products = () => {
                   <td className="px-8 py-5 text-sm font-bold text-slate-500">
                     {product.weight ? `${product.weight}kg` : '-'}
                   </td>
-                  <td className="px-8 py-5">
                     <div className="flex flex-col">
                       <span className="font-display font-bold text-slate-800">৳{product.price}</span>
                       {product.original_price > product.price && (
@@ -218,6 +217,23 @@ const Products = () => {
                         </div>
                       )}
                     </div>
+                  </td>
+                  <td className="px-8 py-5">
+                    <span className={clsx(
+                      "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 w-fit",
+                      product.stock <= 0 ? "bg-rose-50 text-rose-600 border border-rose-100" :
+                      product.stock < 10 ? "bg-amber-50 text-amber-600 border border-amber-100" :
+                      "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                    )}>
+                      <div className={clsx(
+                        "w-1.5 h-1.5 rounded-full",
+                        product.stock <= 0 ? "bg-rose-600" :
+                        product.stock < 10 ? "bg-amber-600 animate-pulse" :
+                        "bg-emerald-600"
+                      )} />
+                      {product.stock <= 0 ? "Out of Stock" :
+                       product.stock < 10 ? "Low Stock" : "In Stock"}
+                    </span>
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-2">
@@ -240,6 +256,17 @@ const Products = () => {
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => {
+                           // Quick stock edit would go here or just open modal
+                           setEditingProduct(product);
+                           setIsModalOpen(true);
+                        }}
+                        className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all"
+                        title="Quick Stock Update"
+                      >
+                        <Package size={18} />
+                      </button>
                       <button 
                         onClick={() => {
                           setEditingProduct(product);

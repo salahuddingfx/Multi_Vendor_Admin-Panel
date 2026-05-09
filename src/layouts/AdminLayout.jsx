@@ -69,6 +69,7 @@ const AdminLayout = () => {
   // Notification State
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [lowStockCount, setLowStockCount] = useState(0);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const dropdownRef = useRef(null);
   const hasFetchedInitial = useRef(false);
@@ -76,9 +77,10 @@ const AdminLayout = () => {
   useEffect(() => {
     if (!hasFetchedInitial.current) {
       fetchNotifications();
+      fetchDashboardStats();
       hasFetchedInitial.current = true;
     }
-  }, []);
+  }, [selectedStore]); // Re-fetch on store change
 
   useEffect(() => {
     if (user?.id) {
@@ -140,6 +142,15 @@ const AdminLayout = () => {
       setUnreadCount(0);
     } catch (error) {
       console.error('Failed to mark all as read', error);
+    }
+  };
+
+  const fetchDashboardStats = async () => {
+    try {
+      const stats = await api.getDashboardStats(selectedStore);
+      setLowStockCount(stats.lowStock || 0);
+    } catch (error) {
+      console.error('Failed to fetch dashboard stats', error);
     }
   };
 
@@ -227,6 +238,17 @@ const AdminLayout = () => {
                 >
                   <item.icon size={isActive ? 22 : 20} className={clsx(isActive ? "text-white" : "text-slate-400 group-hover:text-slate-900 transition-colors")} />
                   {isSidebarOpen && <span className="tracking-tight text-sm font-display font-bold">{item.name}</span>}
+                  
+                  {/* Badge for Inventory */}
+                  {item.name === 'Inventory' && lowStockCount > 0 && (
+                    <div className={clsx(
+                      "absolute flex items-center justify-center rounded-full border-2 border-white font-black",
+                      isSidebarOpen ? "right-6 px-2 py-0.5 text-[8px] min-w-[20px]" : "top-2 right-2 w-4 h-4 text-[7px]",
+                      isActive ? "bg-white text-slate-900" : "bg-red-500 text-white"
+                    )}>
+                      {lowStockCount}
+                    </div>
+                  )}
                 </Link>
               );
             })}
