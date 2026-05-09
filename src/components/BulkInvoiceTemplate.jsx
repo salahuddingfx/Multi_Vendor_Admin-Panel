@@ -139,11 +139,11 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                   <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '40px' }}>
                     <thead>
                       <tr>
-                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '12px 15px', textAlign: 'center', fontSize: '11px', fontWeight: 600, width: '50px' }}>SL.</th>
-                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '12px 15px', textAlign: 'left', fontSize: '11px', fontWeight: 600 }}>Item Description</th>
-                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '12px 15px', textAlign: 'center', fontSize: '11px', fontWeight: 600 }}>Price</th>
-                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '12px 15px', textAlign: 'center', fontSize: '11px', fontWeight: 600 }}>Qty.</th>
-                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '12px 15px', textAlign: 'right', fontSize: '11px', fontWeight: 600 }}>Total</th>
+                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '8px 15px', textAlign: 'center', fontSize: '11px', fontWeight: 600, width: '50px' }}>SL.</th>
+                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '8px 15px', textAlign: 'left', fontSize: '11px', fontWeight: 600 }}>Item Description</th>
+                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '8px 15px', textAlign: 'center', fontSize: '11px', fontWeight: 600 }}>Price</th>
+                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '8px 15px', textAlign: 'center', fontSize: '11px', fontWeight: 600 }}>Qty.</th>
+                        <th style={{ backgroundColor: '#334155', color: '#fff', padding: '8px 15px', textAlign: 'right', fontSize: '11px', fontWeight: 600 }}>Total</th>
                       </tr>
                     </thead>
                     <tbody>
