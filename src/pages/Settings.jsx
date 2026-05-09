@@ -109,6 +109,7 @@ const Settings = () => {
     },
     about: defaultAbout,
     home: defaultHome,
+    tagline: '',
   });
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
@@ -139,6 +140,7 @@ const Settings = () => {
           bkash_number: data.bkash_number || '',
           free_delivery_threshold: data.free_delivery_threshold || '2500',
           website: data.website || (selectedStore === 'acharu' ? 'www.acharu.com' : 'www.tajashutki.com'),
+          tagline: data.tagline || '',
           logo_url: data.logo_url || '',
           notifications: data.notifications ? (typeof data.notifications === 'string' ? JSON.parse(data.notifications) : data.notifications) : {
             new_order_email: true,
@@ -315,6 +317,7 @@ const Settings = () => {
                   ['Currency Symbol', 'currency', 'text'],
                   ['WhatsApp Number', 'whatsapp_number', 'text'],
                   ['Store Website', 'website', 'text'],
+                  ['Store Tagline', 'tagline', 'text'],
                   ['Delivery Charge (Inside City)', 'delivery_inside', 'text'],
                   ['Delivery Charge (Outside City)', 'delivery_outside', 'text'],
                   ['Per KG Extra Charge', 'delivery_per_kg', 'text'],
