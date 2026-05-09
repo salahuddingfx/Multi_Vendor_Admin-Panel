@@ -272,8 +272,26 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
             {order.items.map((item, idx) => (
               <tr key={idx} style={{ backgroundColor: idx % 2 === 0 ? '#fff' : '#f8fafc' }}>
                 <td style={{ padding: '15px', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '11px', textAlign: 'center' }}>{idx + 1}</td>
-                <td style={{ padding: '15px', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '11px' }}>
-                  {item.name} {item.variation_info && `(${item.variation_info})`}
+                <td style={{ padding: '12px 15px', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', color: '#1e293b' }}>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    {item.product?.images?.find(img => img.is_primary)?.image_path && (
+                      <img 
+                        src={item.product.images.find(img => img.is_primary).image_path} 
+                        alt="" 
+                        style={{ width: '45px', height: '45px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #e2e8f0' }}
+                      />
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: '11px', marginBottom: '2px' }}>
+                        {item.name} {item.variation_info && <span style={{ color: brandColor, fontSize: '9px' }}>({item.variation_info})</span>}
+                      </div>
+                      {item.product?.description && (
+                        <div style={{ fontSize: '9px', color: '#64748b', fontWeight: 500, lineHeight: '1.3', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {item.product.description}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </td>
                 <td style={{ padding: '15px', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '11px', textAlign: 'center' }}>৳{Number(item.price).toFixed(2)}</td>
                 <td style={{ padding: '15px', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', color: '#1e293b', fontWeight: 600, fontSize: '11px', textAlign: 'center' }}>{item.quantity}</td>
