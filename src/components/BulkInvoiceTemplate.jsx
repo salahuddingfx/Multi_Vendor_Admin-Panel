@@ -28,11 +28,12 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
             }
           })();
 
-          const phone = settings.support_phone || settings.contact || (order.site?.slug === 'acharu' || order.site_id == 1 ? '01700000000' : '01800000000');
+          const phone = settings.support_phone || settings.phone || settings.contact || (order.site?.slug === 'acharu' || order.site_id == 1 ? '01700000000' : '01800000000');
           const address = settings.address || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh');
           const website = settings.website || settings.store_website || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'www.acharu.com' : 'www.tajashutki.com');
           const email = settings.store_email || settings.email || `support@${(order.site?.slug === 'acharu' || order.site_id == 1) ? 'acharu' : 'tajashutki'}.com`;
-          const storeName = settings.store_name || order.site?.name || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'ACHARU' : 'TAJA SHUTKI');
+          const storeName = settings.store_name || order.site?.name || (order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI');
+          const tagline = settings.tagline || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'PREMIUM ARTISAL COLLECTION' : 'FRESHNESS DELIVERED DAILY');
           
           return (
             <div key={order.id} className="invoice-page" style={{ 
