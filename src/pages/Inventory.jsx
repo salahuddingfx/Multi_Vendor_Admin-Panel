@@ -27,6 +27,7 @@ const Inventory = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false);
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showShipmentModal, setShowShipmentModal] = useState(false);
@@ -116,8 +117,13 @@ const Inventory = () => {
 
   const filteredProducts = (Array.isArray(products) ? products : []).filter(p => {
     const categoryName = (typeof p.category === 'object' ? p.category?.name : p.category) || '';
-    return p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           categoryName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         categoryName.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const totalStock = (p.stock || 0) + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0);
+    const matchesLowStock = !showLowStockOnly || (totalStock < 10);
+    
+    return matchesSearch && matchesLowStock;
   });
 
   const lowStockCount = products.filter(p => p.stock < 10).length;
