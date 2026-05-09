@@ -155,7 +155,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
   // Render Standard A4 Invoice
   return (
     <div style={{ display: 'none' }}>
-      <div ref={ref} className="print-standard" style={{...baseStyle, fontSize: '11px', padding: '0.75in'}}>
+      <div ref={ref} className="print-standard" style={{...baseStyle, fontSize: '11px', padding: '0.75in', display: 'flex', flexDirection: 'column'}}>
         {order.payment_status === 'paid' && (
           <div style={{
             position: 'absolute',
@@ -333,7 +333,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
           </div>
         </div>
 
-        <div className="print-footer" style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: 'calc(100% - 1.5in)' }}>
+        <div className="print-footer" style={{ marginTop: 'auto', width: '100%', borderTop: '1px solid #e2e8f0', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', backgroundColor: '#fff' }}>
           <div style={{ width: '60%' }}>
             <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
             <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>
@@ -358,12 +358,12 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
       </div>
       <style>{`
         @media print {
-          @page { size: A4; margin: 0.75in; }
+          @page { size: A4; margin: 0; }
           html, body { background: #fff !important; }
           body * { visibility: hidden; }
           .print-standard, .print-standard * { visibility: visible; }
-          .print-standard { background: #fff !important; position: relative !important; left: 0; top: 0; width: 100% !important; min-height: auto !important; padding: 0 !important; box-sizing: border-box !important; box-shadow: none !important; }
-          .print-footer { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; background: #fff !important; }
+          .print-standard { background: #fff !important; position: absolute !important; left: 0; top: 0; width: 100% !important; min-height: 297mm !important; padding: 0.75in !important; box-sizing: border-box !important; box-shadow: none !important; display: flex !important; flex-direction: column !important; }
+          .print-footer { position: static !important; width: 100% !important; margin-top: auto !important; }
         }
       `}</style>
     </div>
