@@ -36,7 +36,11 @@ adminClient.interceptors.response.use(
   },
   (error) => {
     if (!error.response) {
-      toast.error('Network error — please check your connection');
+      if (error.code === 'ECONNABORTED') {
+        toast.error('Request timed out — please try again');
+      } else if (!axios.isCancel(error)) {
+        toast.error('Connection lost — checking server status...');
+      }
       return Promise.reject(error);
     }
 
