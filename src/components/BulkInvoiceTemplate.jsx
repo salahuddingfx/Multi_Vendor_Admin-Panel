@@ -74,10 +74,10 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                   <div style={{ display: 'flex', marginBottom: '25px' }}>
                     <div>
                       <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#1e293b', margin: 0, letterSpacing: '-0.5px' }}>
-                        {order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI'}
+                        {storeName}
                       </h1>
                       <div style={{ fontSize: '9px', textTransform: 'uppercase', color: '#64748b', letterSpacing: '1px', marginTop: '2px', fontWeight: '700' }}>
-                        {order.site_id === 1 ? 'Premium Artisanal Collection' : 'Freshness Delivered Daily'}
+                        {settings.tagline || (order.site_id === 1 ? 'Premium Artisanal Collection' : 'Freshness Delivered Daily')}
                       </div>
                     </div>
                   </div>
@@ -124,28 +124,13 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                       </table>
 
                       <div style={{ textAlign: 'right' }}>
-                        <div className="invoice-to-label" style={{ fontSize: '13px' }}>Invoice From:</div>
-                        {(() => {
-                          let settings = {};
-                          try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
-                          return (
-                            <div className="recipient-name" style={{ fontSize: '14px' }}>
-                              {settings.store_name || order.site?.name || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'ACHARU' : 'TAJA SHUTKI')}
-                            </div>
-                          );
-                        })()}
+                        <div className="recipient-name" style={{ fontSize: '14px' }}>
+                          {storeName}
+                        </div>
                         <div className="recipient-address">
-                          {(() => {
-                            let settings = {};
-                            try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
-                            return (
-                              <>
-                                {settings.address || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
-                                {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' || order.site_id == 1 ? '01700000000' : '01800000000')}<br />
-                                {settings.store_email || `support@${(order.site?.slug === 'acharu' || order.site_id == 1) ? 'acharu' : 'tajashutki'}.com`}
-                              </>
-                            );
-                          })()}
+                          {address}<br />
+                          {phone}<br />
+                          {email}
                         </div>
                       </div>
                     </div>
@@ -239,17 +224,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     <div style={{ width: '60%' }}>
                       <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
                       <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>
-                        {(() => {
-                          let settings = {};
-                          try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
-                          return (
-                            <>
-                              {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' || order.site_id == 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
-                              {settings.address || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
-                              {settings.website || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'www.acharu.com' : 'www.tajashutki.com')}
-                            </>
-                          );
-                        })()}
+                        {phone} &nbsp;|&nbsp; {address} &nbsp;|&nbsp; {website}
                       </div>
                     </div>
                     <div style={{ width: '40%', textAlign: 'right' }}>
