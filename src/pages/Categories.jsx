@@ -12,6 +12,7 @@ const Categories = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [name, setName] = useState('');
+  const [parentId, setParentId] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [catToDelete, setCatToDelete] = useState(null);
@@ -39,6 +40,7 @@ const Categories = () => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('is_featured', isFeatured ? 1 : 0);
+    if (parentId) formData.append('parent_id', parentId);
     if (!editingCategory) formData.append('site_id', siteId);
 
     try {
@@ -51,6 +53,7 @@ const Categories = () => {
       }
       setIsModalOpen(false);
       setName('');
+      setParentId('');
       setIsFeatured(false);
       setEditingCategory(null);
       fetchCategories();
@@ -83,6 +86,7 @@ const Categories = () => {
           onClick={() => { 
             setEditingCategory(null); 
             setName(''); 
+            setParentId('');
             setIsFeatured(false);
             setIsModalOpen(true); 
           }}
@@ -98,47 +102,87 @@ const Categories = () => {
           [1,2,3].map(i => <div key={i} className="h-32 bg-white animate-pulse rounded-[40px]" />)
         ) : (
           categories.map((cat) => (
-            <div key={cat.id} className="bg-white p-6 rounded-[32px] shadow-premium border border-black/[0.01] group relative">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all overflow-hidden ${cat.is_featured ? 'bg-maroon text-white shadow-lg shadow-maroon/20' : 'bg-slate-50 text-slate-400'}`}>
-                    <Tag size={24} />
-                  </div>
-                  <div>
-                    <div className="font-black text-slate-800 text-lg uppercase tracking-tight">{cat.name}</div>
-                    <div className="flex items-center gap-2">
-                       <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Slug: {cat.slug}</span>
-                       {cat.is_featured && (
-                         <span className="flex items-center gap-1 text-[8px] font-black bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full uppercase tracking-tighter">
-                           <Star size={8} fill="currentColor" /> Featured
-                         </span>
-                       )}
+            <div key={cat.id} className="space-y-4">
+              <div className="bg-white p-6 rounded-[32px] shadow-premium border border-black/[0.01] group relative">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all overflow-hidden ${cat.is_featured ? 'bg-maroon text-white shadow-lg shadow-maroon/20' : 'bg-slate-50 text-slate-400'}`}>
+                      <Tag size={24} />
+                    </div>
+                    <div>
+                      <div className="font-black text-slate-800 text-lg uppercase tracking-tight">{cat.name}</div>
+                      <div className="flex items-center gap-2">
+                         <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Slug: {cat.slug}</span>
+                         {cat.is_featured && (
+                           <span className="flex items-center gap-1 text-[8px] font-black bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full uppercase tracking-tighter">
+                             <Star size={8} fill="currentColor" /> Featured
+                           </span>
+                         )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex gap-1">
-                  <button 
-                    onClick={() => { 
-                      setEditingCategory(cat); 
-                      setName(cat.name); 
-                      setIsFeatured(cat.is_featured);
-                      setIsModalOpen(true); 
-                    }}
-                    className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-slate-800 transition-all"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setCatToDelete(cat.id);
-                      setShowDeleteConfirm(true);
-                    }}
-                    className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-red-50 hover:text-white transition-all"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex gap-1">
+                    <button 
+                      onClick={() => { 
+                        setEditingCategory(cat); 
+                        setName(cat.name); 
+                        setParentId(cat.parent_id || '');
+                        setIsFeatured(cat.is_featured);
+                        setIsModalOpen(true); 
+                      }}
+                      className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-slate-800 transition-all"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setCatToDelete(cat.id);
+                        setShowDeleteConfirm(true);
+                      }}
+                      className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-red-50 hover:text-white transition-all"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
+              
+              {/* Children / Subcategories */}
+              {cat.children && cat.children.length > 0 && (
+                <div className="ml-10 space-y-3 pl-6 border-l-2 border-slate-100">
+                  {cat.children.map(sub => (
+                    <div key={sub.id} className="bg-white/60 p-4 rounded-2xl flex items-center justify-between border border-black/[0.01]">
+                      <div className="flex items-center gap-3">
+                        <Tag size={14} className="text-slate-300" />
+                        <span className="font-bold text-slate-700 text-sm">{sub.name}</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => { 
+                            setEditingCategory(sub); 
+                            setName(sub.name); 
+                            setParentId(sub.parent_id || '');
+                            setIsFeatured(sub.is_featured);
+                            setIsModalOpen(true); 
+                          }}
+                          className="w-8 h-8 rounded-lg bg-white text-slate-400 flex items-center justify-center hover:bg-slate-100 hover:text-slate-800 transition-all"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setCatToDelete(sub.id);
+                            setShowDeleteConfirm(true);
+                          }}
+                          className="w-8 h-8 rounded-lg bg-white text-slate-400 flex items-center justify-center hover:bg-red-50 hover:text-white transition-all"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))
         )}
@@ -161,6 +205,20 @@ const Categories = () => {
                   placeholder="e.g. Spicy Pickles"
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Parent Category (Optional)</label>
+                <select 
+                  value={parentId}
+                  onChange={(e) => setParentId(e.target.value)}
+                  className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-bold text-slate-900 appearance-none"
+                >
+                  <option value="">Top Level Category</option>
+                  {categories.filter(c => c.id !== editingCategory?.id).map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[28px] border border-slate-100">
