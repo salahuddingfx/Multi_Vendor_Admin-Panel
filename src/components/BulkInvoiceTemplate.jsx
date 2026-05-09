@@ -78,7 +78,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         {storeName}
                       </h1>
                       <div style={{ fontSize: '9px', textTransform: 'uppercase', color: '#64748b', letterSpacing: '1px', marginTop: '2px', fontWeight: '700' }}>
-                        {settings.tagline || (order.site_id === 1 ? 'Premium Artisanal Collection' : 'Freshness Delivered Daily')}
+                        {tagline}
                       </div>
                     </div>
                   </div>
