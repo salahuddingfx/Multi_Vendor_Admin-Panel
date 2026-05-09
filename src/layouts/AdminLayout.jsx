@@ -84,7 +84,7 @@ const AdminLayout = () => {
     if (user?.id) {
       const interval = setInterval(() => {
         fetchNotifications(true);
-      }, 1000); // 1 second polling as requested
+      }, 30000); // 30 second polling to prevent overwhelming single-threaded PHP server
       return () => clearInterval(interval);
     }
   }, [user?.id, notifications?.[0]?.id]); 
