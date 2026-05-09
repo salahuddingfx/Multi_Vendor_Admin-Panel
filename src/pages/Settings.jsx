@@ -18,7 +18,6 @@ import {
   ShoppingBag,
   Sparkles,
   RotateCw,
-  Mail,
   Share2,
   Camera
 } from 'lucide-react';
