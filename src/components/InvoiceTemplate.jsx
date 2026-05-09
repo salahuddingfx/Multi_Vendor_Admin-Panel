@@ -333,7 +333,9 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                   </tr>
                 )}
                 <tr>
-                  <td style={{ padding: '12px 15px', fontSize: '14px', fontWeight: 700, color: '#fff', backgroundColor: brandColor }}>Total:</td>
+                  <td style={{ padding: '12px 15px', fontSize: '14px', fontWeight: 700, color: '#fff', backgroundColor: brandColor }}>
+                    {order.payment_status === 'paid' ? 'Total Paid Amount:' : 'Total Payable Amount:'}
+                  </td>
                   <td style={{ padding: '12px 15px', fontSize: '14px', fontWeight: 700, color: '#fff', backgroundColor: brandColor, textAlign: 'right' }}>৳{Number(order.total_amount).toFixed(2)}</td>
                 </tr>
               </tbody>
