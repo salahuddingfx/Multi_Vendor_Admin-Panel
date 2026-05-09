@@ -28,6 +28,7 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -112,8 +113,9 @@ const Products = () => {
                         p.id.toString().includes(searchQuery);
     
     const matchesCategory = selectedCategory === 'All' || categoryName === selectedCategory;
+    const matchesLowStock = !showLowStockOnly || (p.stock < 10);
     
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && matchesLowStock;
   });
 
   return (
@@ -164,6 +166,18 @@ const Products = () => {
           <div className="text-sm font-bold text-slate-400 px-4">
             Total: <span className="text-slate-800">{filteredProducts.length}</span>
           </div>
+          <button 
+            onClick={() => setShowLowStockOnly(!showLowStockOnly)}
+            className={clsx(
+              "flex items-center gap-2 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border",
+              showLowStockOnly 
+                ? "bg-rose-50 text-rose-600 border-rose-200 shadow-lg shadow-rose-200/50" 
+                : "bg-white text-slate-400 border-slate-100 hover:text-slate-800"
+            )}
+          >
+            <Star size={14} className={showLowStockOnly ? "fill-rose-500" : ""} />
+            Low Stock Only
+          </button>
         </div>
       </div>
 
