@@ -27,7 +27,9 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                 padding: config.padding,
                 boxSizing: 'border-box',
                 pageBreakAfter: 'always',
-                minHeight: isStandard ? '11in' : 'auto'
+                minHeight: isStandard ? '11in' : 'auto',
+                WebkitPrintColorAdjust: 'exact',
+                printColorAdjust: 'exact'
             }}>
               {/* Standard Layout */}
               {isStandard ? (
@@ -53,8 +55,8 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     </div>
                   )}
 
-                  <div style={{ display: 'block', marginBottom: '25px' }}>
-                    <div style={{ display: 'inline-block' }}>
+                  <div style={{ display: 'flex', marginBottom: '25px' }}>
+                    <div>
                       <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#1e293b', margin: 0, letterSpacing: '-0.5px' }}>
                         {order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI'}
                       </h1>
@@ -64,16 +66,16 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     </div>
                   </div>
 
-                  <div style={{ display: 'table', width: '100%', marginBottom: '30px' }}>
-                    <div style={{ display: 'table-cell', background: brandColor, height: '35px', width: '55%' }}></div>
-                    <div style={{ display: 'table-cell', padding: '0 20px', verticalAlign: 'middle', whiteSpace: 'nowrap', width: '1%' }}>
+                  <div style={{ display: 'flex', width: '100%', marginBottom: '30px', alignItems: 'center' }}>
+                    <div style={{ background: brandColor, height: '35px', width: '55%' }}></div>
+                    <div style={{ padding: '0 20px', whiteSpace: 'nowrap' }}>
                       <h2 style={{ fontSize: '38px', fontWeight: 600, color: '#334155', letterSpacing: '1px', margin: 0, lineHeight: 1 }}>INVOICE</h2>
                     </div>
-                    <div style={{ display: 'table-cell', background: brandColor, height: '35px', width: '10%' }}></div>
+                    <div style={{ background: brandColor, height: '35px', flexGrow: 1 }}></div>
                   </div>
 
-                  <div style={{ display: 'table', width: '100%', marginBottom: '40px' }}>
-                    <div style={{ display: 'table-cell', width: '50%', verticalAlign: 'top' }}>
+                  <div style={{ display: 'flex', width: '100%', marginBottom: '40px', justifyContent: 'space-between' }}>
+                    <div style={{ width: '50%' }}>
                       <div style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', marginBottom: '5px' }}>Invoice to:</div>
                       <div style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b', marginBottom: '2px' }}>{order.customer_name}</div>
                       <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600, lineHeight: 1.5 }}>
@@ -82,16 +84,16 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         {order.location}
                       </div>
                     </div>
-                    <div style={{ display: 'table-cell', width: '50%', verticalAlign: 'top' }}>
-                      <table style={{ float: 'right', borderCollapse: 'collapse' }}>
+                    <div style={{ width: '50%', textAlign: 'right' }}>
+                      <table style={{ marginLeft: 'auto', borderCollapse: 'collapse' }}>
                         <tbody>
                           <tr>
-                            <td style={{ padding: '4px 0 4px 20px', fontWeight: 700, color: '#1e293b', fontSize: '13px' }}>Invoice#</td>
-                            <td style={{ padding: '4px 0 4px 20px', fontWeight: 600, color: '#475569', textAlign: 'right', fontSize: '12px' }}>{order.tracking_id?.toUpperCase()}</td>
+                            <td style={{ padding: '4px 20px 4px 0', fontWeight: 700, color: '#1e293b', fontSize: '13px', textAlign: 'left' }}>Invoice#</td>
+                            <td style={{ padding: '4px 0', fontWeight: 600, color: '#475569', textAlign: 'right', fontSize: '12px' }}>{order.tracking_id?.toUpperCase()}</td>
                           </tr>
                           <tr>
-                            <td style={{ padding: '4px 0 4px 20px', fontWeight: 700, color: '#1e293b', fontSize: '13px' }}>Date</td>
-                            <td style={{ padding: '4px 0 4px 20px', fontWeight: 600, color: '#475569', textAlign: 'right', fontSize: '12px' }}>
+                            <td style={{ padding: '4px 20px 4px 0', fontWeight: 700, color: '#1e293b', fontSize: '13px', textAlign: 'left' }}>Date</td>
+                            <td style={{ padding: '4px 0', fontWeight: 600, color: '#475569', textAlign: 'right', fontSize: '12px' }}>
                               {new Date(order.created_at).toLocaleDateString('en-GB')}
                             </td>
                           </tr>
@@ -125,8 +127,8 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     </tbody>
                   </table>
 
-                  <div style={{ display: 'table', width: '100%', marginBottom: '60px' }}>
-                    <div style={{ display: 'table-cell', width: '55%', verticalAlign: 'top', paddingRight: '20px' }}>
+                  <div style={{ display: 'flex', width: '100%', marginBottom: '60px' }}>
+                    <div style={{ width: '55%', paddingRight: '20px' }}>
                       <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', marginBottom: '15px' }}>Thank you for your business</div>
                       
                       <div style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b', marginBottom: '5px', marginTop: '15px' }}>Terms & Conditions</div>
@@ -158,7 +160,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         </tbody>
                       </table>
                     </div>
-                    <div style={{ display: 'table-cell', width: '45%', verticalAlign: 'top' }}>
+                    <div style={{ width: '45%' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <tbody>
                           <tr>
@@ -184,8 +186,8 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     </div>
                   </div>
 
-                  <div style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'table', width: 'calc(100% - 1.5in)' }}>
-                    <div style={{ display: 'table-cell', width: '60%', verticalAlign: 'bottom' }}>
+                  <div style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: 'calc(100% - 1.5in)' }}>
+                    <div style={{ width: '60%' }}>
                       <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
                       <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>
                         {order.site_id === 1 ? '01700000000' : '01800000000'} &nbsp;|&nbsp; 
@@ -193,7 +195,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         {order.site_id === 1 ? 'www.acharu.com' : 'www.tajashutki.com'}
                       </div>
                     </div>
-                    <div style={{ display: 'table-cell', width: '40%', verticalAlign: 'bottom', textAlign: 'right' }}>
+                    <div style={{ width: '40%', textAlign: 'right' }}>
                       <div style={{ borderTop: '1px solid #1e293b', width: '150px', display: 'inline-block', marginBottom: '8px' }}></div><br />
                       <span style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>Authorised Sign</span>
                     </div>
@@ -245,11 +247,17 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
       </div>
       <style>{`
         @media print {
-          @page { size: ${isStandard ? 'A4' : config.width + ' auto'}; margin: ${isStandard ? '0.5in' : '0'}; }
+          @page { size: ${isStandard ? 'A4' : config.width + ' auto'}; margin: 0; }
           body * { visibility: hidden; }
           .bulk-print-container, .bulk-print-container * { visibility: visible; }
           .bulk-print-container { position: absolute !important; left: 0; top: 0; width: 100% !important; }
-          .invoice-page { page-break-after: always !important; break-after: page !important; }
+          .invoice-page { 
+            page-break-after: always !important; 
+            break-after: page !important; 
+            margin: 0 !important; 
+            width: ${isStandard ? '210mm' : config.width} !important;
+            min-height: ${isStandard ? '297mm' : 'auto'} !important;
+          }
         }
       `}</style>
     </div>
