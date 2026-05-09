@@ -346,7 +346,7 @@ const Orders = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50">
-                <th className="px-8 py-5 w-10">
+                <th className="px-4 py-4 w-10 text-center">
                   <input 
                     type="checkbox" 
                     className="w-5 h-5 rounded-lg border-slate-200 text-maroon focus:ring-maroon cursor-pointer transition-all"
@@ -354,12 +354,12 @@ const Orders = () => {
                     onChange={toggleSelectAll}
                   />
                 </th>
-                <th className="px-4 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Order Details</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Customer</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Products</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Total</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
+                <th className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Order Details</th>
+                <th className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Customer</th>
+                <th className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Products</th>
+                <th className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Total</th>
+                <th className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Status</th>
+                <th className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -368,7 +368,7 @@ const Orders = () => {
                   "hover:bg-slate-50/30 transition-colors group",
                   selectedOrderIds.includes(order.id) && "bg-slate-50"
                 )}>
-                  <td className="px-8 py-8">
+                  <td className="px-4 py-6 text-center">
                     <input 
                       type="checkbox" 
                       className="w-5 h-5 rounded-lg border-slate-200 text-maroon focus:ring-maroon cursor-pointer transition-all"
@@ -376,7 +376,7 @@ const Orders = () => {
                       onChange={() => toggleSelectOrder(order.id)}
                     />
                   </td>
-                  <td className="px-8 py-8">
+                  <td className="px-4 py-6">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-black text-slate-900 text-base tracking-tight">#{order.tracking_id.toUpperCase()}</span>
@@ -401,7 +401,7 @@ const Orders = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-8">
+                  <td className="px-4 py-6">
                     <div className="flex flex-col">
                       <span className="font-black text-slate-800 text-sm leading-none mb-1.5">{order.customer_name}</span>
                       <div className="flex items-center gap-2 mb-2">
@@ -426,7 +426,7 @@ const Orders = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-8 py-8">
+                  <td className="px-4 py-6">
                     <div className="flex flex-col gap-2.5">
                       {order.items?.map((item, idx) => (
                         <div key={idx} className="flex items-start gap-3 group/item">
@@ -447,23 +447,23 @@ const Orders = () => {
                       ))}
                     </div>
                   </td>
-                  <td className="px-8 py-8">
+                  <td className="px-4 py-6">
                     <div className="flex flex-col">
                       <span className="font-black text-slate-900 text-lg tracking-tight">৳{order.total_amount}</span>
                       
-                      <div className="flex flex-col gap-1 mt-2.5 mb-3 p-2 bg-slate-50/50 rounded-xl border border-slate-100/50">
-                         <div className="flex justify-between items-center gap-4">
-                           <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Subtotal:</span>
-                           <span className="text-[10px] text-slate-600 font-bold">৳{order.subtotal}</span>
+                      <div className="flex flex-col gap-0.5 mt-2 mb-2 p-1.5 bg-slate-50/50 rounded-lg border border-slate-100/50">
+                         <div className="flex justify-between items-center gap-2">
+                           <span className="text-[7px] text-slate-400 font-black uppercase tracking-widest">Sub:</span>
+                           <span className="text-[9px] text-slate-600 font-bold">৳{order.subtotal}</span>
                          </div>
-                         <div className="flex justify-between items-center gap-4">
-                           <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest">Delivery:</span>
-                           <span className="text-[10px] text-slate-600 font-bold">৳{order.delivery_charge}</span>
+                         <div className="flex justify-between items-center gap-2">
+                           <span className="text-[7px] text-slate-400 font-black uppercase tracking-widest">Del:</span>
+                           <span className="text-[9px] text-slate-600 font-bold">৳{order.delivery_charge}</span>
                          </div>
                          {parseFloat(order.discount_amount) > 0 && (
-                           <div className="flex justify-between items-center gap-4">
-                             <span className="text-[8px] text-emerald-500 font-black uppercase tracking-widest">Discount:</span>
-                             <span className="text-[10px] text-emerald-600 font-bold">-৳{order.discount_amount}</span>
+                           <div className="flex justify-between items-center gap-2">
+                             <span className="text-[7px] text-emerald-500 font-black uppercase tracking-widest">Disc:</span>
+                             <span className="text-[9px] text-emerald-600 font-bold">-৳{order.discount_amount}</span>
                            </div>
                          )}
                       </div>
@@ -484,7 +484,7 @@ const Orders = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-8">
+                  <td className="px-4 py-6">
                     <div className="relative group/status w-40 mx-auto">
                       <select 
                         value={order.status.toLowerCase()}
@@ -503,7 +503,7 @@ const Orders = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-8 text-right">
+                  <td className="px-4 py-6 text-right">
                     <div className="flex items-center justify-end gap-3">
                       {/* Print Actions Group */}
                       <div className="flex items-center bg-slate-50 p-1.5 rounded-2xl border border-slate-100 group/print hover:bg-white hover:shadow-lg transition-all duration-500">
