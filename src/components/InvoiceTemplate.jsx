@@ -343,10 +343,11 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
       <style>{`
         @media print {
           @page { size: A4; margin: 0.75in; }
+          html, body { background: #fff !important; }
           body * { visibility: hidden; }
           .print-standard, .print-standard * { visibility: visible; }
-          .print-standard { background: transparent !important; position: absolute !important; left: 0; top: 0; width: 100% !important; min-height: auto !important; padding: 0 !important; box-sizing: border-box !important; box-shadow: none !important; }
-          .print-footer { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; }
+          .print-standard { background: #fff !important; position: absolute !important; left: 0; top: 0; width: 100% !important; min-height: auto !important; padding: 0 !important; box-sizing: border-box !important; box-shadow: none !important; }
+          .print-footer { position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; background: #fff !important; }
         }
       `}</style>
     </div>
