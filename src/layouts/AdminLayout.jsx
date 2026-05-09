@@ -18,8 +18,11 @@ import {
   Image as ImageIcon,
   Star,
   Ticket,
-  TrendingUp
+  TrendingUp,
+  Search as SearchIcon,
+  Command
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { Toaster, toast } from 'sonner';
 import { useState, useEffect, useRef } from 'react';
@@ -73,6 +76,28 @@ const AdminLayout = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const dropdownRef = useRef(null);
   const hasFetchedInitial = useRef(false);
+
+  // Command Palette State
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [commandSearch, setCommandSearch] = useState('');
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setIsCommandPaletteOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const filteredNavigation = navigation.filter(item => 
+    item.name.toLowerCase().includes(commandSearch.toLowerCase())
+  );
 
   useEffect(() => {
     if (!hasFetchedInitial.current) {
@@ -315,11 +340,18 @@ const AdminLayout = () => {
             >
               {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <div className="hidden sm:block">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">Navigation / {selectedStore}</p>
-              <h2 className="font-display font-black text-slate-800 text-2xl tracking-tight leading-none">
-                {navigation.find(n => n.href === location.pathname)?.name || 'Dashboard'}
-              </h2>
+            <div className="hidden sm:flex items-center gap-4">
+              <div 
+                onClick={() => setIsCommandPaletteOpen(true)}
+                className="flex items-center gap-3 px-6 py-3 bg-white/50 border border-slate-100 rounded-2xl cursor-pointer hover:bg-white hover:shadow-lg transition-all group"
+              >
+                <SearchIcon size={16} className="text-slate-400 group-hover:text-slate-900" />
+                <span className="text-xs font-bold text-slate-400 group-hover:text-slate-600">Quick Search...</span>
+                <div className="flex items-center gap-1 ml-4 px-2 py-1 bg-slate-100 rounded-lg">
+                  <Command size={10} className="text-slate-400" />
+                  <span className="text-[9px] font-black text-slate-400">K</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -443,6 +475,81 @@ const AdminLayout = () => {
           onClick={toggleSidebar}
         />
       )}
+
+      {/* Command Palette Modal */}
+      <AnimatePresence>
+        {isCommandPaletteOpen && (
+          <div className="fixed inset-0 z-[100] flex items-start justify-center pt-32 px-4 bg-slate-900/60 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden"
+            >
+              <div className="p-8 border-b border-slate-50 relative">
+                <SearchIcon className="absolute left-10 top-1/2 -translate-y-1/2 text-slate-400" size={24} />
+                <input 
+                  autoFocus
+                  type="text" 
+                  placeholder="Where do you want to go?..."
+                  className="w-full pl-16 pr-8 py-4 bg-slate-50 border-none rounded-3xl outline-none text-lg font-bold text-slate-800 placeholder:text-slate-300"
+                  value={commandSearch}
+                  onChange={(e) => setCommandSearch(e.target.value)}
+                />
+              </div>
+              
+              <div className="p-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+                <div className="px-4 py-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4">Navigation</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {filteredNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        onClick={() => {
+                          setIsCommandPaletteOpen(false);
+                          setCommandSearch('');
+                        }}
+                        className="flex items-center justify-between p-4 rounded-[24px] hover:bg-slate-50 transition-all group"
+                      >
+                        <div className="flex items-center gap-5">
+                          <div className="p-3 bg-white border border-slate-100 rounded-2xl group-hover:bg-slate-900 group-hover:text-white transition-all shadow-sm">
+                            <item.icon size={20} />
+                          </div>
+                          <span className="font-display font-bold text-slate-800 text-lg tracking-tight">{item.name}</span>
+                        </div>
+                        <ChevronDown size={18} className="text-slate-200 -rotate-90 group-hover:text-slate-400 transition-colors" />
+                      </Link>
+                    ))}
+                    {filteredNavigation.length === 0 && (
+                      <div className="p-12 text-center">
+                         <SearchIcon size={40} className="mx-auto text-slate-100 mb-4" />
+                         <p className="text-slate-400 font-bold">No pages found matching "{commandSearch}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6 bg-slate-50/50 border-t border-slate-50 flex items-center justify-between px-10">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-slate-400 shadow-sm">ESC</div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">to close</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-slate-400 shadow-sm">
+                    <ChevronDown size={10} className="rotate-180" />
+                  </div>
+                  <div className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-lg text-[9px] font-black text-slate-400 shadow-sm">
+                    <ChevronDown size={10} />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">to navigate</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
