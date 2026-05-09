@@ -112,8 +112,8 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         <div style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', marginBottom: '2px' }}>{order.site?.name || (order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI')}</div>
                         <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600, lineHeight: 1.5 }}>
                           {order.site?.settings?.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
-                          {order.site?.settings?.contact_phone || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
-                          {order.site?.settings?.contact_email || `support@${order.site_id === 1 ? 'acharu' : 'tajashutki'}.com`}
+                          {order.site?.settings?.support_phone || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
+                          {order.site?.settings?.store_email || `support@${order.site_id === 1 ? 'acharu' : 'tajashutki'}.com`}
                         </div>
                       </div>
                     </div>
@@ -207,7 +207,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     <div style={{ width: '60%' }}>
                       <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
                       <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>
-                        {order.site?.settings?.contact_phone || (order.site_id === 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
+                        {order.site?.settings?.support_phone || (order.site_id === 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
                         {order.site?.settings?.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
                         {order.site?.settings?.website || (order.site_id === 1 ? 'www.acharu.com' : 'www.tajashutki.com')}
                       </div>
