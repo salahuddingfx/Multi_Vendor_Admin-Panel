@@ -83,9 +83,16 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                         {order.customer_address}<br />
                         {order.location}
                       </div>
+
+                      {order.customer_notes && (
+                        <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#fef3c7', borderLeft: '3px solid #f59e0b', color: '#b45309', fontSize: '11px', fontWeight: 600 }}>
+                          <span style={{ fontWeight: 800, display: 'block', marginBottom: '2px' }}>Customer Note:</span>
+                          {order.customer_notes}
+                        </div>
+                      )}
                     </div>
-                    <div style={{ width: '50%', textAlign: 'right' }}>
-                      <table style={{ marginLeft: 'auto', borderCollapse: 'collapse' }}>
+                    <div style={{ width: '50%', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                      <table style={{ borderCollapse: 'collapse', marginBottom: '20px' }}>
                         <tbody>
                           <tr>
                             <td style={{ padding: '4px 20px 4px 0', fontWeight: 700, color: '#1e293b', fontSize: '13px', textAlign: 'left' }}>Invoice#</td>
@@ -99,6 +106,16 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                           </tr>
                         </tbody>
                       </table>
+
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>Invoice From:</div>
+                        <div style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', marginBottom: '2px' }}>{order.site?.name || (order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI')}</div>
+                        <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600, lineHeight: 1.5 }}>
+                          {order.site?.settings?.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
+                          {order.site?.settings?.contact_phone || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
+                          {order.site?.settings?.contact_email || `support@${order.site_id === 1 ? 'acharu' : 'tajashutki'}.com`}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -154,7 +171,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                           {order.customer_notes && (
                             <tr>
                               <td style={{ padding: '2px 0', fontSize: '9px', fontWeight: 600, color: '#1e293b', paddingRight: '15px' }}>Note:</td>
-                              <td style={{ padding: '2px 0', fontSize: '9px', fontWeight: 500, color: '#475569' }}>{order.customer_notes}</td>
+                              <td style={{ padding: '2px 0', fontSize: '9px', fontWeight: 500, color: '#475569' }}>Included in Customer Details</td>
                             </tr>
                           )}
                         </tbody>
@@ -190,9 +207,9 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     <div style={{ width: '60%' }}>
                       <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
                       <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>
-                        {order.site_id === 1 ? '01700000000' : '01800000000'} &nbsp;|&nbsp; 
-                        {order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh'} &nbsp;|&nbsp; 
-                        {order.site_id === 1 ? 'www.acharu.com' : 'www.tajashutki.com'}
+                        {order.site?.settings?.contact_phone || (order.site_id === 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
+                        {order.site?.settings?.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
+                        {order.site?.settings?.website || (order.site_id === 1 ? 'www.acharu.com' : 'www.tajashutki.com')}
                       </div>
                     </div>
                     <div style={{ width: '40%', textAlign: 'right' }}>
