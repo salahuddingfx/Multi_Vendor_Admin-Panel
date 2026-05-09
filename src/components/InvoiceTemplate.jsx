@@ -30,7 +30,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
     printColorAdjust: 'exact'
   };
 
-  const brandColor = order.site_id === 1 ? '#800000' : '#064e3b'; // Maroon for Acharu, Emerald for Taja
+  const brandColor = order.site?.slug === 'acharu' ? '#800000' : '#064e3b'; // Maroon for Acharu, Emerald for Taja
 
   // Render Thermal Receipt Style (1.5, 1.75, 2.0)
   if (!isStandard) {
@@ -39,7 +39,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
         <div ref={ref} className="print-receipt" style={baseStyle}>
           <div style={{ textAlign: 'center', borderBottom: '1.5px solid #000', paddingBottom: '6px', marginBottom: '8px' }}>
             <h1 style={{ margin: 0, fontSize: '16px', fontWeight: '900', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>
-                {order.site_id === 1 ? 'ACHARU' : 'TAJA SHUTKI'}
+                {order.site?.slug === 'acharu' ? 'ACHARU' : 'TAJA SHUTKI'}
             </h1>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', fontSize: '8px', fontWeight: 'bold', marginTop: '2px' }}>
                 <span style={{ border: '1px solid #000', padding: '0 4px', borderRadius: '2px' }}>OFFICIAL INVOICE</span>
@@ -137,7 +137,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
 
           <div style={{ marginTop: '12px', textAlign: 'center', fontSize: '7px', borderTop: '0.5px solid #eee', paddingTop: '6px' }}>
              <p style={{ fontWeight: 'bold', marginBottom: '2px' }}>Thank you for shopping!</p>
-             <p style={{ color: '#666' }}>Visit again: {order.site_id === 1 ? 'acharu.com' : 'tajashutki.com'}</p>
+             <p style={{ color: '#666' }}>Visit again: {order.site?.slug === 'acharu' ? 'acharu.com' : 'tajashutki.com'}</p>
           </div>
         </div>
         <style>{`
@@ -246,9 +246,9 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                   try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
                   return (
                     <>
-                      {settings.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
-                      {settings.support_phone || settings.contact || (order.site_id === 1 ? '01700000000' : '01800000000')}<br />
-                      {settings.store_email || `support@${order.site_id === 1 ? 'acharu' : 'tajashutki'}.com`}
+                      {settings.address || (order.site?.slug === 'acharu' ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
+                      {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' ? '01700000000' : '01800000000')}<br />
+                      {settings.store_email || `support@${order.site?.slug === 'acharu' ? 'acharu' : 'tajashutki'}.com`}
                     </>
                   );
                 })()}
@@ -350,9 +350,9 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                 try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
                 return (
                   <>
-                    {settings.support_phone || settings.contact || (order.site_id === 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
-                    {settings.address || (order.site_id === 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
-                    {settings.website || (order.site_id === 1 ? 'www.acharu.com' : 'www.tajashutki.com')}
+                    {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
+                    {settings.address || (order.site?.slug === 'acharu' ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
+                    {settings.website || (order.site?.slug === 'acharu' ? 'www.acharu.com' : 'www.tajashutki.com')}
                   </>
                 );
               })()}
