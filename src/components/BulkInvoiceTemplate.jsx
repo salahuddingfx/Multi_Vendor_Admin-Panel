@@ -265,10 +265,11 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
       <style>{`
         @media print {
           @page { size: ${isStandard ? 'A4' : config.width + ' auto'}; margin: ${isStandard ? '0.75in' : '0'}; }
+          html, body { background: #fff !important; }
           body * { visibility: hidden; }
-          .print-container { padding: 0 !important; background: none !important; }
+          .print-container { padding: 0 !important; background: #fff !important; }
           .print-standard, .print-standard * { visibility: visible; }
-          .print-standard { background: transparent !important; position: static !important; width: 100% !important; min-height: auto !important; padding: 0 !important; box-sizing: border-box !important; margin-bottom: 0 !important; page-break-after: always; box-shadow: none !important; }
+          .print-standard { background: #fff !important; position: static !important; width: 100% !important; min-height: auto !important; padding: 0 !important; box-sizing: border-box !important; margin-bottom: 0 !important; page-break-after: always; box-shadow: none !important; }
           .bulk-print-container, .bulk-print-container * { visibility: visible; }
           .bulk-print-container { position: absolute !important; left: 0; top: 0; width: 100% !important; }
           .invoice-page { 
