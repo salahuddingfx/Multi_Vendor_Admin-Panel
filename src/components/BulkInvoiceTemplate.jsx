@@ -33,7 +33,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
             }}>
               {/* Standard Layout */}
               {isStandard ? (
-                <div className="print-standard" style={{ position: 'relative', height: '100%', fontSize: '11px', padding: '0.75in', boxSizing: 'border-box' }}>
+                <div className="print-standard" style={{ position: 'relative', height: '100%', fontSize: '11px', padding: '0.75in', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
                   {order.payment_status === 'paid' && (
                     <div style={{
                       position: 'absolute',
@@ -211,7 +211,7 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                     </div>
                   </div>
 
-                  <div className="print-footer" style={{ position: 'absolute', bottom: '0.75in', left: '0.75in', right: '0.75in', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: 'calc(100% - 1.5in)' }}>
+                  <div className="print-footer" style={{ marginTop: 'auto', width: '100%', borderTop: '1px solid #e2e8f0', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div style={{ width: '60%' }}>
                       <div style={{ background: brandColor, height: '4px', width: '100%', marginBottom: '10px' }}></div>
                       <div style={{ fontSize: '10px', fontWeight: 700, color: '#1e293b' }}>
@@ -285,16 +285,18 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
           body * { visibility: hidden; }
           .print-container { padding: 0 !important; background: #fff !important; }
           .print-standard, .print-standard * { visibility: visible; }
-          .print-standard { background: #fff !important; position: static !important; width: 100% !important; min-height: auto !important; padding: 0 !important; box-sizing: border-box !important; margin-bottom: 0 !important; page-break-after: always; box-shadow: none !important; }
+          .print-standard { background: #fff !important; position: static !important; width: 100% !important; min-height: 297mm !important; padding: 0.75in !important; box-sizing: border-box !important; margin-bottom: 0 !important; page-break-after: always; box-shadow: none !important; display: flex !important; flex-direction: column !important; }
           .bulk-print-container, .bulk-print-container * { visibility: visible; }
           .bulk-print-container { position: absolute !important; left: 0; top: 0; width: 100% !important; }
           .invoice-page { 
-            page-break-after: always !important; 
-            break-after: page !important; 
-            margin: 0 !important; 
+            position: relative !important;
+            page-break-after: always;
+            margin: 0 !important;
+            box-shadow: none !important;
             width: ${isStandard ? '210mm' : config.width} !important;
             min-height: ${isStandard ? '297mm' : 'auto'} !important;
           }
+          .print-footer { position: static !important; width: 100% !important; margin-top: auto !important; }
         }
       `}</style>
     </div>
