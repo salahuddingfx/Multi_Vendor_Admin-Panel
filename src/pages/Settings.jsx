@@ -296,7 +296,7 @@ const Settings = () => {
           {/* ── GENERAL TAB ── */}
           {activeTab === 'general' && (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {[
                   ['Store Name', 'store_name', 'text'],
                   ['Store Email', 'store_email', 'email'],
                   ['Support Phone', 'support_phone', 'text'],
