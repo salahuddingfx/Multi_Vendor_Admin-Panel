@@ -124,10 +124,9 @@ const BulkInvoiceTemplate = React.forwardRef(({ orders, type = 'standard' }, ref
                       </table>
 
                       <div style={{ textAlign: 'right' }}>
-                        <div className="recipient-name" style={{ fontSize: '14px' }}>
-                          {storeName}
-                        </div>
-                        <div className="recipient-address">
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>Invoice From:</div>
+                        <div style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b', marginBottom: '2px' }}>{storeName}</div>
+                        <div style={{ fontSize: '11px', color: '#475569', fontWeight: 600, lineHeight: 1.5 }}>
                           {address}<br />
                           {phone}<br />
                           {email}
