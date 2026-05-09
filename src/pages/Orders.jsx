@@ -405,21 +405,21 @@ const Orders = () => {
                     <div className="flex flex-col">
                       <span className="font-black text-slate-800 text-sm leading-none mb-1.5">{order.customer_name}</span>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-slate-500 text-[11px] font-bold">{order.customer_phone}</span>
+                        <span className="text-slate-500 text-[10px] font-bold">{order.customer_phone}</span>
                         <span className={clsx(
-                          "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest",
+                          "px-2 py-0.5 rounded text-[7px] font-black uppercase tracking-widest",
                           order.location?.toLowerCase() === 'cox' ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"
                         )}>
                           {order.location}
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-400 font-medium max-w-[220px] leading-relaxed italic mb-1" title={order.customer_address}>
+                      <p className="text-[10px] text-slate-400 font-medium max-w-[180px] leading-tight italic mb-1 line-clamp-2" title={order.customer_address}>
                         {order.customer_address}
                       </p>
                       {order.customer_notes && (
-                        <div className="mt-1 p-2 bg-blue-50/50 rounded-lg border border-blue-100/50 max-w-[220px]">
-                          <p className="text-[9px] text-blue-600 font-bold leading-tight">
-                            <span className="uppercase tracking-widest text-[8px] opacity-60 block mb-0.5">Note:</span>
+                        <div className="mt-1 p-1.5 bg-blue-50/50 rounded-lg border border-blue-100/50 max-w-[180px]">
+                          <p className="text-[9px] text-blue-600 font-bold leading-tight line-clamp-2">
+                            <span className="uppercase tracking-widest text-[7px] opacity-60 block mb-0.5">Note:</span>
                             {order.customer_notes}
                           </p>
                         </div>
@@ -427,18 +427,18 @@ const Orders = () => {
                     </div>
                   </td>
                   <td className="px-4 py-6">
-                    <div className="flex flex-col gap-2.5">
+                    <div className="flex flex-col gap-1.5">
                       {order.items?.map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-3 group/item">
-                          <div className="w-6 h-6 shrink-0 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500 group-hover/item:bg-slate-900 group-hover/item:text-white transition-colors">
+                        <div key={idx} className="flex items-start gap-2 group/item">
+                          <div className="w-5 h-5 shrink-0 rounded bg-slate-100 flex items-center justify-center text-[9px] font-black text-slate-500 group-hover/item:bg-slate-900 group-hover/item:text-white transition-colors">
                             {item.quantity}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-[11px] font-black text-slate-700 tracking-tight leading-none group-hover/item:text-slate-900 transition-colors">
+                            <span className="text-[10px] font-black text-slate-700 tracking-tight leading-none group-hover/item:text-slate-900 transition-colors truncate max-w-[150px]">
                               {item.name}
                             </span>
                             {item.variation_info && (
-                              <span className="text-[9px] font-bold text-blue-500 uppercase tracking-widest mt-1">
+                              <span className="text-[8px] font-bold text-blue-500 uppercase tracking-widest mt-0.5">
                                 {item.variation_info}
                               </span>
                             )}
