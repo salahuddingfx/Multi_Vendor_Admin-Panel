@@ -30,7 +30,7 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
     printColorAdjust: 'exact'
   };
 
-  const brandColor = order.site?.slug === 'acharu' ? '#800000' : '#064e3b'; // Maroon for Acharu, Emerald for Taja
+  const brandColor = (order.site?.slug === 'acharu' || order.site_id == 1) ? '#800000' : '#064e3b'; // Maroon for Acharu, Emerald for Taja
 
   // Render Thermal Receipt Style (1.5, 1.75, 2.0)
   if (!isStandard) {
@@ -246,9 +246,9 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                   try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
                   return (
                     <>
-                      {settings.address || (order.site?.slug === 'acharu' ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
-                      {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' ? '01700000000' : '01800000000')}<br />
-                      {settings.store_email || `support@${order.site?.slug === 'acharu' ? 'acharu' : 'tajashutki'}.com`}
+                      {settings.address || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')}<br />
+                      {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' || order.site_id == 1 ? '01700000000' : '01800000000')}<br />
+                      {settings.store_email || `support@${(order.site?.slug === 'acharu' || order.site_id == 1) ? 'acharu' : 'tajashutki'}.com`}
                     </>
                   );
                 })()}
@@ -350,9 +350,9 @@ const InvoiceTemplate = React.forwardRef(({ order, type = 'standard' }, ref) => 
                 try { settings = typeof order.site?.settings === 'string' ? JSON.parse(order.site.settings) : (order.site?.settings || {}); } catch(e) {}
                 return (
                   <>
-                    {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
-                    {settings.address || (order.site?.slug === 'acharu' ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
-                    {settings.website || (order.site?.slug === 'acharu' ? 'www.acharu.com' : 'www.tajashutki.com')}
+                    {settings.support_phone || settings.contact || (order.site?.slug === 'acharu' || order.site_id == 1 ? '01700000000' : '01800000000')} &nbsp;|&nbsp; 
+                    {settings.address || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'Dhaka, Bangladesh' : 'Cox\'s Bazar, Bangladesh')} &nbsp;|&nbsp; 
+                    {settings.website || (order.site?.slug === 'acharu' || order.site_id == 1 ? 'www.acharu.com' : 'www.tajashutki.com')}
                   </>
                 );
               })()}
