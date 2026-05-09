@@ -94,6 +94,12 @@ const Settings = () => {
     free_delivery_threshold: '2500',
     website: '',
     logo_url: '',
+    notifications: {
+      new_order_email: true,
+      low_stock_alerts: true,
+      notice_bar_enabled: false,
+      notice_bar_text: '',
+    },
     social_links: {
       facebook: '',
       instagram: '',
@@ -135,6 +141,12 @@ const Settings = () => {
           free_delivery_threshold: data.free_delivery_threshold || '2500',
           website: data.website || (selectedStore === 'acharu' ? 'www.acharu.com' : 'www.tajashutki.com'),
           logo_url: data.logo_url || '',
+          notifications: data.notifications ? (typeof data.notifications === 'string' ? JSON.parse(data.notifications) : data.notifications) : {
+            new_order_email: true,
+            low_stock_alerts: true,
+            notice_bar_enabled: false,
+            notice_bar_text: '',
+          },
           social_links: {
             facebook: '',
             instagram: '',
@@ -296,8 +308,7 @@ const Settings = () => {
           {/* ── GENERAL TAB ── */}
           {activeTab === 'general' && (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[
+                { [
                   ['Store Name', 'store_name', 'text'],
                   ['Store Email', 'store_email', 'email'],
                   ['Support Phone', 'support_phone', 'text'],
@@ -314,7 +325,7 @@ const Settings = () => {
                     <label className={labelCls}>{label}</label>
                     <input
                       type={type}
-                      value={settings[key]}
+                      value={settings[key] || ''}
                       onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
                       className={inputCls}
                     />
@@ -805,18 +816,42 @@ const Settings = () => {
                           <p className="font-bold text-slate-800">New Order Email</p>
                           <p className="text-xs text-slate-500">Receive an email for every new order.</p>
                         </div>
-                        <div className="w-12 h-6 bg-slate-900 rounded-full flex items-center px-1">
-                          <div className="w-4 h-4 bg-white rounded-full translate-x-6"></div>
-                        </div>
+                        <button 
+                          onClick={() => setSettings({
+                            ...settings, 
+                            notifications: { ...settings.notifications, new_order_email: !settings.notifications?.new_order_email }
+                          })}
+                          className={clsx(
+                            "w-12 h-6 rounded-full flex items-center px-1 transition-all",
+                            settings.notifications?.new_order_email ? "bg-slate-900" : "bg-slate-200"
+                          )}
+                        >
+                          <div className={clsx(
+                            "w-4 h-4 bg-white rounded-full transition-all",
+                            settings.notifications?.new_order_email && "translate-x-6"
+                          )}></div>
+                        </button>
                       </div>
                       <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100">
                         <div>
                           <p className="font-bold text-slate-800">Low Stock Alerts</p>
                           <p className="text-xs text-slate-500">Notify when products fall below 10 units.</p>
                         </div>
-                        <div className="w-12 h-6 bg-slate-900 rounded-full flex items-center px-1">
-                          <div className="w-4 h-4 bg-white rounded-full translate-x-6"></div>
-                        </div>
+                        <button 
+                          onClick={() => setSettings({
+                            ...settings, 
+                            notifications: { ...settings.notifications, low_stock_alerts: !settings.notifications?.low_stock_alerts }
+                          })}
+                          className={clsx(
+                            "w-12 h-6 rounded-full flex items-center px-1 transition-all",
+                            settings.notifications?.low_stock_alerts ? "bg-slate-900" : "bg-slate-200"
+                          )}
+                        >
+                          <div className={clsx(
+                            "w-4 h-4 bg-white rounded-full transition-all",
+                            settings.notifications?.low_stock_alerts && "translate-x-6"
+                          )}></div>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -831,10 +866,23 @@ const Settings = () => {
                           type="text" 
                           className={inputCls} 
                           placeholder="e.g. Free shipping on orders over ৳2500!"
+                          value={settings.notifications?.notice_bar_text || ''}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            notifications: { ...settings.notifications, notice_bar_text: e.target.value }
+                          })}
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-maroon focus:ring-maroon" />
+                        <input 
+                          type="checkbox" 
+                          className="w-4 h-4 rounded border-slate-300 text-maroon focus:ring-maroon" 
+                          checked={settings.notifications?.notice_bar_enabled || false}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            notifications: { ...settings.notifications, notice_bar_enabled: e.target.checked }
+                          })}
+                        />
                         <span className="text-sm font-bold text-slate-700">Enable Notice Bar</span>
                       </div>
                     </div>
