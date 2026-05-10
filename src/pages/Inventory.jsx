@@ -14,7 +14,8 @@ import {
   TrendingUp,
   X,
   Edit,
-  Eye
+  Eye,
+  Star
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useStore } from '../store/useStore';
