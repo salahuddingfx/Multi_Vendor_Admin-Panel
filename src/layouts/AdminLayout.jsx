@@ -292,7 +292,8 @@ const AdminLayout = () => {
                  </div>
                   <div className="flex-grow overflow-hidden">
                     <p className="font-black text-slate-800 text-xs truncate font-display tracking-tight">{user?.name || 'Admin User'}</p>
-                    <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest truncate">{user?.role || 'Administrator'}</p>
+                    <p className="text-maroon text-[10px] font-bold truncate mt-0.5">@{user?.username || 'admin'}</p>
+                    <p className="text-slate-400 text-[8px] font-black uppercase tracking-widest truncate mt-0.5">{user?.role || 'Administrator'}</p>
                   </div>
                </div>
              ) : (
