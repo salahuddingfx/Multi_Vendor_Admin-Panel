@@ -11,7 +11,7 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'admin' });
+  const [formData, setFormData] = useState({ name: '', username: '', email: '', password: '', role: 'admin' });
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -37,6 +37,7 @@ const Users = () => {
     e.preventDefault();
     const data = new FormData();
     data.append('name', formData.name);
+    data.append('username', formData.username);
     data.append('email', formData.email);
     data.append('role', formData.role);
     if (formData.password) data.append('password', formData.password);
@@ -59,7 +60,7 @@ const Users = () => {
       setEditingUser(null);
       setImage(null);
       setImagePreview(null);
-      setFormData({ name: '', email: '', password: '', role: 'admin' });
+      setFormData({ name: '', username: '', email: '', password: '', role: 'admin' });
       fetchUsers();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Error saving user');
@@ -87,7 +88,7 @@ const Users = () => {
           <p className="text-slate-400 font-medium mt-1">Manage global access to your store dashboards.</p>
         </div>
         <button 
-          onClick={() => { setEditingUser(null); setFormData({ name: '', email: '', password: '', role: 'admin' }); setIsModalOpen(true); }}
+          onClick={() => { setEditingUser(null); setFormData({ name: '', username: '', email: '', password: '', role: 'admin' }); setIsModalOpen(true); }}
           className="bg-maroon text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-maroon/20 hover:scale-105 active:scale-95 transition-all"
         >
           <Plus size={20} />
@@ -114,6 +115,7 @@ const Users = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-slate-800">{user.name}</h3>
+                    <p className="text-xs font-bold text-maroon mb-1">@{user.username}</p>
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
                        <Shield size={12} className="text-amber-500" />
                        {user.role}
@@ -134,6 +136,7 @@ const Users = () => {
                       setEditingUser(user); 
                       setFormData({ 
                         name: user.name || '', 
+                        username: user.username || '',
                         email: user.email || '', 
                         role: user.role || 'admin',
                         password: '' // Always initialize as string
@@ -198,6 +201,17 @@ const Users = () => {
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-medium"
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Username</label>
+                <input 
+                  type="text" 
+                  value={formData.username}
+                  onChange={(e) => setFormData({...formData, username: e.target.value})}
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all font-medium"
+                  required
+                  placeholder="e.g. admin_john"
                 />
               </div>
               <div className="space-y-2">

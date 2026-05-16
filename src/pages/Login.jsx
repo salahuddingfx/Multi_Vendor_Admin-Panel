@@ -46,13 +46,13 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Email Address</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Email or Username</label>
               <div className="relative group">
                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-maroon transition-colors" size={20} />
                 <input 
-                  type="email" 
+                  type="text" 
                   required
-                  placeholder="admin@acharu.com"
+                  placeholder="admin or admin@acharu.com"
                   className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-maroon/5 focus:border-maroon focus:bg-white transition-all font-medium text-slate-700"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
