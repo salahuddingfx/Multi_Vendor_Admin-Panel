@@ -273,6 +273,7 @@ const Settings = () => {
     { id: 'about', label: 'About Page', icon: Users },
     { id: 'social', label: 'Social Media', icon: Plus },
     { id: 'notifications', label: 'Alerts', icon: Bell },
+    { id: 'security', label: 'Security & Access', icon: Clock },
   ];
 
   const SaveButton = () => (
@@ -890,8 +891,181 @@ const Settings = () => {
             </div>
           )}
 
+          {/* ── SECURITY TAB ── */}
+          {activeTab === 'security' && (
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div>
+                <h3 className="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
+                  <Clock size={20} className="text-slate-400" /> Security & Access Controls
+                </h3>
+                <p className="text-slate-500 text-sm mb-8">Manage admin session idle timeout and working hours access limits.</p>
+                
+                <div className="space-y-8 max-w-2xl">
+                  {/* Session Timeout */}
+                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-slate-800">Auto Logout (Idle Inactivity)</p>
+                        <p className="text-xs text-slate-500 font-medium">Log out admins automatically after a period of inactivity.</p>
+                      </div>
+                      <button 
+                        onClick={() => setSettings({
+                          ...settings,
+                          security: { 
+                            ...settings.security, 
+                            inactivity_timeout_enabled: !settings.security?.inactivity_timeout_enabled 
+                          }
+                        })}
+                        className={clsx(
+                          "w-12 h-6 rounded-full flex items-center px-1 transition-all",
+                          settings.security?.inactivity_timeout_enabled ? "bg-slate-900" : "bg-slate-200"
+                        )}
+                      >
+                        <div className={clsx(
+                          "w-4 h-4 bg-white rounded-full transition-all",
+                          settings.security?.inactivity_timeout_enabled && "translate-x-6"
+                        )}></div>
+                      </button>
+                    </div>
+
+                    {settings.security?.inactivity_timeout_enabled && (
+                      <div className="space-y-2 animate-in fade-in duration-300">
+                        <label className={labelCls}>Inactivity Timeout (Minutes)</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="1440"
+                          value={settings.security?.inactivity_timeout || 15}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            security: { 
+                              ...settings.security, 
+                              inactivity_timeout: Math.max(1, parseInt(e.target.value) || 1) 
+                            }
+                          })}
+                          className={inputCls}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Working Hours */}
+                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-slate-800">Restrict Working Hours</p>
+                        <p className="text-xs text-slate-500 font-medium">Lock admin panel access outside of specified days and hours.</p>
+                      </div>
+                      <button 
+                        onClick={() => setSettings({
+                          ...settings,
+                          security: { 
+                            ...settings.security, 
+                            working_hours_enabled: !settings.security?.working_hours_enabled 
+                          }
+                        })}
+                        className={clsx(
+                          "w-12 h-6 rounded-full flex items-center px-1 transition-all",
+                          settings.security?.working_hours_enabled ? "bg-slate-900" : "bg-slate-200"
+                        )}
+                      >
+                        <div className={clsx(
+                          "w-4 h-4 bg-white rounded-full transition-all",
+                          settings.security?.working_hours_enabled && "translate-x-6"
+                        )}></div>
+                      </button>
+                    </div>
+
+                    {settings.security?.working_hours_enabled && (
+                      <div className="space-y-6 animate-in fade-in duration-300">
+                        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-xs space-y-1">
+                          <p className="font-bold">⚠️ Warning: Access Restriction</p>
+                          <p>Enabling this will restrict all admin actions to the selected days and hours (based on Bangladesh Time UTC+6). Setting this incorrectly can lock you out.</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className={labelCls}>Start Time</label>
+                            <input
+                              type="time"
+                              value={settings.security?.working_hours_start || '09:00'}
+                              onChange={(e) => setSettings({
+                                ...settings,
+                                security: { 
+                                  ...settings.security, 
+                                  working_hours_start: e.target.value 
+                                }
+                              })}
+                              className={inputCls}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className={labelCls}>End Time</label>
+                            <input
+                              type="time"
+                              value={settings.security?.working_hours_end || '18:00'}
+                              onChange={(e) => setSettings({
+                                ...settings,
+                                security: { 
+                                  ...settings.security, 
+                                  working_hours_end: e.target.value 
+                                }
+                              })}
+                              className={inputCls}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <label className={labelCls}>Working Days</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            {[
+                              { label: 'Sunday', val: 0 },
+                              { label: 'Monday', val: 1 },
+                              { label: 'Tuesday', val: 2 },
+                              { label: 'Wednesday', val: 3 },
+                              { label: 'Thursday', val: 4 },
+                              { label: 'Friday', val: 5 },
+                              { label: 'Saturday', val: 6 },
+                            ].map((day) => {
+                              const isChecked = (settings.security?.working_days || []).map(Number).includes(day.val);
+                              return (
+                                <label key={day.val} className="flex items-center gap-2 p-3 bg-white rounded-xl border border-slate-100 cursor-pointer select-none hover:bg-slate-50 transition-colors">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => {
+                                      const currentDays = settings.security?.working_days || [];
+                                      const newDays = e.target.checked
+                                        ? [...currentDays, day.val]
+                                        : currentDays.filter(d => Number(d) !== day.val);
+                                      setSettings({
+                                        ...settings,
+                                        security: {
+                                          ...settings.security,
+                                          working_days: newDays
+                                        }
+                                      });
+                                    }}
+                                    className="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                                  />
+                                  <span className="text-xs font-bold text-slate-700">{day.label}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <SaveButton />
+            </div>
+          )}
+
           {/* Placeholder tabs for any others */}
-          {!['general', 'about', 'home', 'social', 'notifications'].includes(activeTab) && (
+          {!['general', 'about', 'home', 'social', 'notifications', 'security'].includes(activeTab) && (
             <div className="py-20 text-center space-y-4">
               <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
                 <Layout className="text-slate-200" size={32} />
