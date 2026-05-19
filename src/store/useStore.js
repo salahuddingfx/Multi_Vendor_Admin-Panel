@@ -8,6 +8,7 @@ export const useStore = create(
       isSidebarOpen: true,
       user: null,
       isAuthenticated: false,
+      settings: null,
       
       // Actions
       setSelectedStore: (store) => set({ selectedStore: store }),
@@ -17,9 +18,10 @@ export const useStore = create(
       login: (userData) => set({ user: userData, isAuthenticated: true }),
       logout: () => {
         localStorage.removeItem('admin_token');
-        set({ user: null, isAuthenticated: false });
+        set({ user: null, isAuthenticated: false, settings: null });
       },
       updateUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
+      setSettings: (settings) => set({ settings }),
       
       // Theme Helper
       getThemeColor: (state) => state.selectedStore === 'acharu' ? '#800000' : '#1A365D',

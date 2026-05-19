@@ -12,12 +12,27 @@ const adminClient = axios.create({
   timeout: 30000,
 });
 
-// Add a request interceptor to include the token
+// Add a request interceptor to include the token and site context
 adminClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('admin_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Add site context header
+  try {
+    const appStateStr = localStorage.getItem('admin-app-state');
+    if (appStateStr) {
+      const appState = JSON.parse(appStateStr);
+      const selectedStore = appState.state?.selectedStore;
+      if (selectedStore) {
+        config.headers['X-Site-Context'] = selectedStore;
+      }
+    }
+  } catch (e) {
+    // Ignore JSON parsing errors
+  }
+
   return config;
 });
 

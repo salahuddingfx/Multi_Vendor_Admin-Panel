@@ -29,8 +29,130 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
 
 const AdminLayout = () => {
-  const { selectedStore, setSelectedStore, isSidebarOpen, toggleSidebar, logout, user, updateUser } = useStore();
+  const { selectedStore, setSelectedStore, isSidebarOpen, toggleSidebar, logout, user, updateUser, settings, setSettings, isAuthenticated } = useStore();
   const location = useLocation();
+
+  const timeoutRef = useRef(null);
+
+  // Fetch settings in AdminLayout
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const siteId = selectedStore === 'acharu' ? 1 : 2;
+        const data = await api.getSettings(siteId);
+        setSettings(data);
+      } catch (error) {
+        console.error('Failed to fetch settings in AdminLayout', error);
+      }
+    };
+    if (isAuthenticated) {
+      fetchSettings();
+    }
+  }, [selectedStore, isAuthenticated, setSettings]);
+
+  // Inactivity timeout logic
+  useEffect(() => {
+    const events = ['mousemove', 'keypress', 'mousedown', 'scroll', 'touchstart'];
+    
+    const resetInactivityTimer = () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      
+      const security = settings?.security;
+      const inactivityEnabled = security?.inactivity_timeout_enabled ?? true;
+      
+      if (!inactivityEnabled) return;
+      
+      const timeoutMinutes = parseInt(security?.inactivity_timeout) || 15;
+      const timeoutMs = timeoutMinutes * 60 * 1000;
+      
+      timeoutRef.current = setTimeout(() => {
+        logout();
+        toast.error("Logged out due to inactivity.", {
+          duration: 5000,
+          style: {
+            background: '#EF4444',
+            color: 'white',
+            borderRadius: '16px'
+          }
+        });
+      }, timeoutMs);
+    };
+
+    if (isAuthenticated) {
+      resetInactivityTimer();
+      const handleActivity = () => resetInactivityTimer();
+      
+      events.forEach(event => window.addEventListener(event, handleActivity));
+      
+      return () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        events.forEach(event => window.removeEventListener(event, handleActivity));
+      };
+    }
+  }, [isAuthenticated, settings?.security, logout]);
+
+  // Working hours check logic
+  useEffect(() => {
+    const checkWorkingHours = () => {
+      const security = settings?.security;
+      if (!security?.working_hours_enabled) return;
+      
+      const now = new Date();
+      // Convert current local time to Bangladesh Standard Time (UTC+6)
+      const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const bdTime = new Date(utcTime + (3600000 * 6));
+      
+      const bdDay = bdTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const bdHours = bdTime.getHours();
+      const bdMinutes = bdTime.getMinutes();
+      
+      // Check working days
+      const workingDays = security.working_days || [0, 1, 2, 3, 4, 5, 6];
+      const parsedWorkingDays = workingDays.map(Number);
+      
+      if (!parsedWorkingDays.includes(bdDay)) {
+        logout();
+        toast.error("Logged out: Today is not a working day.", {
+          duration: 5000,
+          style: {
+            background: '#EF4444',
+            color: 'white',
+            borderRadius: '16px'
+          }
+        });
+        return;
+      }
+      
+      // Check working hours
+      const startStr = security.working_hours_start || "09:00";
+      const endStr = security.working_hours_end || "18:00";
+      
+      const [startH, startM] = startStr.split(':').map(Number);
+      const [endH, endM] = endStr.split(':').map(Number);
+      
+      const currentMinutes = bdHours * 60 + bdMinutes;
+      const startMinutes = startH * 60 + startM;
+      const endMinutes = endH * 60 + endM;
+      
+      if (currentMinutes < startMinutes || currentMinutes > endMinutes) {
+        logout();
+        toast.error("Logged out: Outside of working hours.", {
+          duration: 5000,
+          style: {
+            background: '#EF4444',
+            color: 'white',
+            borderRadius: '16px'
+          }
+        });
+      }
+    };
+
+    if (isAuthenticated && settings) {
+      checkWorkingHours(); // Initial check
+      const interval = setInterval(checkWorkingHours, 15000); // Check every 15 seconds
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, settings, logout]);
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
