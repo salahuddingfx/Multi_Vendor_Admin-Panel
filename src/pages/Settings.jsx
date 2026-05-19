@@ -75,7 +75,7 @@ const inputCls = "w-full px-4 py-3 bg-slate-50 border border-transparent rounded
 const labelCls = "block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1";
 
 const Settings = () => {
-  const { selectedStore } = useStore();
+  const { selectedStore, setSettings: setGlobalSettings } = useStore();
   const [activeTab, setActiveTab] = useState('general');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -110,6 +110,14 @@ const Settings = () => {
     about: defaultAbout,
     home: defaultHome,
     tagline: '',
+    security: {
+      inactivity_timeout_enabled: true,
+      inactivity_timeout: 15,
+      working_hours_enabled: false,
+      working_hours_start: '09:00',
+      working_hours_end: '18:00',
+      working_days: [0, 1, 2, 3, 4, 5, 6],
+    },
   });
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
