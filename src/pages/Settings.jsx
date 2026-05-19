@@ -134,6 +134,7 @@ const Settings = () => {
         const parsedSocial = data.social_links ? (typeof data.social_links === 'string' ? JSON.parse(data.social_links) : data.social_links) : {};
         const parsedAbout = data.about ? (typeof data.about === 'string' ? JSON.parse(data.about) : data.about) : {};
         const parsedHome = data.home ? (typeof data.home === 'string' ? JSON.parse(data.home) : data.home) : {};
+        const parsedSecurity = data.security ? (typeof data.security === 'string' ? JSON.parse(data.security) : data.security) : {};
 
         setSettings({
           store_name: data.store_name || '',
@@ -167,6 +168,15 @@ const Settings = () => {
           },
           about: { ...defaultAbout, ...parsedAbout },
           home: { ...defaultHome, ...parsedHome },
+          security: {
+            inactivity_timeout_enabled: true,
+            inactivity_timeout: 15,
+            working_hours_enabled: false,
+            working_hours_start: '09:00',
+            working_hours_end: '18:00',
+            working_days: [0, 1, 2, 3, 4, 5, 6],
+            ...parsedSecurity
+          },
         });
       }
     } catch (error) {
@@ -180,6 +190,7 @@ const Settings = () => {
     setSaving(true);
     try {
       await api.updateSettings(siteId, settings);
+      setGlobalSettings(settings);
       toast.success('Settings updated successfully');
     } catch (error) {
       toast.error('Error saving settings');
