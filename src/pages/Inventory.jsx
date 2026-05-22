@@ -37,6 +37,7 @@ const Inventory = () => {
   const [returnQty, setReturnQty] = useState(1);
   const [returnReason, setReturnReason] = useState('');
   const [newStock, setNewStock] = useState(0);
+  const [costItems, setCostItems] = useState([]);
   const [activeMenu, setActiveMenu] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
   const [variationStocks, setVariationStocks] = useState([]);
@@ -105,6 +106,15 @@ const Inventory = () => {
       if (variationStocks.length > 0) {
         formData.append('variations', JSON.stringify(variationStocks));
       }
+      if (showEditModal) {
+        const sanitizedCosts = (costItems || [])
+          .map((item) => ({
+            label: (item.label || '').trim(),
+            amount: Number(item.amount)
+          }))
+          .filter((item) => item.label && Number.isFinite(item.amount) && item.amount >= 0);
+        formData.append('cost_items', JSON.stringify(sanitizedCosts));
+      }
       formData.append('_method', 'PUT'); // Ensure Laravel treats it as PUT
       await api.updateProduct(selectedProduct.id, formData);
       toast.success('Stock level adjusted successfully');
@@ -114,6 +124,40 @@ const Inventory = () => {
     } catch (error) {
       toast.error('Failed to update stock');
     }
+  };
+
+  const normalizeCostItems = (items) => (
+    Array.isArray(items)
+      ? items
+          .map((item) => ({
+            label: (item?.label || '').toString(),
+            amount: item?.amount ?? ''
+          }))
+          .filter((item) => item.label !== '' || item.amount !== '')
+      : []
+  );
+
+  const formatCurrency = (val) => {
+    return new Intl.NumberFormat('en-BD', {
+      style: 'currency',
+      currency: 'BDT',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(val || 0);
+  };
+
+  const addCostItem = () => {
+    setCostItems((prev) => [...prev, { label: '', amount: '' }]);
+  };
+
+  const updateCostItem = (index, field, value) => {
+    setCostItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const removeCostItem = (index) => {
+    setCostItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   const filteredProducts = (Array.isArray(products) ? products : []).filter(p => {
@@ -182,6 +226,7 @@ const Inventory = () => {
           <button 
             onClick={() => {
               setSelectedProduct(null);
+              setCostItems([]);
               setShowShipmentModal(true);
             }}
             className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-200"
@@ -269,6 +314,7 @@ const Inventory = () => {
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Category</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Stock Status</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Valuation</th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Unit Cost</th>
                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
               </tr>
             </thead>
@@ -342,6 +388,16 @@ const Inventory = () => {
                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Per Unit</span>
                       </div>
                     </td>
+                    <td className="px-8 py-8">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-slate-900">
+                          {formatCurrency((Array.isArray(p.cost_items) ? p.cost_items : []).reduce((sum, item) => sum + (Number(item?.amount) || 0), 0))}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                          {(Array.isArray(p.cost_items) ? p.cost_items.length : 0)} cost items
+                        </span>
+                      </div>
+                    </td>
                     <td className={clsx("px-10 py-8 text-right relative", activeMenu === p.id ? "z-[50]" : "z-[1]")}>
                       <div className="flex justify-end gap-3">
                         <button 
@@ -349,6 +405,7 @@ const Inventory = () => {
                             setSelectedProduct(p);
                             setNewStock(p.stock);
                             setVariationStocks(p.variations ? p.variations.map(v => ({...v})) : []);
+                            setCostItems(normalizeCostItems(p.cost_items));
                             setShowEditModal(true);
                           }}
                           className="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-maroon hover:shadow-lg transition-all"
@@ -448,6 +505,7 @@ const Inventory = () => {
                       setSelectedProduct(p);
                       setNewStock(p?.stock || 0);
                       setVariationStocks(p?.variations ? p.variations.map(v => ({...v})) : []);
+                      setCostItems(normalizeCostItems(p?.cost_items));
                     }}
                     className="w-full px-8 py-5 bg-slate-50 border border-slate-100 rounded-3xl outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all font-bold text-slate-800 appearance-none"
                   >
@@ -651,8 +709,8 @@ const Inventory = () => {
                 <p className="text-slate-400 text-sm font-medium mt-1">Adjusting: {selectedProduct?.name}</p>
               </div>
               
-              <div className="space-y-6">
-                <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-6">
+                  <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                   {/* Base Product */}
                   <div className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100 flex items-center justify-between gap-4">
                     <div>
@@ -714,12 +772,66 @@ const Inventory = () => {
                       </div>
                     </div>
                   ))}
-                </div>
+                  </div>
 
-                <button 
-                  onClick={handleUpdateStock}
-                  className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-maroon hover:shadow-xl hover:shadow-maroon/20 hover:scale-[1.01] active:scale-95 transition-all shadow-lg shadow-slate-200"
-                >
+                  <div className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Cost Items</p>
+                        <p className="text-sm font-bold text-slate-700">Per-unit cost breakdown</p>
+                      </div>
+                      <button
+                        onClick={addCostItem}
+                        className="px-4 py-2 rounded-full bg-white border border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 hover:shadow-sm transition-all"
+                      >
+                        Add Item
+                      </button>
+                    </div>
+
+                    {costItems.length === 0 ? (
+                      <p className="text-xs text-slate-400 font-medium">No cost items yet. Add packaging, handling, or other costs.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {costItems.map((item, idx) => (
+                          <div key={idx} className="flex flex-col md:flex-row gap-3 items-stretch">
+                            <input
+                              type="text"
+                              value={item.label}
+                              onChange={(e) => updateCostItem(idx, 'label', e.target.value)}
+                              placeholder="Cost label (e.g. Packaging)"
+                              className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none text-sm font-bold text-slate-700 focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all"
+                            />
+                            <div className="flex gap-2 items-center">
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={item.amount}
+                                onChange={(e) => updateCostItem(idx, 'amount', e.target.value)}
+                                placeholder="Amount"
+                                className="w-32 px-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none text-sm font-bold text-slate-700 focus:ring-4 focus:ring-maroon/5 focus:border-maroon transition-all"
+                              />
+                              <button
+                                onClick={() => removeCostItem(idx)}
+                                className="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-200 transition-all"
+                                title="Remove item"
+                              >
+                                <X size={16} className="mx-auto" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      Total per unit: {formatCurrency(costItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0))}
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={handleUpdateStock}
+                    className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-maroon hover:shadow-xl hover:shadow-maroon/20 hover:scale-[1.01] active:scale-95 transition-all shadow-lg shadow-slate-200"
+                  >
                   Confirm Adjustment
                 </button>
               </div>
@@ -732,4 +844,3 @@ const Inventory = () => {
 };
 
 export default Inventory;
-

@@ -190,6 +190,7 @@ const SalesDashboard = () => {
   const [endDate, setEndDate] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [timelinePage, setTimelinePage] = useState(1);
 
   // 0 means All Stores, 1 Acharu, 2 TajaShutki
   const siteId = selectedStore === 'all' ? 0 : (selectedStore === 'acharu' ? 1 : 2);
@@ -208,6 +209,10 @@ const SalesDashboard = () => {
       fetchStats();
     }
   }, [range, selectedStore]);
+
+  useEffect(() => {
+    setTimelinePage(1);
+  }, [data?.timeline?.length, range, startDate, endDate, selectedStore]);
 
   const fetchStats = async () => {
     try {
@@ -239,6 +244,17 @@ const SalesDashboard = () => {
       maximumFractionDigits: 0
     }).format(val);
   };
+
+  const timeline = data?.timeline || [];
+  const timelinePageSize = 10;
+  const totalTimelinePages = Math.max(1, Math.ceil(timeline.length / timelinePageSize));
+  const paginatedTimeline = timeline.slice(
+    (timelinePage - 1) * timelinePageSize,
+    timelinePage * timelinePageSize
+  );
+  const totalOrderValue = timeline.reduce((acc, item) => acc + (item.type === 'order' ? Number(item.value || 0) : 0), 0);
+  const totalReturnValue = timeline.reduce((acc, item) => acc + (item.type === 'return' ? Number(item.value || 0) : 0), 0);
+  const totalOrderCost = timeline.reduce((acc, item) => acc + (item.type === 'order' ? Number(item.cost_total || 0) : 0), 0);
 
   if (loading && !data) return (
     <div className="space-y-12 animate-pulse p-4 md:p-8">
@@ -594,12 +610,13 @@ const SalesDashboard = () => {
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">ID</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Subject</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Amount</th>
+                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Cost</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Details</th>
                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Time</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data?.timeline?.map((item, i) => (
+              {paginatedTimeline.map((item, i) => (
                 <tr key={i} className="hover:bg-slate-50/80 transition-colors">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-3">
@@ -615,6 +632,9 @@ const SalesDashboard = () => {
                   <td className="px-8 py-6 text-xs font-black text-slate-900">#{item.id}</td>
                   <td className="px-8 py-6 text-xs font-bold text-slate-600">{item.title}</td>
                   <td className="px-8 py-6 text-sm font-black text-slate-900">{formatCurrency(item.value)}</td>
+                  <td className="px-8 py-6 text-sm font-black text-slate-900">
+                    {item.type === 'order' ? formatCurrency(item.cost_total || 0) : '—'}
+                  </td>
                   <td className="px-8 py-6">
                     <span className={clsx(
                       "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest",
@@ -624,6 +644,11 @@ const SalesDashboard = () => {
                     )}>
                       {item.detail || 'Processed'}
                     </span>
+                    {item.type === 'order' && item.cost_breakdown && Object.keys(item.cost_breakdown).length > 0 && (
+                      <div className="mt-2 text-[10px] font-bold text-slate-400">
+                        {Object.entries(item.cost_breakdown).map(([label, amount]) => `${label}: ${formatCurrency(amount)}`).join(' • ')}
+                      </div>
+                    )}
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex flex-col items-end">
@@ -633,16 +658,59 @@ const SalesDashboard = () => {
                   </td>
                 </tr>
               ))}
-              {(!data?.timeline || data.timeline.length === 0) && (
+              {timeline.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="px-8 py-20 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
+                  <td colSpan="7" className="px-8 py-20 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
                     No transactions found for the selected period.
                   </td>
                 </tr>
               )}
             </tbody>
+            {timeline.length > 0 && (
+              <tfoot>
+                <tr className="bg-slate-900 text-white border-t border-slate-800">
+                  <td className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-300">Grand Total</td>
+                  <td className="px-8 py-6 text-xs font-black text-slate-400" colSpan="2">All results</td>
+                  <td className="px-8 py-6 text-sm font-black text-white">{formatCurrency(totalOrderValue)}</td>
+                  <td className="px-8 py-6 text-sm font-black text-white">{formatCurrency(totalOrderCost)}</td>
+                  <td className="px-8 py-6 text-xs font-bold text-slate-300">
+                    Returns: <span className="text-rose-400 font-bold">{formatCurrency(totalReturnValue)}</span> • Net: <span className="text-emerald-400 font-black text-sm">{formatCurrency(totalOrderValue - totalReturnValue - totalOrderCost)}</span>
+                  </td>
+                  <td className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">All</td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
+        {timeline.length > 0 && (
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-8 py-6 border-t border-slate-50">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Page {timelinePage} of {totalTimelinePages}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setTimelinePage((prev) => Math.max(1, prev - 1))}
+                disabled={timelinePage === 1}
+                className={clsx(
+                  "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                  timelinePage === 1 ? "bg-slate-100 text-slate-300 cursor-not-allowed" : "bg-white text-slate-500 border border-slate-100 hover:text-slate-900"
+                )}
+              >
+                <ChevronLeft size={14} /> Prev
+              </button>
+              <button
+                onClick={() => setTimelinePage((prev) => Math.min(totalTimelinePages, prev + 1))}
+                disabled={timelinePage === totalTimelinePages}
+                className={clsx(
+                  "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                  timelinePage === totalTimelinePages ? "bg-slate-100 text-slate-300 cursor-not-allowed" : "bg-white text-slate-500 border border-slate-100 hover:text-slate-900"
+                )}
+              >
+                Next <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

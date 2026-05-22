@@ -389,10 +389,28 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImageFiles(prev => [...prev, ...files]);
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+    const validFiles = [];
+    const oversizedFiles = [];
+
+    files.forEach(file => {
+      if (file.size > MAX_SIZE) {
+        oversizedFiles.push(file.name);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (oversizedFiles.length > 0) {
+      toast.error(`Some files exceed the 10MB limit: ${oversizedFiles.join(', ')}`);
+    }
+
+    if (validFiles.length === 0) return;
+
+    setImageFiles(prev => [...prev, ...validFiles]);
     
     // Generate previews for new files
-    const newPreviews = files.map(file => ({
+    const newPreviews = validFiles.map(file => ({
       url: URL.createObjectURL(file),
       isExisting: false,
       file: file

@@ -76,8 +76,19 @@ adminClient.interceptors.response.use(
         toast.error('Resource not found');
         break;
       case 422:
-        if (data?.message) toast.error(data.message);
-        else toast.error('Please check your input and try again');
+        const validationErrors = data?.data || data?.errors;
+        if (validationErrors && typeof validationErrors === 'object') {
+          const errorMessages = Object.values(validationErrors).flat();
+          if (errorMessages.length > 0) {
+            toast.error(errorMessages[0]);
+          } else {
+            toast.error(data.message || 'Validation Error.');
+          }
+        } else if (data?.message) {
+          toast.error(data.message);
+        } else {
+          toast.error('Please check your input and try again');
+        }
         break;
       case 429:
         toast.error('Too many requests — please slow down');
