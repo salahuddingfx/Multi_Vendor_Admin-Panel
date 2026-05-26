@@ -149,15 +149,14 @@ export const api = {
   },
 
   updateProduct: async (id, formData) => {
-    formData.append('_method', 'PUT');
-    const response = await adminClient.post(`/products/${id}`, formData, {
+    const response = await adminClient.post(`/products/${id}/update`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   },
 
   deleteProduct: async (id) => {
-    const response = await adminClient.delete(`/products/${id}`);
+    const response = await adminClient.post(`/products/${id}/delete`);
     return response.data;
   },
 
@@ -175,16 +174,14 @@ export const api = {
   },
 
   updateCategory: async (id, formData) => {
-    // Laravel handles multipart/form-data via POST + _method=PUT
-    formData.append('_method', 'PUT');
-    const response = await adminClient.post(`/categories/${id}`, formData, {
+    const response = await adminClient.post(`/categories/${id}/update`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   },
 
   deleteCategory: async (id) => {
-    const response = await adminClient.delete(`/categories/${id}`);
+    const response = await adminClient.post(`/categories/${id}/delete`);
     return response.data;
   },
 
@@ -195,22 +192,22 @@ export const api = {
   },
 
   updateOrderStatus: async (orderId, status) => {
-    const response = await adminClient.patch(`/orders/${orderId}/status`, { status });
+    const response = await adminClient.post(`/orders/${orderId}/status`, { status });
     return response.data;
   },
 
   updatePaymentStatus: async (orderId, paymentStatus) => {
-    const response = await adminClient.put(`/orders/${orderId}/payment-status`, { payment_status: paymentStatus });
+    const response = await adminClient.post(`/orders/${orderId}/payment-status`, { payment_status: paymentStatus });
     return response.data;
   },
   
   updateOrder: async (id, data) => {
-    const response = await adminClient.put(`/orders/${id}`, data);
+    const response = await adminClient.post(`/orders/${id}/update`, data);
     return response.data;
   },
 
   deleteOrder: async (id) => {
-    const response = await adminClient.delete(`/orders/${id}`);
+    const response = await adminClient.post(`/orders/${id}/delete`);
     return response.data;
   },
 
@@ -231,7 +228,7 @@ export const api = {
   },
 
   updateSettings: async (siteId, settings) => {
-    const response = await adminClient.put(`/sites/${siteId}/settings`, { settings });
+    const response = await adminClient.post(`/sites/${siteId}/settings/update`, { settings });
     return response.data;
   },
 
@@ -263,7 +260,7 @@ export const api = {
   },
 
   deleteHeroSlide: async (id) => {
-    const response = await adminClient.delete(`/hero-slides/${id}`);
+    const response = await adminClient.post(`/hero-slides/${id}/delete`);
     return response.data;
   },
 
@@ -276,12 +273,12 @@ export const api = {
   },
 
   updateReview: async (id, reviewData) => {
-    const response = await adminClient.put(`/reviews/${id}`, reviewData);
+    const response = await adminClient.post(`/reviews/${id}/update`, reviewData);
     return response.data;
   },
 
   deleteReview: async (id) => {
-    const response = await adminClient.delete(`/reviews/${id}`);
+    const response = await adminClient.post(`/reviews/${id}/delete`);
     return response.data;
   },
 
@@ -297,12 +294,12 @@ export const api = {
   },
 
   updateCoupon: async (id, couponData) => {
-    const response = await adminClient.put(`/coupons/${id}`, couponData);
+    const response = await adminClient.post(`/coupons/${id}/update`, couponData);
     return response.data;
   },
 
   deleteCoupon: async (id) => {
-    const response = await adminClient.delete(`/coupons/${id}`);
+    const response = await adminClient.post(`/coupons/${id}/delete`);
     return response.data;
   },
 
@@ -313,12 +310,12 @@ export const api = {
   },
 
   markNotificationRead: async (id) => {
-    const response = await adminClient.put(`/notifications/${id}/read`);
+    const response = await adminClient.post(`/notifications/${id}/read`);
     return response.data;
   },
 
   markAllNotificationsRead: async () => {
-    const response = await adminClient.put('/notifications/mark-all-read');
+    const response = await adminClient.post('/notifications/mark-all-read');
     return response.data;
   },
 
@@ -329,7 +326,7 @@ export const api = {
   },
 
   markMessageRead: async (id) => {
-    const response = await adminClient.put(`/messages/${id}/read`);
+    const response = await adminClient.post(`/messages/${id}/read`);
     return response.data;
   },
 
@@ -347,18 +344,14 @@ export const api = {
   },
 
   updateUser: async (id, formData) => {
-    // For file uploads in Laravel via PUT, we use POST with _method=PUT
-    if (formData instanceof FormData) {
-      formData.append('_method', 'PUT');
-    }
-    const response = await adminClient.post(`/users/${id}`, formData, {
+    const response = await adminClient.post(`/users/${id}/update`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   },
 
   deleteUser: async (id) => {
-    const response = await adminClient.delete(`/users/${id}`);
+    const response = await adminClient.post(`/users/${id}/delete`);
     return response.data;
   },
 
