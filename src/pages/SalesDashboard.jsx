@@ -757,7 +757,7 @@ const SalesDashboard = () => {
             </div>
           </div>
           
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 no-print">
                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Audit Range Selection</span>
                <div className="flex flex-col sm:flex-row items-stretch gap-4">
                   {/* Start Date Custom Calendar */}
@@ -811,6 +811,11 @@ const SalesDashboard = () => {
                     Run Audit <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                </div>
+               {startDate && endDate && (
+                 <p className="text-[9px] font-bold text-slate-400 mt-1 text-right">
+                   * Time selection filters the Master Transaction Report table & file exports.
+                 </p>
+               )}
             </div>
           </div>
         </div>
@@ -871,7 +876,7 @@ const SalesDashboard = () => {
                   </td>
                 </tr>
               ))}
-              {timeline.length === 0 && (
+              {filteredTimeline.length === 0 && (
                 <tr>
                   <td colSpan="7" className="px-8 py-20 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
                     No transactions found for the selected period.
@@ -879,7 +884,7 @@ const SalesDashboard = () => {
                 </tr>
               )}
             </tbody>
-            {timeline.length > 0 && (
+            {filteredTimeline.length > 0 && (
               <tfoot>
                 <tr className="bg-slate-900 text-white border-t border-slate-800">
                   <td className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-300">Grand Total</td>
@@ -895,8 +900,8 @@ const SalesDashboard = () => {
             )}
           </table>
         </div>
-        {timeline.length > 0 && (
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-8 py-6 border-t border-slate-50">
+        {filteredTimeline.length > 0 && (
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-8 py-6 border-t border-slate-50 no-print">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
               Page {timelinePage} of {totalTimelinePages}
             </p>
