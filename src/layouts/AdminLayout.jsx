@@ -10,6 +10,8 @@ import {
   Menu, 
   X,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Globe,
   Bell,
   LogOut,
@@ -32,6 +34,18 @@ const AdminLayout = () => {
   const { selectedStore, setSelectedStore, isSidebarOpen, toggleSidebar, logout, user, updateUser, settings, setSettings, isAuthenticated } = useStore();
   const location = useLocation();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const showFull = isMobile ? true : isSidebarOpen;
 
   const timeoutRef = useRef(null);
 
@@ -350,68 +364,78 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside className={clsx(
-        "fixed inset-y-0 left-0 z-50 p-4 transition-all duration-700 h-full shrink-0",
-        // Desktop: always visible, collapses to icon-only
+        "fixed inset-y-0 left-0 z-50 p-4 transition-all duration-300 ease-in-out h-full shrink-0",
+        // Desktop: always visible
         "md:translate-x-0",
         // Desktop width
-        isSidebarOpen ? "md:w-80" : "md:w-[100px]",
+        showFull ? "w-[280px] md:w-80" : "w-0 md:w-[96px]",
         // Mobile: full width slide-in drawer
-        isMobileSidebarOpen ? "translate-x-0 w-80" : "-translate-x-full w-80 md:translate-x-0"
+        isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
-        <div className="h-full flex flex-col bg-white rounded-[40px] shadow-premium border border-black/[0.02] overflow-hidden">
+        <div className="h-full flex flex-col bg-white rounded-[32px] shadow-premium border border-black/[0.02] overflow-hidden">
           {/* Logo Section */}
           <div className={clsx(
-            "flex items-center shrink-0 transition-all duration-700",
-            isSidebarOpen ? "p-10 gap-5" : "p-6 justify-center"
+            "flex items-center shrink-0 transition-all duration-300 relative",
+            showFull ? "p-8 gap-4" : "p-6 justify-center"
           )}>
             <div 
               className={clsx(
-                "rounded-full flex items-center justify-center bg-white shadow-2xl transition-all duration-700 overflow-hidden border border-slate-100 shrink-0",
-                isSidebarOpen ? "w-14 h-14" : "w-12 h-12"
+                "rounded-full flex items-center justify-center bg-white shadow-2xl transition-all duration-300 overflow-hidden border border-slate-100 shrink-0",
+                showFull ? "w-12 h-12" : "w-10 h-10"
               )}
               style={{ 
-                transform: isSidebarOpen ? 'rotate(0deg)' : 'rotate(360deg)'
+                transform: showFull ? 'rotate(0deg)' : 'rotate(360deg)'
               }}
             >
               <img src="/Acharu and TajaShutki.png" alt="Admin Logo" className="w-full h-full object-cover" />
             </div>
-            {isSidebarOpen && (
-              <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-700">
-                <span className="font-display font-black text-2xl text-slate-800 tracking-tight leading-none">
+            {showFull && (
+              <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-300">
+                <span className="font-display font-black text-xl text-slate-800 tracking-tight leading-none">
                   Nexus <span style={{ color: themeColor }}>Admin</span>
                 </span>
-                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 mt-2.5">Unified Ecosystem</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 mt-2">Unified Ecosystem</span>
               </div>
+            )}
+            
+            {/* Mobile Close Button inside Sidebar */}
+            {isMobileSidebarOpen && (
+              <button 
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 md:hidden p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-50 rounded-xl transition-all"
+              >
+                <X size={18} />
+              </button>
             )}
           </div>
 
           {/* Navigation */}
-          <nav className="flex-grow px-6 space-y-2 overflow-y-auto custom-scrollbar pt-2 pb-10">
+          <nav className="flex-grow px-4 space-y-1 overflow-y-auto custom-scrollbar pt-2 pb-6">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  title={!isSidebarOpen ? item.name : ''}
+                  title={!showFull ? item.name : ''}
                   onClick={() => setIsMobileSidebarOpen(false)}
                   className={clsx(
-                    "flex items-center font-bold transition-all duration-300 group relative",
-                    isSidebarOpen ? "gap-5 px-6 py-4 rounded-[24px]" : "justify-center w-14 h-14 mx-auto rounded-2xl",
+                    "flex items-center font-bold transition-all duration-200 group relative",
+                    showFull ? "gap-4 px-4 py-3 rounded-2xl" : "justify-center w-12 h-12 mx-auto rounded-xl",
                     isActive 
-                      ? "text-white shadow-lg" 
+                      ? "text-white shadow-md" 
                       : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
                   )}
-                  style={isActive ? { backgroundColor: themeColor, boxShadow: `0 12px 24px -10px ${themeColor}80` } : {}}
+                  style={isActive ? { backgroundColor: themeColor, boxShadow: `0 8px 16px -8px ${themeColor}80` } : {}}
                 >
-                  <item.icon size={isActive ? 22 : 20} className={clsx(isActive ? "text-white" : "text-slate-400 group-hover:text-slate-900 transition-colors")} />
-                  {isSidebarOpen && <span className="tracking-tight text-sm font-display font-bold">{item.name}</span>}
+                  <item.icon size={isActive ? 20 : 18} className={clsx(isActive ? "text-white" : "text-slate-400 group-hover:text-slate-900 transition-colors")} />
+                  {showFull && <span className="tracking-tight text-sm font-display font-bold">{item.name}</span>}
                   
                   {/* Badge for Inventory */}
                   {item.name === 'Inventory' && lowStockCount > 0 && (
                     <div className={clsx(
                       "absolute flex items-center justify-center rounded-full border-2 border-white font-black",
-                      isSidebarOpen ? "right-6 px-2 py-0.5 text-[8px] min-w-[20px]" : "top-2 right-2 w-4 h-4 text-[7px]",
+                      showFull ? "right-4 px-1.5 py-0.5 text-[8px] min-w-[18px]" : "top-1 right-1 w-3.5 h-3.5 text-[6px]",
                       isActive ? "bg-white text-slate-900" : "bg-red-500 text-white"
                     )}>
                       {lowStockCount}
@@ -423,9 +447,9 @@ const AdminLayout = () => {
           </nav>
 
           {/* User Profile & Logout */}
-          <div className="p-3 md:p-4 m-3 mt-auto rounded-[32px] bg-slate-50/80 space-y-3 border border-slate-100 shrink-0">
-             {isSidebarOpen ? (
-               <div className="flex items-center gap-3 p-3 rounded-2xl bg-white shadow-sm overflow-hidden">
+          <div className="p-3 m-3 mt-auto rounded-3xl bg-slate-50/80 space-y-2 border border-slate-100 shrink-0">
+             {showFull ? (
+               <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-white shadow-sm overflow-hidden">
                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
                    {user?.image_path ? (
                      <img src={user.image_path} alt={user.name} className="w-full h-full object-cover" />
@@ -440,7 +464,7 @@ const AdminLayout = () => {
                   </div>
                </div>
              ) : (
-               <div className="w-12 h-12 mx-auto rounded-2xl bg-white shadow-sm flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
+               <div className="w-12 h-12 mx-auto rounded-xl bg-white shadow-sm flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
                  {user?.image_path ? (
                    <img src={user.image_path} alt={user.name} className="w-full h-full object-cover" />
                  ) : (
@@ -455,12 +479,12 @@ const AdminLayout = () => {
                  toast.success('Logged out safely');
                }}
                className={clsx(
-                 isSidebarOpen ? "w-full flex items-center gap-3 px-4 py-4 rounded-[20px]" : "w-14 h-14 mx-auto flex items-center justify-center rounded-2xl",
+                 showFull ? "w-full flex items-center gap-3 px-4 py-3 rounded-2xl" : "w-12 h-12 mx-auto flex items-center justify-center rounded-xl",
                  "font-bold text-red-500 hover:bg-red-500 hover:text-white transition-all"
                )}
              >
-               <LogOut size={20} />
-               {isSidebarOpen && <span className="text-sm">Sign Out</span>}
+               <LogOut size={18} />
+               {showFull && <span className="text-xs">Sign Out</span>}
              </button>
 
           </div>
@@ -469,8 +493,8 @@ const AdminLayout = () => {
 
       {/* Spacer for Fixed Sidebar on Desktop Only */}
       <div className={clsx(
-        "hidden md:block transition-all duration-700 shrink-0",
-        isSidebarOpen ? "w-80" : "w-[100px]"
+        "hidden md:block transition-all duration-300 ease-in-out shrink-0",
+        showFull ? "w-80" : "w-[96px]"
       )} />
 
       {/* Main Content Area - Independently Scrollable */}
@@ -490,7 +514,7 @@ const AdminLayout = () => {
               onClick={toggleSidebar}
               className="hidden md:flex p-4 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all shadow-sm border border-slate-100"
             >
-              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {isSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
             </button>
             <div className="hidden sm:flex items-center gap-4">
               <div 
