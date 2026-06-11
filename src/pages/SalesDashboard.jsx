@@ -523,9 +523,9 @@ const SalesDashboard = () => {
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto">
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto no-print">
           {/* Quick Range Selector stays at top for convenience */}
-          <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] border border-black/[0.03] shadow-sm w-full md:w-auto overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] border border-black/[0.03] shadow-sm w-full md:w-auto overflow-x-auto scrollbar-hide no-print">
             {ranges.map((r) => (
               <button
                 key={r.id}
