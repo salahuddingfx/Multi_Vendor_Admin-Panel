@@ -44,6 +44,10 @@ const Inventory = () => {
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+
   useEffect(() => {
     fetchProducts();
     fetchAuditLogs();
@@ -53,13 +57,8 @@ const Inventory = () => {
     if (!siteId) return;
     try {
       setLoading(true);
-      const res = await api.getProducts(siteId);
-      let productData = [];
-      if (Array.isArray(res)) productData = res;
-      else if (res && Array.isArray(res.data)) productData = res.data;
-      else if (res && res.data && Array.isArray(res.data.data)) productData = res.data.data;
-      
-      setProducts(productData);
+      const allProducts = await api.getAllProducts(siteId);
+      setProducts(Array.isArray(allProducts) ? allProducts : []);
     } catch (error) {
       console.error('Failed to fetch inventory:', error);
       toast.error('Failed to fetch inventory');
@@ -170,6 +169,18 @@ const Inventory = () => {
     
     return matchesSearch && matchesLowStock;
   });
+
+  // Pagination
+  const totalItems = filteredProducts.length;
+  const totalPages = itemsPerPage === 0 ? 1 : Math.ceil(totalItems / itemsPerPage);
+  const paginatedProducts = itemsPerPage === 0
+    ? filteredProducts
+    : filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const lowStockCount = products.filter(p => p.stock < 10).length;
 
@@ -306,7 +317,7 @@ const Inventory = () => {
           </div>
         </div>
 
-        <div className="overflow-x-visible">
+        <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50">
@@ -320,7 +331,7 @@ const Inventory = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               <AnimatePresence mode='popLayout'>
-                {filteredProducts.map((p, idx) => (
+                {paginatedProducts.map((p, idx) => (
                   <motion.tr 
                     layout
                     initial={{ opacity: 0 }}
@@ -471,6 +482,69 @@ const Inventory = () => {
             </div>
           )}
         </div>
+
+        {/* Pagination Bar */}
+        {totalItems > 0 && (
+          <div className="px-6 py-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Show</span>
+              {[10, 25, 50, 100, 0].map(n => (
+                <button
+                  key={n}
+                  onClick={() => { setItemsPerPage(n); setCurrentPage(1); }}
+                  className={clsx(
+                    "px-3 py-1.5 rounded-xl text-xs font-black transition-all border",
+                    itemsPerPage === n
+                      ? "bg-maroon text-white border-maroon shadow-lg shadow-maroon/20"
+                      : "bg-white text-slate-400 border-slate-100 hover:border-maroon hover:text-maroon"
+                  )}
+                >
+                  {n === 0 ? 'All' : n}
+                </button>
+              ))}
+              <span className="text-xs font-medium text-slate-400">
+                Showing {itemsPerPage === 0 ? totalItems : Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}–{itemsPerPage === 0 ? totalItems : Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
+              </span>
+            </div>
+            {itemsPerPage !== 0 && totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-100 text-xs font-bold text-slate-500 hover:text-maroon hover:border-maroon disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronRight size={14} className="rotate-180" /> Prev
+                </button>
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  const start = Math.max(1, currentPage - 3);
+                  const page = start + i;
+                  if (page > totalPages) return null;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={clsx(
+                        "w-9 h-9 rounded-xl text-xs font-black transition-all border",
+                        currentPage === page
+                          ? "bg-maroon text-white border-maroon shadow-lg shadow-maroon/20"
+                          : "bg-white text-slate-400 border-slate-100 hover:border-maroon hover:text-maroon"
+                      )}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-100 text-xs font-bold text-slate-500 hover:text-maroon hover:border-maroon disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  Next <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* New Shipment Modal */}
