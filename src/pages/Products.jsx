@@ -241,10 +241,10 @@ const Products = () => {
                   <td className="px-8 py-5">
                     <div className="flex flex-col">
                       <span className="font-display font-bold text-slate-800">৳{product.price}</span>
-                      {Number(product.original_price) > Number(product.price) && (
+                      {Number(product.original_price) > 0 && Number(product.price) > 0 && Number(product.original_price) > Number(product.price) && (
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] text-slate-400 line-through">৳{product.original_price}</span>
-                          <span className="text-[9px] font-black text-emerald-500">-{Math.round(product.discount_percentage)}%</span>
+                          <span className="text-[9px] font-black text-emerald-500">-{Math.round(((Number(product.original_price) - Number(product.price)) / Number(product.original_price)) * 100)}%</span>
                         </div>
                       )}
                     </div>
