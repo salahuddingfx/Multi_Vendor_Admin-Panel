@@ -105,7 +105,7 @@ const Banners = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">HOMEPAGE BANNERS</h1>
           <p className="text-slate-500 mt-1 font-medium">Manage the hero slides for {selectedStore.toUpperCase()}</p>
@@ -210,7 +210,7 @@ const Banners = () => {
             </div>
             
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Title</label>
                   <input 
@@ -234,7 +234,7 @@ const Banners = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Link to Product</label>
                   <select 
@@ -271,7 +271,7 @@ const Banners = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Display Order</label>
                     <input 
