@@ -425,7 +425,14 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
     category_id: editingProduct?.category_id ?? '',
     price: editingProduct?.price ?? '',
     original_price: editingProduct?.original_price ?? '',
-    discount_percentage: editingProduct?.discount_percentage ?? '',
+    discount_percentage: (() => {
+      const original = Number(editingProduct?.original_price) || 0;
+      const selling = Number(editingProduct?.price) || 0;
+      if (original > selling && original > 0) {
+        return (((original - selling) / original) * 100).toFixed(2);
+      }
+      return '0.00';
+    })(),
     weight: editingProduct?.weight ?? '',
     stock: editingProduct?.stock ?? '',
     description: editingProduct?.description ?? '',
@@ -547,9 +554,11 @@ const ProductModal = ({ isOpen, onClose, editingProduct, onSuccess, siteId }) =>
   };
 
   const handlePriceChange = (selling, original) => {
+    const s = Number(selling) || 0;
+    const o = Number(original) || 0;
     let discount = 0;
-    if (original > selling && original > 0) {
-      discount = ((original - selling) / original) * 100;
+    if (o > s && o > 0) {
+      discount = ((o - s) / o) * 100;
     }
     setFormData(prev => ({ 
       ...prev, 
