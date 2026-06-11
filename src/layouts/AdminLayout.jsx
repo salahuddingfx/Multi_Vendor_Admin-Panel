@@ -364,11 +364,8 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside className={clsx(
-        "fixed inset-y-0 left-0 z-50 p-4 transition-all duration-300 ease-in-out h-full shrink-0",
-        // Desktop: always visible
-        "md:translate-x-0",
-        // Desktop width
-        showFull ? "w-[280px] md:w-80" : "w-0 md:w-[96px]",
+        "fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out h-full shrink-0",
+        showFull ? "p-4 w-[280px] md:w-80" : "p-3 w-0 md:w-[96px]",
         // Mobile: full width slide-in drawer
         isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
@@ -376,7 +373,7 @@ const AdminLayout = () => {
           {/* Logo Section */}
           <div className={clsx(
             "flex items-center shrink-0 transition-all duration-300 relative",
-            showFull ? "p-8 gap-4" : "p-6 justify-center"
+            showFull ? "p-8 gap-4" : "py-6 justify-center"
           )}>
             <div 
               className={clsx(
@@ -410,7 +407,10 @@ const AdminLayout = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-grow px-4 space-y-1 overflow-y-auto custom-scrollbar pt-2 pb-6">
+          <nav className={clsx(
+            "flex-grow space-y-1 overflow-y-auto custom-scrollbar pt-2 pb-6",
+            showFull ? "px-4" : "px-1.5"
+          )}>
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
@@ -421,7 +421,7 @@ const AdminLayout = () => {
                   onClick={() => setIsMobileSidebarOpen(false)}
                   className={clsx(
                     "flex items-center font-bold transition-all duration-200 group relative",
-                    showFull ? "gap-4 px-4 py-3 rounded-2xl" : "justify-center w-12 h-12 mx-auto rounded-xl",
+                    showFull ? "gap-4 px-4 py-3 rounded-2xl" : "justify-center w-11 h-11 mx-auto rounded-xl",
                     isActive 
                       ? "text-white shadow-md" 
                       : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
@@ -447,7 +447,10 @@ const AdminLayout = () => {
           </nav>
 
           {/* User Profile & Logout */}
-          <div className="p-3 m-3 mt-auto rounded-3xl bg-slate-50/80 space-y-2 border border-slate-100 shrink-0">
+          <div className={clsx(
+            "mt-auto rounded-3xl bg-slate-50/80 border border-slate-100 shrink-0 transition-all duration-300",
+            showFull ? "p-3 m-3 space-y-2" : "p-1.5 m-1.5 space-y-1"
+          )}>
              {showFull ? (
                <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-white shadow-sm overflow-hidden">
                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
@@ -464,7 +467,7 @@ const AdminLayout = () => {
                   </div>
                </div>
              ) : (
-               <div className="w-12 h-12 mx-auto rounded-xl bg-white shadow-sm flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
+               <div className="w-10 h-10 mx-auto rounded-xl bg-white shadow-sm flex items-center justify-center font-black text-slate-400 border border-slate-100 overflow-hidden shrink-0">
                  {user?.image_path ? (
                    <img src={user.image_path} alt={user.name} className="w-full h-full object-cover" />
                  ) : (
@@ -479,7 +482,7 @@ const AdminLayout = () => {
                  toast.success('Logged out safely');
                }}
                className={clsx(
-                 showFull ? "w-full flex items-center gap-3 px-4 py-3 rounded-2xl" : "w-12 h-12 mx-auto flex items-center justify-center rounded-xl",
+                 showFull ? "w-full flex items-center gap-3 px-4 py-3 rounded-2xl" : "w-10 h-10 mx-auto flex items-center justify-center rounded-xl",
                  "font-bold text-red-500 hover:bg-red-500 hover:text-white transition-all"
                )}
              >
