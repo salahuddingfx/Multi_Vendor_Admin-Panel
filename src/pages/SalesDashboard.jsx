@@ -361,12 +361,12 @@ const SalesDashboard = () => {
   };
 
   const exportToCSV = () => {
-    if (!timeline.length) {
+    if (!filteredTimeline.length) {
       toast.error('No data to export');
       return;
     }
     const headers = ['Type', 'Activity ID', 'Subject', 'Amount (BDT)', 'Cost (BDT)', 'Status', 'Date', 'Time'];
-    const rows = timeline.map(item => [
+    const rows = filteredTimeline.map(item => [
       item.type.toUpperCase(),
       item.id,
       item.title,
@@ -391,7 +391,7 @@ const SalesDashboard = () => {
   };
 
   const exportToXLS = () => {
-    if (!timeline.length) {
+    if (!filteredTimeline.length) {
       toast.error('No data to export');
       return;
     }
@@ -420,7 +420,7 @@ const SalesDashboard = () => {
           <tbody>
     `;
 
-    timeline.forEach(item => {
+    filteredTimeline.forEach(item => {
       html += `
         <tr>
           <td>${item.type.toUpperCase()}</td>
@@ -467,7 +467,7 @@ const SalesDashboard = () => {
             Sales <span className="text-maroon italic">Master.</span>
           </h1>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 no-print">
             {['all', 'acharu', 'tajashutki'].map((s) => (
               <button 
                 key={s}
