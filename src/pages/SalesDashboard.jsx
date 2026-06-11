@@ -202,8 +202,7 @@ const SalesDashboard = () => {
     { id: 'weekly', name: 'Weekly' },
     { id: 'monthly', name: 'Monthly' },
     { id: '90days', name: '90D' },
-    { id: 'yearly', name: 'Yearly' },
-    { id: 'custom', name: 'Custom Dates 📅' }
+    { id: 'yearly', name: 'Yearly' }
   ];
 
   useEffect(() => {
@@ -217,14 +216,8 @@ const SalesDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!startDate && !endDate && range === 'custom') {
-      setRange('monthly');
-    }
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    // If dates are picked or custom mode is selected, we ignore the predefined range
-    if (!startDate && !endDate && range !== 'custom') {
+    // If dates are picked, we ignore the predefined range
+    if (!startDate && !endDate) {
       fetchStats();
     }
   }, [range, selectedStore]);
@@ -476,7 +469,7 @@ const SalesDashboard = () => {
           </div>
         </div>
         
-        <div className="flex flex-col gap-4 w-full xl:w-auto items-end">
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto">
           {/* Quick Range Selector stays at top for convenience */}
           <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] border border-black/[0.03] shadow-sm w-full md:w-auto overflow-x-auto scrollbar-hide">
             {ranges.map((r) => (
@@ -484,13 +477,11 @@ const SalesDashboard = () => {
                 key={r.id}
                 onClick={() => {
                   setRange(r.id);
-                  if (r.id !== 'custom') {
-                    setStartDate('');
-                    setEndDate('');
-                  }
+                  setStartDate('');
+                  setEndDate('');
                 }}
                 className={`px-6 py-3 rounded-[18px] text-[9px] font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${
-                  (range === r.id && r.id !== 'custom' && !startDate) || (r.id === 'custom' && (range === 'custom' || startDate))
+                  range === r.id && !startDate
                     ? 'bg-slate-900 text-white shadow-xl scale-105' 
                     : 'text-slate-400 hover:text-slate-600 hover:bg-white'
                 }`}
@@ -499,38 +490,6 @@ const SalesDashboard = () => {
               </button>
             ))}
           </div>
-
-          {/* Collapsible Date Pickers */}
-          <AnimatePresence>
-            {(range === 'custom' || startDate) && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0, y: -10 }}
-                className="flex flex-col sm:flex-row items-center gap-4 bg-white/80 backdrop-blur-md p-4 rounded-[32px] border border-black/[0.02] shadow-premium"
-              >
-                <CustomCalendar 
-                  label="From"
-                  value={startDate}
-                  onChange={setStartDate}
-                  color="maroon"
-                />
-                <div className="w-4 h-px bg-slate-200 hidden sm:block" />
-                <CustomCalendar 
-                  label="To"
-                  value={endDate}
-                  onChange={setEndDate}
-                  color="slate"
-                />
-                <button 
-                  onClick={handleCustomFilter}
-                  className="h-14 px-8 bg-maroon text-white rounded-[22px] text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-maroon/30 hover:shadow-maroon/50 hover:scale-[1.02] active:scale-95 transition-all duration-500 flex items-center gap-2"
-                >
-                  Apply <ArrowRight size={14} />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
 
