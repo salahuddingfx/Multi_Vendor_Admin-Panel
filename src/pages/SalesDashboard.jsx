@@ -357,7 +357,243 @@ const SalesDashboard = () => {
   ];
 
   const handlePrint = () => {
-    window.print();
+    if (!filteredTimeline.length) {
+      toast.error('No data to print');
+      return;
+    }
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error('Please allow popups to print report');
+      return;
+    }
+
+    const storeName = selectedStore === 'all' ? 'All Stores' : (selectedStore === 'acharu' ? 'Acharu' : 'TajaShutki');
+    const rangeLabel = startDate ? `${startDate} ${startTime} to ${endDate} ${endTime}` : `${range.toUpperCase()} (Preset)`;
+    const reportDate = new Date().toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    let tableRows = '';
+    filteredTimeline.forEach(item => {
+      const isOrder = item.type === 'order';
+      const amountVal = formatCurrency(item.value || 0);
+      const costVal = isOrder ? formatCurrency(item.cost_total || 0) : '—';
+      const itemDate = new Date(item.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const itemTime = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      tableRows += `
+        <tr>
+          <td style="font-weight: bold; padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">${item.type.toUpperCase()}</td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">#${item.id}</td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">${item.title}</td>
+          <td style="font-weight: bold; padding: 10px 8px; border-bottom: 1px solid #e2e8f0; color: ${isOrder ? '#15803d' : '#be123c'};">${amountVal}</td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">${costVal}</td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;"><span style="padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; background-color: #f1f5f9;">${item.detail || 'Processed'}</span></td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">${itemDate}</td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #e2e8f0;">${itemTime}</td>
+        </tr>
+      `;
+    });
+
+    const netProfit = totalOrderValue - totalReturnValue - totalOrderCost;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Sales Audit Report - ${storeName}</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            padding: 30px;
+            background-color: #ffffff;
+            margin: 0;
+          }
+          .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+          }
+          .logo-area h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            color: #800000;
+            letter-spacing: -0.5px;
+          }
+          .logo-area p {
+            margin: 4px 0 0 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+          }
+          .report-badge {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #64748b;
+          }
+          .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            font-size: 12px;
+            background-color: #f8fafc;
+            padding: 15px 20px;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+          }
+          .meta-item {
+            line-height: 1.6;
+          }
+          .meta-item strong {
+            color: #0f172a;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 11px;
+          }
+          th {
+            background-color: #f1f5f9;
+            border-bottom: 2px solid #cbd5e1;
+            text-align: left;
+            padding: 12px 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #475569;
+            letter-spacing: 0.5px;
+          }
+          .grand-total-section {
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            font-size: 12px;
+            margin-top: 30px;
+          }
+          .grand-total-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+          }
+          .total-box h4 {
+            margin: 0 0 5px 0;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            letter-spacing: 1px;
+          }
+          .total-box p {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+          }
+          .net-profit-box {
+            border-left: 2px dashed #334155;
+            padding-left: 15px;
+          }
+          @media print {
+            body {
+              padding: 0;
+            }
+            .grand-total-section {
+              background-color: #0f172a !important;
+              color: #ffffff !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            th {
+              background-color: #f1f5f9 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header-container">
+          <div class="logo-area">
+            <h1>Sales Audit Report</h1>
+            <p>Nexus Unified Ecosystem</p>
+          </div>
+          <div class="report-badge">Official Audit Log</div>
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <strong>Store Scope:</strong> ${storeName}<br/>
+            <strong>Filter Range:</strong> ${rangeLabel}
+          </div>
+          <div class="meta-item" style="text-align: right;">
+            <strong>Generated Date:</strong> ${reportDate}<br/>
+            <strong>Status:</strong> Finalized Audit
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Activity ID</th>
+              <th>Subject</th>
+              <th>Amount (BDT)</th>
+              <th>Cost (BDT)</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+
+        <div class="grand-total-section">
+          <div class="grand-total-grid">
+            <div class="total-box">
+              <h4>Total Orders</h4>
+              <p>${formatCurrency(totalOrderValue)}</p>
+            </div>
+            <div class="total-box">
+              <h4>Total Returns</h4>
+              <p style="color: #fda4af;">${formatCurrency(totalReturnValue)}</p>
+            </div>
+            <div class="total-box">
+              <h4>Total Costs</h4>
+              <p>${formatCurrency(totalOrderCost)}</p>
+            </div>
+            <div class="total-box net-profit-box">
+              <h4>Estimated Net Margin</h4>
+              <p style="color: #86efac; font-size: 18px;">${formatCurrency(netProfit)}</p>
+            </div>
+          </div>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() {
+              window.close();
+            }, 100);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   const exportToCSV = () => {
