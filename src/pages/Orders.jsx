@@ -56,6 +56,10 @@ const Orders = () => {
     customer_address: '',
     location: ''
   });
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const Skeleton = () => (
     <div className="space-y-8 animate-pulse">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -87,14 +91,8 @@ const Orders = () => {
   const fetchOrders = async (isSilent = false) => {
     if (!orders.length && !isSilent) setLoading(true);
     try {
-      const res = await api.getOrders(siteId);
-      if (res && res.data && Array.isArray(res.data.data)) {
-        setOrders(res.data.data);
-      } else if (res && Array.isArray(res.data)) {
-        setOrders(res.data);
-      } else {
-        setOrders([]);
-      }
+      const allOrders = await api.getAllOrders(siteId);
+      setOrders(Array.isArray(allOrders) ? allOrders : []);
     } catch (err) {
       console.error('Failed to fetch orders:', err);
       if (!isSilent) setOrders([]);
@@ -119,6 +117,18 @@ const Orders = () => {
     const matchesFilter = filterStatus === 'all' || filterStatus === 'All' || order.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
+
+  // Pagination
+  const totalOrders = filteredOrders.length;
+  const totalPages = itemsPerPage === 0 ? 1 : Math.ceil(totalOrders / itemsPerPage);
+  const paginatedOrders = itemsPerPage === 0 
+    ? filteredOrders 
+    : filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -199,10 +209,10 @@ const Orders = () => {
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
 
   const toggleSelectAll = () => {
-    if (selectedOrderIds.length === filteredOrders.length) {
+    if (selectedOrderIds.length === paginatedOrders.length) {
       setSelectedOrderIds([]);
     } else {
-      setSelectedOrderIds(filteredOrders.map(o => o.id));
+      setSelectedOrderIds(paginatedOrders.map(o => o.id));
     }
   };
 
@@ -350,7 +360,7 @@ const Orders = () => {
                   <input 
                     type="checkbox" 
                     className="w-5 h-5 rounded-lg border-slate-200 text-maroon focus:ring-maroon cursor-pointer transition-all"
-                    checked={selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length}
+                    checked={selectedOrderIds.length > 0 && selectedOrderIds.length === paginatedOrders.length}
                     onChange={toggleSelectAll}
                   />
                 </th>
@@ -363,7 +373,7 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredOrders.map((order) => (
+              {paginatedOrders.map((order) => (
                 <tr key={order.id} className={clsx(
                   "hover:bg-slate-50/30 transition-colors group",
                   selectedOrderIds.includes(order.id) && "bg-slate-50"
@@ -581,6 +591,69 @@ const Orders = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Bar */}
+        {totalOrders > 0 && (
+          <div className="px-6 py-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Show</span>
+              {[10, 25, 50, 100, 0].map(n => (
+                <button
+                  key={n}
+                  onClick={() => { setItemsPerPage(n); setCurrentPage(1); }}
+                  className={clsx(
+                    "px-3 py-1.5 rounded-xl text-xs font-black transition-all border",
+                    itemsPerPage === n
+                      ? "bg-maroon text-white border-maroon shadow-lg shadow-maroon/20"
+                      : "bg-white text-slate-400 border-slate-100 hover:border-maroon hover:text-maroon"
+                  )}
+                >
+                  {n === 0 ? 'All' : n}
+                </button>
+              ))}
+              <span className="text-xs font-medium text-slate-400">
+                Showing {itemsPerPage === 0 ? totalOrders : Math.min((currentPage - 1) * itemsPerPage + 1, totalOrders)}–{itemsPerPage === 0 ? totalOrders : Math.min(currentPage * itemsPerPage, totalOrders)} of {totalOrders}
+              </span>
+            </div>
+            {itemsPerPage !== 0 && totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-100 text-xs font-bold text-slate-500 hover:text-maroon hover:border-maroon disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronRight size={14} className="rotate-180" /> Prev
+                </button>
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  const start = Math.max(1, currentPage - 3);
+                  const page = start + i;
+                  if (page > totalPages) return null;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={clsx(
+                        "w-9 h-9 rounded-xl text-xs font-black transition-all border",
+                        currentPage === page
+                          ? "bg-maroon text-white border-maroon shadow-lg shadow-maroon/20"
+                          : "bg-white text-slate-400 border-slate-100 hover:border-maroon hover:text-maroon"
+                      )}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-100 text-xs font-bold text-slate-500 hover:text-maroon hover:border-maroon disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  Next <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Hidden Invoice Component for Printing */}
