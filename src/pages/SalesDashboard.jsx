@@ -188,6 +188,8 @@ const SalesDashboard = () => {
   const [range, setRange] = useState('monthly');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [startTime, setStartTime] = useState('00:00');
+  const [endTime, setEndTime] = useState('23:59');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timelinePage, setTimelinePage] = useState(1);
@@ -215,8 +217,32 @@ const SalesDashboard = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Auto-fetch statistics when custom date-times or store change
   useEffect(() => {
-    // If dates are picked, we ignore the predefined range
+    if (startDate && endDate) {
+      const fullStart = `${startDate} ${startTime}`;
+      const fullEnd = `${endDate} ${endTime}`;
+      
+      const fetchWithDates = async () => {
+        try {
+          setLoading(true);
+          const res = await api.getSalesStats(siteId || '', range, fullStart, fullEnd); 
+          setData(res);
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to fetch sales intelligence');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchWithDates();
+    } else if (!startDate && !endDate) {
+      fetchStats();
+    }
+  }, [startDate, endDate, startTime, endTime, selectedStore]);
+
+  // Handle predefined range presets fetch
+  useEffect(() => {
     if (!startDate && !endDate) {
       fetchStats();
     }
@@ -229,7 +255,7 @@ const SalesDashboard = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const res = await api.getSalesStats(siteId || '', range, startDate, endDate); 
+      const res = await api.getSalesStats(siteId || '', range, '', ''); 
       setData(res);
     } catch (error) {
       console.error(error);
@@ -245,7 +271,21 @@ const SalesDashboard = () => {
       toast.error('Please select both start and end dates');
       return;
     }
-    fetchStats();
+    const fullStart = `${startDate} ${startTime}`;
+    const fullEnd = `${endDate} ${endTime}`;
+    const fetchWithDates = async () => {
+      try {
+        setLoading(true);
+        const res = await api.getSalesStats(siteId || '', range, fullStart, fullEnd); 
+        setData(res);
+      } catch (error) {
+        console.error(error);
+        toast.error('Failed to fetch sales intelligence');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWithDates();
   };
 
   const formatCurrency = (val) => {
@@ -335,7 +375,8 @@ const SalesDashboard = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `sales_report_${selectedStore}_${startDate || range}_to_${endDate || 'today'}.csv`);
+    const filename = `sales_report_${selectedStore}_${startDate ? `${startDate}_${startTime.replace(':', '-')}` : range}_to_${endDate ? `${endDate}_${endTime.replace(':', '-')}` : 'today'}.csv`;
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -353,6 +394,11 @@ const SalesDashboard = () => {
       <body>
         <table>
           <thead>
+            <tr style="background-color: #f8fafc;">
+              <th colspan="8" style="font-size: 14px; font-weight: bold; text-align: center; padding: 15px; border: 1px solid #cbd5e1;">
+                Sales Report: ${selectedStore.toUpperCase()} (${startDate ? `${startDate} ${startTime}` : range.toUpperCase()} to ${endDate ? `${endDate} ${endTime}` : 'NOW'})
+              </th>
+            </tr>
             <tr style="background-color: #800000; color: white; font-weight: bold;">
               <th>Type</th>
               <th>Activity ID</th>
@@ -393,7 +439,8 @@ const SalesDashboard = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `sales_report_${selectedStore}_${startDate || range}_to_${endDate || 'today'}.xls`);
+    const filename = `sales_report_${selectedStore}_${startDate ? `${startDate}_${startTime.replace(':', '-')}` : range}_to_${endDate ? `${endDate}_${endTime.replace(':', '-')}` : 'today'}.xls`;
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -703,31 +750,56 @@ const SalesDashboard = () => {
             </div>
           </div>
           
-          <div className="flex flex-col lg:flex-row items-stretch gap-6 w-full lg:w-auto mt-8 lg:mt-0">
             <div className="flex flex-col gap-3">
                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">Audit Range Selection</span>
-               <div className="flex flex-col sm:flex-row items-center gap-4">
+               <div className="flex flex-col sm:flex-row items-stretch gap-4">
                   {/* Start Date Custom Calendar */}
-                  <CustomCalendar 
-                    label="From"
-                    value={startDate}
-                    onChange={setStartDate}
-                    color="maroon"
-                  />
+                  <div className="flex flex-col gap-1.5 shrink-0">
+                    <CustomCalendar 
+                      label="From"
+                      value={startDate}
+                      onChange={setStartDate}
+                      color="maroon"
+                    />
+                    {startDate && (
+                      <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl w-full">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Time</span>
+                        <input 
+                          type="time" 
+                          value={startTime}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          className="bg-transparent text-xs font-black text-slate-700 outline-none w-full cursor-pointer"
+                        />
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="w-8 h-px bg-slate-200 hidden sm:block" />
+                  <div className="w-4 h-px bg-slate-200 hidden sm:block shrink-0 self-center" />
 
                   {/* End Date Custom Calendar */}
-                  <CustomCalendar 
-                    label="To"
-                    value={endDate}
-                    onChange={setEndDate}
-                    color="slate"
-                  />
+                  <div className="flex flex-col gap-1.5 shrink-0">
+                    <CustomCalendar 
+                      label="To"
+                      value={endDate}
+                      onChange={setEndDate}
+                      color="slate"
+                    />
+                    {endDate && (
+                      <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl w-full">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Time</span>
+                        <input 
+                          type="time" 
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          className="bg-transparent text-xs font-black text-slate-700 outline-none w-full cursor-pointer"
+                        />
+                      </div>
+                    )}
+                  </div>
 
                   <button 
                     onClick={handleCustomFilter}
-                    className="h-14 px-10 bg-maroon text-white rounded-[22px] text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-maroon/30 hover:shadow-maroon/50 hover:scale-[1.02] active:scale-95 transition-all duration-500 flex items-center gap-3 group"
+                    className="h-14 px-10 bg-maroon text-white rounded-[22px] text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-maroon/30 hover:shadow-maroon/50 hover:scale-[1.02] active:scale-95 transition-all duration-500 flex items-center gap-3 group shrink-0 self-start sm:self-auto"
                   >
                     Run Audit <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                   </button>
@@ -846,7 +918,6 @@ const SalesDashboard = () => {
           </div>
         )}
       </div>
-    </div>
   );
 };
 
