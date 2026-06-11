@@ -191,6 +191,8 @@ const SalesDashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timelinePage, setTimelinePage] = useState(1);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const exportRef = useRef(null);
 
   // 0 means All Stores, 1 Acharu, 2 TajaShutki
   const siteId = selectedStore === 'all' ? 0 : (selectedStore === 'acharu' ? 1 : 2);
@@ -201,11 +203,28 @@ const SalesDashboard = () => {
     { id: 'monthly', name: 'Monthly' },
     { id: '90days', name: '90D' },
     { id: 'yearly', name: 'Yearly' },
+    { id: 'custom', name: 'Custom Dates 📅' }
   ];
 
   useEffect(() => {
-    // If dates are picked, we ignore the predefined range
-    if (!startDate && !endDate) {
+    const handleClickOutside = (event) => {
+      if (exportRef.current && !exportRef.current.contains(event.target)) {
+        setIsExportOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!startDate && !endDate && range === 'custom') {
+      setRange('monthly');
+    }
+  }, [startDate, endDate]);
+
+  useEffect(() => {
+    // If dates are picked or custom mode is selected, we ignore the predefined range
+    if (!startDate && !endDate && range !== 'custom') {
       fetchStats();
     }
   }, [range, selectedStore]);
@@ -228,7 +247,7 @@ const SalesDashboard = () => {
   };
 
   const handleCustomFilter = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!startDate || !endDate) {
       toast.error('Please select both start and end dates');
       return;
@@ -301,6 +320,93 @@ const SalesDashboard = () => {
     window.print();
   };
 
+  const exportToCSV = () => {
+    if (!timeline.length) {
+      toast.error('No data to export');
+      return;
+    }
+    const headers = ['Type', 'Activity ID', 'Subject', 'Amount (BDT)', 'Cost (BDT)', 'Status', 'Date', 'Time'];
+    const rows = timeline.map(item => [
+      item.type.toUpperCase(),
+      item.id,
+      item.title,
+      item.value,
+      item.type === 'order' ? (item.cost_total || 0) : 0,
+      item.detail || 'Processed',
+      new Date(item.created_at).toLocaleDateString('en-GB'),
+      new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `sales_report_${selectedStore}_${startDate || range}_to_${endDate || 'today'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('CSV Exported successfully!');
+  };
+
+  const exportToXLS = () => {
+    if (!timeline.length) {
+      toast.error('No data to export');
+      return;
+    }
+    let html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"/><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Sales Report</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+      <body>
+        <table>
+          <thead>
+            <tr style="background-color: #800000; color: white; font-weight: bold;">
+              <th>Type</th>
+              <th>Activity ID</th>
+              <th>Subject</th>
+              <th>Amount (BDT)</th>
+              <th>Cost (BDT)</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    timeline.forEach(item => {
+      html += `
+        <tr>
+          <td>${item.type.toUpperCase()}</td>
+          <td>#${item.id}</td>
+          <td>${item.title}</td>
+          <td>${item.value}</td>
+          <td>${item.type === 'order' ? (item.cost_total || 0) : '—'}</td>
+          <td>${item.detail || 'Processed'}</td>
+          <td>${new Date(item.created_at).toLocaleDateString('en-GB')}</td>
+          <td>${new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `sales_report_${selectedStore}_${startDate || range}_to_${endDate || 'today'}.xls`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Excel Exported successfully!');
+  };
+
   return (
     <div className="space-y-12 pb-20">
       {/* Dynamic Header Section */}
@@ -326,16 +432,51 @@ const SalesDashboard = () => {
               >{s === 'all' ? 'Group View' : (s === 'acharu' ? 'Acharu' : 'TajaShutki')}</button>
             ))}
             
-            <button 
-              onClick={handlePrint}
-              className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-maroon transition-all flex items-center gap-2 shadow-lg"
-            >
-              <Download size={14} /> Master Export
-            </button>
+            <div className="relative" ref={exportRef}>
+              <button 
+                onClick={() => setIsExportOpen(!isExportOpen)}
+                className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-maroon transition-all flex items-center gap-2 shadow-lg"
+              >
+                <Download size={14} /> Export Report
+              </button>
+
+              <AnimatePresence>
+                {isExportOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-[99] flex flex-col gap-1"
+                  >
+                    <button
+                      onClick={() => { exportToCSV(); setIsExportOpen(false); }}
+                      className="w-full text-left px-4 py-3 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2 transition-colors"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      Export as CSV (.csv)
+                    </button>
+                    <button
+                      onClick={() => { exportToXLS(); setIsExportOpen(false); }}
+                      className="w-full text-left px-4 py-3 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2 transition-colors"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Export for Excel (.xls)
+                    </button>
+                    <button
+                      onClick={() => { handlePrint(); setIsExportOpen(false); }}
+                      className="w-full text-left px-4 py-3 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2 transition-colors"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-rose-500" />
+                      Print / Save as PDF
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto">
+        <div className="flex flex-col gap-4 w-full xl:w-auto items-end">
           {/* Quick Range Selector stays at top for convenience */}
           <div className="flex items-center gap-1.5 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] border border-black/[0.03] shadow-sm w-full md:w-auto overflow-x-auto scrollbar-hide">
             {ranges.map((r) => (
@@ -343,11 +484,13 @@ const SalesDashboard = () => {
                 key={r.id}
                 onClick={() => {
                   setRange(r.id);
-                  setStartDate('');
-                  setEndDate('');
+                  if (r.id !== 'custom') {
+                    setStartDate('');
+                    setEndDate('');
+                  }
                 }}
                 className={`px-6 py-3 rounded-[18px] text-[9px] font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${
-                  range === r.id && !startDate
+                  (range === r.id && r.id !== 'custom' && !startDate) || (r.id === 'custom' && (range === 'custom' || startDate))
                     ? 'bg-slate-900 text-white shadow-xl scale-105' 
                     : 'text-slate-400 hover:text-slate-600 hover:bg-white'
                 }`}
@@ -356,6 +499,38 @@ const SalesDashboard = () => {
               </button>
             ))}
           </div>
+
+          {/* Collapsible Date Pickers */}
+          <AnimatePresence>
+            {(range === 'custom' || startDate) && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, y: -10 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -10 }}
+                className="flex flex-col sm:flex-row items-center gap-4 bg-white/80 backdrop-blur-md p-4 rounded-[32px] border border-black/[0.02] shadow-premium"
+              >
+                <CustomCalendar 
+                  label="From"
+                  value={startDate}
+                  onChange={setStartDate}
+                  color="maroon"
+                />
+                <div className="w-4 h-px bg-slate-200 hidden sm:block" />
+                <CustomCalendar 
+                  label="To"
+                  value={endDate}
+                  onChange={setEndDate}
+                  color="slate"
+                />
+                <button 
+                  onClick={handleCustomFilter}
+                  className="h-14 px-8 bg-maroon text-white rounded-[22px] text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-maroon/30 hover:shadow-maroon/50 hover:scale-[1.02] active:scale-95 transition-all duration-500 flex items-center gap-2"
+                >
+                  Apply <ArrowRight size={14} />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
