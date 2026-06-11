@@ -457,7 +457,7 @@ const SalesDashboard = () => {
   return (
     <div className="space-y-12 pb-20">
       {/* Dynamic Header Section */}
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 no-print">
         <div className="space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-maroon/5 rounded-full border border-maroon/10">
             <LayoutDashboard size={14} className="text-maroon" />
@@ -548,14 +548,14 @@ const SalesDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 no-print">
         {stats.map((stat, i) => (
           <StatCard key={i} {...stat} formatCurrency={formatCurrency} />
         ))}
       </div>
 
       {/* Main Financial Visualization */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 no-print">
         {/* Revenue Chart */}
         <div className="lg:col-span-2 bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium relative overflow-hidden group">
           <div className="mb-12 flex justify-between items-start">
@@ -642,7 +642,7 @@ const SalesDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 no-print">
         {/* Market Leaders (Deep Product Stats) */}
         <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] border border-black/[0.02] shadow-premium">
           <div className="flex items-center justify-between mb-12">
