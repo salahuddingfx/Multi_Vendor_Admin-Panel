@@ -141,6 +141,22 @@ export const api = {
     return response.data;
   },
 
+  // Fetch ALL products across all pages (admin)
+  getAllProducts: async (siteId) => {
+    let allItems = [];
+    let page = 1;
+    let lastPage = 1;
+    do {
+      const response = await adminClient.get('/products', { params: { site_id: siteId, page } });
+      const res = response.data;
+      const pageData = res?.data?.data ?? res?.data ?? [];
+      if (Array.isArray(pageData)) allItems = [...allItems, ...pageData];
+      lastPage = res?.data?.last_page ?? 1;
+      page++;
+    } while (page <= lastPage);
+    return allItems;
+  },
+
   storeProduct: async (formData) => {
     const response = await adminClient.post('/products', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -189,6 +205,22 @@ export const api = {
   getOrders: async (siteId) => {
     const response = await adminClient.get('/orders', { params: { site_id: siteId } });
     return response.data;
+  },
+
+  // Fetch ALL orders across all pages (admin)
+  getAllOrders: async (siteId) => {
+    let allItems = [];
+    let page = 1;
+    let lastPage = 1;
+    do {
+      const response = await adminClient.get('/orders', { params: { site_id: siteId, page } });
+      const res = response.data;
+      const pageData = res?.data?.data ?? res?.data ?? [];
+      if (Array.isArray(pageData)) allItems = [...allItems, ...pageData];
+      lastPage = res?.data?.last_page ?? 1;
+      page++;
+    } while (page <= lastPage);
+    return allItems;
   },
 
   updateOrderStatus: async (orderId, status) => {
