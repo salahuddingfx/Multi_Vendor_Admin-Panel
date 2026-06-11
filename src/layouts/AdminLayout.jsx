@@ -31,6 +31,7 @@ import { api } from '../lib/api';
 const AdminLayout = () => {
   const { selectedStore, setSelectedStore, isSidebarOpen, toggleSidebar, logout, user, updateUser, settings, setSettings, isAuthenticated } = useStore();
   const location = useLocation();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const timeoutRef = useRef(null);
 
@@ -333,10 +334,29 @@ const AdminLayout = () => {
     >
       <Toaster position="top-right" expand={false} richColors />
       
-      {/* Sidebar - Floating Aesthetic */}
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isMobileSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-40 md:hidden"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
       <aside className={clsx(
         "fixed inset-y-0 left-0 z-50 p-4 transition-all duration-700 h-full shrink-0",
-        isSidebarOpen ? "w-80" : "w-[100px] -translate-x-full md:translate-x-0"
+        // Desktop: always visible, collapses to icon-only
+        "md:translate-x-0",
+        // Desktop width
+        isSidebarOpen ? "md:w-80" : "md:w-[100px]",
+        // Mobile: full width slide-in drawer
+        isMobileSidebarOpen ? "translate-x-0 w-80" : "-translate-x-full w-80 md:translate-x-0"
       )}>
         <div className="h-full flex flex-col bg-white rounded-[40px] shadow-premium border border-black/[0.02] overflow-hidden">
           {/* Logo Section */}
@@ -374,6 +394,7 @@ const AdminLayout = () => {
                   key={item.name}
                   to={item.href}
                   title={!isSidebarOpen ? item.name : ''}
+                  onClick={() => setIsMobileSidebarOpen(false)}
                   className={clsx(
                     "flex items-center font-bold transition-all duration-300 group relative",
                     isSidebarOpen ? "gap-5 px-6 py-4 rounded-[24px]" : "justify-center w-14 h-14 mx-auto rounded-2xl",
@@ -446,7 +467,7 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Spacer for Fixed Sidebar on Desktop */}
+      {/* Spacer for Fixed Sidebar on Desktop Only */}
       <div className={clsx(
         "hidden md:block transition-all duration-700 shrink-0",
         isSidebarOpen ? "w-80" : "w-[100px]"
@@ -455,22 +476,30 @@ const AdminLayout = () => {
       {/* Main Content Area - Independently Scrollable */}
       <div className="flex-grow flex flex-col min-w-0 h-full overflow-hidden">
         {/* Topbar - Glassmorphic */}
-        <header className="h-24 px-10 flex items-center justify-between sticky top-0 z-40 shrink-0">
-          <div className="flex items-center gap-8">
+        <header className="h-16 md:h-24 px-4 md:px-10 flex items-center justify-between sticky top-0 z-40 shrink-0">
+          <div className="flex items-center gap-3 md:gap-8">
+            {/* Mobile hamburger */}
+            <button 
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="p-3 md:hidden bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all shadow-sm border border-slate-100"
+            >
+              <Menu size={20} />
+            </button>
+            {/* Desktop collapse toggle */}
             <button 
               onClick={toggleSidebar}
-              className="p-4 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all shadow-sm border border-slate-100"
+              className="hidden md:flex p-4 bg-white text-slate-400 hover:bg-slate-50 hover:text-slate-800 rounded-2xl transition-all shadow-sm border border-slate-100"
             >
               {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
             <div className="hidden sm:flex items-center gap-4">
               <div 
                 onClick={() => setIsCommandPaletteOpen(true)}
-                className="flex items-center gap-3 px-6 py-3 bg-white/50 border border-slate-100 rounded-2xl cursor-pointer hover:bg-white hover:shadow-lg transition-all group"
+                className="flex items-center gap-3 px-4 md:px-6 py-3 bg-white/50 border border-slate-100 rounded-2xl cursor-pointer hover:bg-white hover:shadow-lg transition-all group"
               >
                 <SearchIcon size={16} className="text-slate-400 group-hover:text-slate-900" />
-                <span className="text-xs font-bold text-slate-400 group-hover:text-slate-600">Quick Search...</span>
-                <div className="flex items-center gap-1 ml-4 px-2 py-1 bg-slate-100 rounded-lg">
+                <span className="hidden lg:block text-xs font-bold text-slate-400 group-hover:text-slate-600">Quick Search...</span>
+                <div className="hidden lg:flex items-center gap-1 ml-4 px-2 py-1 bg-slate-100 rounded-lg">
                   <Command size={10} className="text-slate-400" />
                   <span className="text-[9px] font-black text-slate-400">K</span>
                 </div>
@@ -478,15 +507,15 @@ const AdminLayout = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 md:gap-6">
             {/* Store Selector - Improved */}
-            <div className="flex items-center gap-2 bg-white/50 backdrop-blur-md p-1.5 rounded-[24px] border border-white/60 shadow-sm">
+            <div className="flex items-center gap-1 md:gap-2 bg-white/50 backdrop-blur-md p-1 md:p-1.5 rounded-[24px] border border-white/60 shadow-sm">
               {stores.map(s => (
                 <button
                   key={s.id}
                   onClick={() => handleStoreChange(s.id)}
                   className={clsx(
-                    "px-6 py-3 rounded-[20px] text-xs font-black transition-all duration-500 uppercase tracking-widest",
+                    "px-3 md:px-6 py-2 md:py-3 rounded-[20px] text-[10px] md:text-xs font-black transition-all duration-500 uppercase tracking-widest",
                     selectedStore === s.id 
                       ? "bg-white text-slate-800 shadow-premium border border-slate-100 scale-105" 
                       : "text-slate-400 hover:text-slate-600 hover:bg-white/30"
@@ -584,20 +613,28 @@ const AdminLayout = () => {
         </header>
 
         {/* Scrollable Content Container */}
-        <main className="flex-grow overflow-y-auto px-6 md:px-10 py-6 custom-scrollbar">
+        <main className="flex-grow overflow-y-auto px-4 md:px-10 py-4 md:py-6 custom-scrollbar">
            <div className="max-w-[1800px] mx-auto w-full pb-20">
               <Outlet />
            </div>
         </main>
       </div>
 
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-40 md:hidden transition-all duration-700"
-          onClick={toggleSidebar}
-        />
-      )}
+      {/* Mobile Close Button on Sidebar (visible only when open) */}
+      <AnimatePresence>
+        {isMobileSidebarOpen && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => setIsMobileSidebarOpen(false)}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] md:hidden flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-full shadow-2xl font-bold text-sm"
+          >
+            <X size={16} />
+            Close Menu
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Command Palette Modal */}
       <AnimatePresence>
