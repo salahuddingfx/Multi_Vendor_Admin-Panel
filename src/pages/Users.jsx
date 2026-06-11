@@ -82,7 +82,7 @@ const Users = () => {
 
   return (
     <div className="space-y-8 pb-20">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-4xl font-display font-black text-slate-800 tracking-tight">Admin Users</h1>
           <p className="text-slate-400 font-medium mt-1">Manage global access to your store dashboards.</p>
