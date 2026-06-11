@@ -37,10 +37,19 @@ const Products = () => {
 
   const siteId = selectedStore === 'acharu' ? 1 : 2;
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, [selectedStore]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, showLowStockOnly]);
 
   const fetchCategories = async () => {
     const data = await api.getCategories(siteId);
@@ -50,14 +59,8 @@ const Products = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await api.getProducts(siteId);
-      // Extra safe check for various API response formats
-      let productData = [];
-      if (Array.isArray(res)) productData = res;
-      else if (res && Array.isArray(res.data)) productData = res.data;
-      else if (res && res.data && Array.isArray(res.data.data)) productData = res.data.data;
-      
-      setProducts(productData);
+      const allProducts = await api.getAllProducts(siteId);
+      setProducts(Array.isArray(allProducts) ? allProducts : []);
     } catch (err) {
       console.error('Failed to fetch products:', err);
       setProducts([]);
@@ -117,6 +120,18 @@ const Products = () => {
     
     return matchesSearch && matchesCategory && matchesLowStock;
   });
+
+  // Pagination
+  const totalItems = filteredProducts.length;
+  const totalPages = itemsPerPage === 0 ? 1 : Math.ceil(totalItems / itemsPerPage);
+  const paginatedProducts = itemsPerPage === 0 
+    ? filteredProducts 
+    : filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="space-y-8">
@@ -198,7 +213,7 @@ const Products = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredProducts.map((product) => (
+              {paginatedProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-slate-50/30 transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
@@ -226,7 +241,7 @@ const Products = () => {
                   <td className="px-8 py-5">
                     <div className="flex flex-col">
                       <span className="font-display font-bold text-slate-800">৳{product.price}</span>
-                      {product.original_price > product.price && (
+                      {Number(product.original_price) > Number(product.price) && (
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] text-slate-400 line-through">৳{product.original_price}</span>
                           <span className="text-[9px] font-black text-emerald-500">-{Math.round(product.discount_percentage)}%</span>
@@ -314,6 +329,69 @@ const Products = () => {
             </div>
           )}
         </div>
+
+        {/* Pagination Bar */}
+        {totalItems > 0 && (
+          <div className="px-8 py-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Show</span>
+              {[10, 25, 50, 100, 0].map(n => (
+                <button
+                  key={n}
+                  onClick={() => { setItemsPerPage(n); setCurrentPage(1); }}
+                  className={clsx(
+                    "px-3 py-1.5 rounded-xl text-xs font-black transition-all border",
+                    itemsPerPage === n
+                      ? "bg-maroon text-white border-maroon shadow-lg shadow-maroon/20"
+                      : "bg-white text-slate-400 border-slate-100 hover:border-maroon hover:text-maroon"
+                  )}
+                >
+                  {n === 0 ? 'All' : n}
+                </button>
+              ))}
+              <span className="text-xs font-medium text-slate-400">
+                Showing {itemsPerPage === 0 ? totalItems : Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}–{itemsPerPage === 0 ? totalItems : Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
+              </span>
+            </div>
+            {itemsPerPage !== 0 && totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-100 text-xs font-bold text-slate-500 hover:text-maroon hover:border-maroon disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  <ChevronLeft size={14} /> Prev
+                </button>
+                {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                  const start = Math.max(1, currentPage - 3);
+                  const page = start + i;
+                  if (page > totalPages) return null;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={clsx(
+                        "w-9 h-9 rounded-xl text-xs font-black transition-all border",
+                        currentPage === page
+                          ? "bg-maroon text-white border-maroon shadow-lg shadow-maroon/20"
+                          : "bg-white text-slate-400 border-slate-100 hover:border-maroon hover:text-maroon"
+                      )}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-100 text-xs font-bold text-slate-500 hover:text-maroon hover:border-maroon disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  Next <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       {/* Modal */}
       {isModalOpen && (
