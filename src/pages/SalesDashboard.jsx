@@ -217,16 +217,13 @@ const SalesDashboard = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Auto-fetch statistics when custom date-times or store change
+  // Auto-fetch statistics when custom date or store changes (without time suffix)
   useEffect(() => {
     if (startDate && endDate) {
-      const fullStart = `${startDate} ${startTime}`;
-      const fullEnd = `${endDate} ${endTime}`;
-      
       const fetchWithDates = async () => {
         try {
           setLoading(true);
-          const res = await api.getSalesStats(siteId || '', range, fullStart, fullEnd); 
+          const res = await api.getSalesStats(siteId || '', range, startDate, endDate); 
           setData(res);
         } catch (error) {
           console.error(error);
@@ -239,7 +236,7 @@ const SalesDashboard = () => {
     } else if (!startDate && !endDate) {
       fetchStats();
     }
-  }, [startDate, endDate, startTime, endTime, selectedStore]);
+  }, [startDate, endDate, selectedStore]);
 
   // Handle predefined range presets fetch
   useEffect(() => {
@@ -247,10 +244,6 @@ const SalesDashboard = () => {
       fetchStats();
     }
   }, [range, selectedStore]);
-
-  useEffect(() => {
-    setTimelinePage(1);
-  }, [data?.timeline?.length, range, startDate, endDate, selectedStore]);
 
   const fetchStats = async () => {
     try {
@@ -271,12 +264,10 @@ const SalesDashboard = () => {
       toast.error('Please select both start and end dates');
       return;
     }
-    const fullStart = `${startDate} ${startTime}`;
-    const fullEnd = `${endDate} ${endTime}`;
     const fetchWithDates = async () => {
       try {
         setLoading(true);
-        const res = await api.getSalesStats(siteId || '', range, fullStart, fullEnd); 
+        const res = await api.getSalesStats(siteId || '', range, startDate, endDate); 
         setData(res);
       } catch (error) {
         console.error(error);
@@ -297,16 +288,32 @@ const SalesDashboard = () => {
     }).format(val);
   };
 
-  const timeline = data?.timeline || [];
+  // Client-side time filter for transaction report timeline
+  const filteredTimeline = React.useMemo(() => {
+    const rawTimeline = data?.timeline || [];
+    if (!startDate || !endDate) return rawTimeline;
+    return rawTimeline.filter(item => {
+      const dateObj = new Date(item.created_at);
+      const hours = String(dateObj.getHours()).padStart(2, '0');
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      const itemTime = `${hours}:${minutes}`;
+      return itemTime >= startTime && itemTime <= endTime;
+    });
+  }, [data?.timeline, startDate, endDate, startTime, endTime]);
+
+  useEffect(() => {
+    setTimelinePage(1);
+  }, [filteredTimeline.length, range, startDate, endDate, selectedStore]);
+
   const timelinePageSize = 10;
-  const totalTimelinePages = Math.max(1, Math.ceil(timeline.length / timelinePageSize));
-  const paginatedTimeline = timeline.slice(
+  const totalTimelinePages = Math.max(1, Math.ceil(filteredTimeline.length / timelinePageSize));
+  const paginatedTimeline = filteredTimeline.slice(
     (timelinePage - 1) * timelinePageSize,
     timelinePage * timelinePageSize
   );
-  const totalOrderValue = timeline.reduce((acc, item) => acc + (item.type === 'order' ? Number(item.value || 0) : 0), 0);
-  const totalReturnValue = timeline.reduce((acc, item) => acc + (item.type === 'return' ? Number(item.value || 0) : 0), 0);
-  const totalOrderCost = timeline.reduce((acc, item) => acc + (item.type === 'order' ? Number(item.cost_total || 0) : 0), 0);
+  const totalOrderValue = filteredTimeline.reduce((acc, item) => acc + (item.type === 'order' ? Number(item.value || 0) : 0), 0);
+  const totalReturnValue = filteredTimeline.reduce((acc, item) => acc + (item.type === 'return' ? Number(item.value || 0) : 0), 0);
+  const totalOrderCost = filteredTimeline.reduce((acc, item) => acc + (item.type === 'order' ? Number(item.cost_total || 0) : 0), 0);
 
   if (loading && !data) return (
     <div className="space-y-12 animate-pulse p-4 md:p-8">
