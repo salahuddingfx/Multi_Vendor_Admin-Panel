@@ -46,7 +46,7 @@ const Reviews = () => {
 
   const toggleApproval = async (id, currentStatus) => {
     try {
-      const data = await api.updateReview(id, { is_approved: !currentStatus });
+      const data = await api.updateReview(id, { is_approved: !currentStatus, site_id: siteId });
       if (data) {
         setReviews(reviews.map(r => r.id === id ? { ...r, is_approved: !currentStatus } : r));
         toast.success(currentStatus ? 'Review unapproved' : 'Review approved');
@@ -59,7 +59,7 @@ const Reviews = () => {
   const deleteReview = async () => {
     if (!reviewToDelete) return;
     try {
-      await api.deleteReview(reviewToDelete);
+      await api.deleteReview(reviewToDelete, siteId);
       setReviews(reviews.filter(r => r.id !== reviewToDelete));
       toast.success('Review deleted');
       setShowDeleteConfirm(false);
@@ -73,7 +73,7 @@ const Reviews = () => {
     if (!replyText[id]?.trim()) return;
     setSubmittingReply(prev => ({ ...prev, [id]: true }));
     try {
-      const data = await api.updateReview(id, { admin_reply: replyText[id] });
+      const data = await api.updateReview(id, { admin_reply: replyText[id], site_id: siteId });
       if (data) {
         setReviews(reviews.map(r => r.id === id ? { ...r, admin_reply: replyText[id] } : r));
         toast.success('Reply saved');
