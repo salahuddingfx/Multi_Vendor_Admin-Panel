@@ -163,7 +163,7 @@ const Inventory = () => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          categoryName.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const totalStock = (p.stock || 0) + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0);
+    const totalStock = Number(p.stock || 0) + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0);
     const matchesLowStock = !showLowStockOnly || (totalStock < 10);
     
     return matchesSearch && matchesLowStock;
@@ -181,7 +181,7 @@ const Inventory = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const lowStockCount = products.filter(p => p.stock < 10).length;
+  const lowStockCount = products.filter(p => Number(p.stock || 0) < 10).length;
 
   const Skeleton = () => (
     <div className="space-y-10 animate-pulse">
@@ -330,68 +330,70 @@ const Inventory = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               <AnimatePresence mode='popLayout'>
-                {paginatedProducts.map((p, idx) => (
-                  <motion.tr 
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    key={p.id} 
-                    className={clsx(
-                      "hover:bg-slate-50/50 transition-all group",
-                      activeMenu === p.id ? "relative z-[60]" : "z-0"
-                    )}
-                  >
-                    <td className="px-10 py-8">
-                      <div className="flex items-center gap-5">
-                        <div className="w-16 h-16 rounded-3xl bg-slate-100 overflow-hidden shrink-0 shadow-sm border border-slate-200">
-                          <img 
-                            src={p.images?.find(i => i.is_primary)?.image_path || p.images?.[0]?.image_path || p.image_url || 'https://via.placeholder.com/150'} 
-                            alt={p.name} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                          />
-                        </div>
-                        <div>
-                          <span className="block font-black text-slate-900 text-base leading-tight mb-1">{p.name}</span>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">SKU: {p.sku || `#${p.id.toString().padStart(5, '0')}`}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-8">
-                      <span className="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest">
-                        {p.category?.name || p.category || 'Uncategorized'}
-                      </span>
-                    </td>
-                    <td className="px-8 py-8">
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center gap-2">
-                           <div className={clsx(
-                             "w-2 h-2 rounded-full",
-                             (p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) < 10 ? "bg-rose-500 animate-pulse" : "bg-emerald-500"
-                           )} />
-                           <span className={clsx(
-                             "text-sm font-black",
-                             (p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) < 10 ? "text-rose-600" : "text-slate-900"
-                           )}>
-                            {p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)} units total
-                           </span>
-                        </div>
-                        {p.variations?.length > 0 && (
-                          <div className="text-[9px] font-bold text-slate-400 mt-1">
-                            {p.variations.length} variations
+                {paginatedProducts.map((p, idx) => {
+                  const productTotalStock = Number(p.stock || 0) + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0);
+                  return (
+                    <motion.tr 
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      key={p.id} 
+                      className={clsx(
+                        "hover:bg-slate-50/50 transition-all group",
+                        activeMenu === p.id ? "relative z-[60]" : "z-0"
+                      )}
+                    >
+                      <td className="px-10 py-8">
+                        <div className="flex items-center gap-5">
+                          <div className="w-16 h-16 rounded-3xl bg-slate-100 overflow-hidden shrink-0 shadow-sm border border-slate-200">
+                            <img 
+                              src={p.images?.find(i => i.is_primary)?.image_path || p.images?.[0]?.image_path || p.image_url || 'https://via.placeholder.com/150'} 
+                              alt={p.name} 
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                            />
                           </div>
-                        )}
-                        <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden mt-1">
-                           <div 
-                             className={clsx(
-                               "h-full rounded-full transition-all duration-1000",
-                               (p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) < 10 ? "bg-rose-500" : "bg-emerald-500"
-                             )}
-                             style={{ width: `${Math.min(100, ((p.stock + (p.variations?.reduce((acc, v) => acc + parseInt(v.stock || 0), 0) || 0)) / 50) * 100)}%` }}
-                           />
+                          <div>
+                            <span className="block font-black text-slate-900 text-base leading-tight mb-1">{p.name}</span>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">SKU: {p.sku || `#${p.id.toString().padStart(5, '0')}`}</span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
+                      <td className="px-8 py-8">
+                        <span className="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest">
+                          {p.category?.name || p.category || 'Uncategorized'}
+                        </span>
+                      </td>
+                      <td className="px-8 py-8">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                             <div className={clsx(
+                               "w-2 h-2 rounded-full",
+                               productTotalStock < 10 ? "bg-rose-500 animate-pulse" : "bg-emerald-500"
+                             )} />
+                             <span className={clsx(
+                               "text-sm font-black",
+                               productTotalStock < 10 ? "text-rose-600" : "text-slate-900"
+                             )}>
+                              {productTotalStock} units total
+                             </span>
+                          </div>
+                          {p.variations?.length > 0 && (
+                            <div className="text-[9px] font-bold text-slate-400 mt-1">
+                              {p.variations.length} variations
+                            </div>
+                          )}
+                          <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden mt-1">
+                             <div 
+                               className={clsx(
+                                 "h-full rounded-full transition-all duration-1000",
+                                 productTotalStock < 10 ? "bg-rose-500" : "bg-emerald-500"
+                               )}
+                               style={{ width: `${Math.min(100, (productTotalStock / 50) * 100)}%` }}
+                             />
+                          </div>
+                        </div>
+                      </td>
                     <td className="px-8 py-8">
                       <div className="flex flex-col">
                          <span className="text-sm font-black text-slate-900">৳{p.price}</span>
@@ -467,7 +469,8 @@ const Inventory = () => {
                       </div>
                     </td>
                   </motion.tr>
-                ))}
+                );
+              })}
               </AnimatePresence>
             </tbody>
           </table>
