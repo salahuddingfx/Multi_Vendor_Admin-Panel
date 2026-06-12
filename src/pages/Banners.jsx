@@ -142,6 +142,10 @@ const Banners = () => {
               <div className="aspect-[16/9] relative overflow-hidden bg-slate-100">
                 <img 
                   src={banner.image_path} 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://images.unsplash.com/photo-1589135233689-d58620025983?q=80&w=600';
+                  }}
                   alt={banner.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
