@@ -37,9 +37,32 @@ adminClient.interceptors.request.use((config) => {
   return config;
 });
 
+const rewriteUrls = (obj) => {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === 'string') {
+    return obj.replace(/https?:\/\/(localhost|127\.0\.0\.1):8000/g, BACKEND_URL);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(rewriteUrls);
+  }
+  if (typeof obj === 'object') {
+    const newObj = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        newObj[key] = rewriteUrls(obj[key]);
+      }
+    }
+    return newObj;
+  }
+  return obj;
+};
+
 // Add a response interceptor to handle 401 errors and broadcast data changes
 adminClient.interceptors.response.use(
   (response) => {
+    if (response.data) {
+      response.data = rewriteUrls(response.data);
+    }
     const method = response.config?.method;
     if (['post', 'put', 'patch', 'delete'].includes(method)) {
       try {
@@ -147,11 +170,19 @@ export const api = {
     let allItems = [];
     let page = 1;
     let lastPage = 1;
+    const seenIds = new Set();
     do {
       const response = await adminClient.get('/products', { params: { site_id: siteId, page } });
       const res = response.data;
       const pageData = res?.data?.data ?? res?.data ?? [];
-      if (Array.isArray(pageData)) allItems = [...allItems, ...pageData];
+      if (Array.isArray(pageData)) {
+        for (const item of pageData) {
+          if (item && item.id && !seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            allItems.push(item);
+          }
+        }
+      }
       lastPage = res?.data?.last_page ?? 1;
       page++;
     } while (page <= lastPage);
@@ -213,11 +244,19 @@ export const api = {
     let allItems = [];
     let page = 1;
     let lastPage = 1;
+    const seenIds = new Set();
     do {
       const response = await adminClient.get('/orders', { params: { site_id: siteId, page } });
       const res = response.data;
       const pageData = res?.data?.data ?? res?.data ?? [];
-      if (Array.isArray(pageData)) allItems = [...allItems, ...pageData];
+      if (Array.isArray(pageData)) {
+        for (const item of pageData) {
+          if (item && item.id && !seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            allItems.push(item);
+          }
+        }
+      }
       lastPage = res?.data?.last_page ?? 1;
       page++;
     } while (page <= lastPage);
