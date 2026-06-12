@@ -32,12 +32,12 @@ const Banners = () => {
   const fetchBanners = async () => {
     setLoading(true);
     try {
-      const [bannerData, productData] = await Promise.all([
+      const [bannerData, productList] = await Promise.all([
         api.getHeroSlides(siteId),
-        api.getProducts(siteId)
+        api.getAllProducts(siteId)
       ]);
       setBanners(bannerData || []);
-      setProducts(productData?.data || []);
+      setProducts(productList || []);
     } catch (err) {
       console.error(err);
       toast.error('Failed to load data');
@@ -58,9 +58,7 @@ const Banners = () => {
     data.append('subtitle', formData.subtitle || '');
     data.append('badge', formData.badge || '');
     data.append('button_text', formData.button_text || 'Shop Now');
-    if (formData.product_id) {
-      data.append('product_id', formData.product_id);
-    }
+    data.append('product_id', formData.product_id || '');
     data.append('order', formData.order);
     if (formData.image) {
       data.append('image', formData.image);
