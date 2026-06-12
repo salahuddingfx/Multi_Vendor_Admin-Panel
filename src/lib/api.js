@@ -40,7 +40,11 @@ adminClient.interceptors.request.use((config) => {
 const rewriteUrls = (obj) => {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === 'string') {
-    return obj.replace(/https?:\/\/(localhost|127\.0\.0\.1):8000/g, BACKEND_URL);
+    let rewritten = obj.replace(/https?:\/\/(localhost|127\.0\.0\.1):8000/g, BACKEND_URL);
+    if (rewritten.includes('eadmin.viretadev.com') && rewritten.includes('/storage/') && !rewritten.includes('/public/storage/')) {
+      rewritten = rewritten.replace('/storage/', '/public/storage/');
+    }
+    return rewritten;
   }
   if (Array.isArray(obj)) {
     return obj.map(rewriteUrls);
@@ -349,8 +353,8 @@ export const api = {
     return response.data;
   },
 
-  deleteReview: async (id) => {
-    const response = await adminClient.post(`/reviews/${id}/delete`);
+  deleteReview: async (id, siteId) => {
+    const response = await adminClient.post(`/reviews/${id}/delete`, { site_id: siteId });
     return response.data;
   },
 
