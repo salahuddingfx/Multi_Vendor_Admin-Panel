@@ -4,7 +4,7 @@ import { Search, Filter, Printer, ExternalLink, ChevronRight, ChevronDown, Packa
 import { useReactToPrint } from 'react-to-print';
 import InvoiceTemplate from '../components/InvoiceTemplate';
 import BulkInvoiceTemplate from '../components/BulkInvoiceTemplate';
-import { api } from '../lib/api';
+import { api, BACKEND_URL } from '../lib/api';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
 import { usePolling } from '../hooks/usePolling';
@@ -547,7 +547,7 @@ const Orders = () => {
 
                       <div className="flex items-center gap-1">
                         <a 
-                          href={`http://127.0.0.1:8000/orders/${order.id}/invoice`} 
+                          href={`${BACKEND_URL}/orders/${order.id}/invoice`} 
                           target="_blank" 
                           rel="noreferrer"
                           className="p-3.5 text-slate-400 hover:text-maroon hover:bg-maroon/5 rounded-2xl transition-all"
