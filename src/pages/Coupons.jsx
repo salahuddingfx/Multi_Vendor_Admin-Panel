@@ -86,11 +86,20 @@ const Coupons = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = { ...formData, site_id: siteId };
+      const payload = { 
+        ...formData, 
+        site_id: siteId,
+        expires_at: formData.expires_at || null,
+        max_uses: formData.max_uses ? parseInt(formData.max_uses) : null,
+        per_user_limit: formData.per_user_limit ? parseInt(formData.per_user_limit) : 1,
+        value: Number(formData.value)
+      };
       if (currentCoupon) {
         await api.updateCoupon(currentCoupon.id, payload);
+        toast.success('Coupon updated successfully');
       } else {
         await api.storeCoupon(payload);
+        toast.success('Coupon created successfully');
       }
       fetchCoupons();
       closeModal();
