@@ -114,7 +114,6 @@ const Inventory = () => {
           .filter((item) => item.label && Number.isFinite(item.amount) && item.amount >= 0);
         formData.append('cost_items', JSON.stringify(sanitizedCosts));
       }
-      formData.append('_method', 'PUT'); // Ensure Laravel treats it as PUT
       await api.updateProduct(selectedProduct.id, formData);
       toast.success('Stock level adjusted successfully');
       setShowEditModal(false);
