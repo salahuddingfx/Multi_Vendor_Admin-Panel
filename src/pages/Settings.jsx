@@ -131,10 +131,20 @@ const Settings = () => {
     try {
       const data = await api.getSettings(siteId);
       if (data) {
-        const parsedSocial = data.social_links ? (typeof data.social_links === 'string' ? JSON.parse(data.social_links) : data.social_links) : {};
-        const parsedAbout = data.about ? (typeof data.about === 'string' ? JSON.parse(data.about) : data.about) : {};
-        const parsedHome = data.home ? (typeof data.home === 'string' ? JSON.parse(data.home) : data.home) : {};
-        const parsedSecurity = data.security ? (typeof data.security === 'string' ? JSON.parse(data.security) : data.security) : {};
+        const safeParse = (val, fallback = {}) => {
+          if (!val) return fallback;
+          if (typeof val !== 'string') return val;
+          try {
+            return JSON.parse(val);
+          } catch (e) {
+             console.error("Failed to parse settings JSON:", e);
+             return fallback;
+          }
+        };
+        const parsedSocial = safeParse(data.social_links);
+        const parsedAbout = safeParse(data.about);
+        const parsedHome = safeParse(data.home);
+        const parsedSecurity = safeParse(data.security);
 
         setSettings({
           store_name: data.store_name || '',
