@@ -187,7 +187,7 @@ const AdminLayout = () => {
 
   const stores = [
     { id: 'acharu', name: 'Acharu', color: '#800000', bg: '#FDF2F2' },
-    { id: 'tajashutki', name: 'Tajashutki', color: '#475569', bg: '#F8FAFC' },
+    { id: 'tajashutki', name: 'Tajashutki', color: '#0D9488', bg: '#F2FBF9' },
   ];
 
   const handleStoreChange = (id) => {
