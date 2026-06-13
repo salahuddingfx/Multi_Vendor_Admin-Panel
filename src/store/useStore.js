@@ -22,9 +22,6 @@ export const useStore = create(
       },
       updateUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
       setSettings: (settings) => set({ settings }),
-      
-      // Theme Helper
-      getThemeColor: (state) => state.selectedStore === 'acharu' ? '#800000' : '#1A365D',
     }),
     {
       name: 'admin-app-state',
