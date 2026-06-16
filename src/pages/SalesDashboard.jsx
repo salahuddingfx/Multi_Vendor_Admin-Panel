@@ -1128,7 +1128,7 @@ const SalesDashboard = () => {
                   <td className="px-8 py-6 text-sm font-black text-white">{formatCurrency(totalOrderValue)}</td>
                   <td className="px-8 py-6 text-sm font-black text-white">{formatCurrency(totalOrderCost)}</td>
                   <td className="px-8 py-6 text-xs font-bold text-slate-300">
-                    Returns: <span className="text-rose-400 font-bold">{formatCurrency(totalReturnValue)}</span> • Net: <span className="text-emerald-400 font-black text-sm">{formatCurrency(totalOrderValue - totalReturnValue - totalOrderCost)}</span>
+                    Returns: <span className="text-rose-400 font-bold">{formatCurrency(totalReturnValue)}</span>
                   </td>
                   <td className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">All</td>
                 </tr>
@@ -1136,6 +1136,45 @@ const SalesDashboard = () => {
             )}
           </table>
         </div>
+
+        {/* Financial Summary Cards Grid */}
+        {filteredTimeline.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 border-t border-slate-50 bg-slate-50/50 no-print">
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <ShoppingBag size={20} strokeWidth={2.5} />
+              </div>
+              <div>
+                <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Total Income</p>
+                <p className="text-xl font-black text-slate-900">{formatCurrency(totalOrderValue - totalReturnValue)}</p>
+                <p className="text-[9px] font-bold text-slate-400 mt-1">Orders: {formatCurrency(totalOrderValue)} • Returns: -{formatCurrency(totalReturnValue)}</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <DollarSign size={20} strokeWidth={2.5} />
+              </div>
+              <div>
+                <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Total Investment</p>
+                <p className="text-xl font-black text-slate-900">{formatCurrency(totalOrderCost)}</p>
+                <p className="text-[9px] font-bold text-slate-400 mt-1">Cost of Goods Sold (COGS)</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-xl bg-maroon/5 text-maroon flex items-center justify-center shrink-0">
+                <TrendingUp size={20} strokeWidth={2.5} />
+              </div>
+              <div>
+                <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Net Profit</p>
+                <p className="text-xl font-black text-maroon">{formatCurrency(totalOrderValue - totalReturnValue - totalOrderCost)}</p>
+                <p className="text-[9px] font-bold text-slate-400 mt-1">Estimated Net Margin</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {filteredTimeline.length > 0 && (
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-8 py-6 border-t border-slate-50 no-print">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
