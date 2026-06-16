@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export const BACKEND_URL = API_BASE_URL ? API_BASE_URL.replace(/\/api\/admin\/?$/, '') : 'http://127.0.0.1:8000';
+export const BACKEND_URL = API_BASE_URL ? API_BASE_URL.replace(/\/api\/.*$/, '') : 'http://127.0.0.1:8000';
 
 const adminClient = axios.create({
   baseURL: API_BASE_URL,
