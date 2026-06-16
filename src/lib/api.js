@@ -169,28 +169,11 @@ export const api = {
     return response.data;
   },
 
-  // Fetch ALL products across all pages (admin)
+  // Fetch ALL products in a single call (admin)
   getAllProducts: async (siteId) => {
-    let allItems = [];
-    let page = 1;
-    let lastPage = 1;
-    const seenIds = new Set();
-    do {
-      const response = await adminClient.get('/products', { params: { site_id: siteId, page } });
-      const res = response.data;
-      const pageData = res?.data?.data ?? res?.data ?? [];
-      if (Array.isArray(pageData)) {
-        for (const item of pageData) {
-          if (item && item.id && !seenIds.has(item.id)) {
-            seenIds.add(item.id);
-            allItems.push(item);
-          }
-        }
-      }
-      lastPage = res?.data?.last_page ?? 1;
-      page++;
-    } while (page <= lastPage);
-    return allItems;
+    const response = await adminClient.get('/products', { params: { site_id: siteId, all: true } });
+    const res = response.data;
+    return res?.data ?? [];
   },
 
   storeProduct: async (formData) => {
@@ -243,28 +226,11 @@ export const api = {
     return response.data;
   },
 
-  // Fetch ALL orders across all pages (admin)
+  // Fetch ALL orders in a single call (admin)
   getAllOrders: async (siteId) => {
-    let allItems = [];
-    let page = 1;
-    let lastPage = 1;
-    const seenIds = new Set();
-    do {
-      const response = await adminClient.get('/orders', { params: { site_id: siteId, page } });
-      const res = response.data;
-      const pageData = res?.data?.data ?? res?.data ?? [];
-      if (Array.isArray(pageData)) {
-        for (const item of pageData) {
-          if (item && item.id && !seenIds.has(item.id)) {
-            seenIds.add(item.id);
-            allItems.push(item);
-          }
-        }
-      }
-      lastPage = res?.data?.last_page ?? 1;
-      page++;
-    } while (page <= lastPage);
-    return allItems;
+    const response = await adminClient.get('/orders', { params: { site_id: siteId, all: true } });
+    const res = response.data;
+    return res?.data ?? [];
   },
 
   updateOrderStatus: async (orderId, status) => {
