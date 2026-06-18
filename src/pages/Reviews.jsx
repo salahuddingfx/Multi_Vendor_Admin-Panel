@@ -173,15 +173,14 @@ const Reviews = () => {
   const bulkApprove = async () => {
     setBulkAction('approve');
     const ids = [...selectedIds];
-    let success = 0;
-    for (const id of ids) {
-      try {
-        await api.updateReview(id, { is_approved: true, site_id: siteId });
-        setReviews(prev => prev.map(r => r.id === id ? { ...r, is_approved: true } : r));
-        success++;
-      } catch (e) { /* skip */ }
+    try {
+      const res = await api.bulkUpdateReviews(siteId, ids, true);
+      const count = res?.data?.updated_count || ids.length;
+      setReviews(prev => prev.map(r => ids.includes(r.id) ? { ...r, is_approved: true } : r));
+      toast.success(`${count} of ${ids.length} reviews approved`);
+    } catch (e) {
+      toast.error('Failed to approve reviews');
     }
-    toast.success(`${success} of ${ids.length} reviews approved`);
     setBulkAction(null);
     clearSelection();
   };
@@ -189,15 +188,14 @@ const Reviews = () => {
   const bulkDelete = async () => {
     setBulkAction('delete');
     const ids = [...selectedIds];
-    let success = 0;
-    for (const id of ids) {
-      try {
-        await api.deleteReview(id, siteId);
-        setReviews(prev => prev.filter(r => r.id !== id));
-        success++;
-      } catch (e) { /* skip */ }
+    try {
+      const res = await api.bulkDeleteReviews(siteId, ids);
+      const count = res?.data?.deleted_count || ids.length;
+      setReviews(prev => prev.filter(r => !ids.includes(r.id)));
+      toast.success(`${count} of ${ids.length} reviews deleted`);
+    } catch (e) {
+      toast.error('Failed to delete reviews');
     }
-    toast.success(`${success} of ${ids.length} reviews deleted`);
     setBulkAction(null);
     clearSelection();
   };
