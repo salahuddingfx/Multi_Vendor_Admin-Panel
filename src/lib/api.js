@@ -324,6 +324,20 @@ export const api = {
     return response.data;
   },
 
+  bulkUpdateReviews: async (siteId, ids, isApproved) => {
+    const response = await adminClient.post('/reviews/bulk-update', {
+      site_id: siteId, ids, is_approved: isApproved
+    });
+    return response.data;
+  },
+
+  bulkDeleteReviews: async (siteId, ids) => {
+    const response = await adminClient.post('/reviews/bulk-delete', {
+      site_id: siteId, ids
+    });
+    return response.data;
+  },
+
   // Coupons
   getCoupons: async (siteId) => {
     const response = await adminClient.get('/coupons', { params: { site_id: siteId } });
