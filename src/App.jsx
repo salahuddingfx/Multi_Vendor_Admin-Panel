@@ -1,26 +1,25 @@
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store/useStore';
 import AdminSkeleton from './components/AdminSkeleton';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdminLayout from './layouts/AdminLayout';
-import Dashboard from './pages/Dashboard';
-import Products from './pages/Products';
-import Orders from './pages/Orders';
-import Settings from './pages/Settings';
-import Login from './pages/Login';
-import SalesDashboard from "./pages/SalesDashboard";
 
-// Placeholders for other pages
-import Categories from './pages/Categories';
-import Inventory from './pages/Inventory';
-import Messages from './pages/Messages';
-import Users from './pages/Users';
-import Customers from './pages/Customers';
-import Reviews from './pages/Reviews';
-import Banners from './pages/Banners';
-import Coupons from './pages/Coupons';
-import NotFound from './pages/NotFound';
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Products = lazy(() => import('./pages/Products'));
+const Orders = lazy(() => import('./pages/Orders'));
+const SalesDashboard = lazy(() => import('./pages/SalesDashboard'));
+const Categories = lazy(() => import('./pages/Categories'));
+const Inventory = lazy(() => import('./pages/Inventory'));
+const Messages = lazy(() => import('./pages/Messages'));
+const Users = lazy(() => import('./pages/Users'));
+const Customers = lazy(() => import('./pages/Customers'));
+const Reviews = lazy(() => import('./pages/Reviews'));
+const Banners = lazy(() => import('./pages/Banners'));
+const Coupons = lazy(() => import('./pages/Coupons'));
+const Settings = lazy(() => import('./pages/Settings'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const App = () => {
   const { isAuthenticated } = useStore();
